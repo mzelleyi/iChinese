@@ -18,9 +18,9 @@
         tools:context=".MainActivity" />
     
     <LinearLayout
-        android:id="@+id/main_activity_input_bar"
+        android:id="@+id/main_activity_search_bar"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/activity_edit_bar_height"
+        android:layout_height="@dimen/activity_search_bar_height"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/main_activity_title"
         android:orientation="horizontal" >

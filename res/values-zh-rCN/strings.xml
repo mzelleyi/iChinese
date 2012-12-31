@@ -13,14 +13,5 @@
 
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
-     
-<!-- App Name -->
-    <string name="app_name">iHuayu</string> 
-<!-- Welcome -->    
-    <string name="hello_world">Hello world! iHuayu</string>
-<!-- Menu Setting -->
-    <string name="menu_settings">Settings</string>
-<!-- Activity_Main_Title -->
-    <string name="title_activity_main">MainActivity</string>
     
 </resources>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tab_search_fragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    <TextView
+        android:id="@+id/search_fragment_title"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/activity_title_height"
+        android:background="@drawable/navigationbar_bg_2x"
+        android:gravity="center"
+        android:maxLines="1"
+        android:text="@string/title_bar_search"
+        android:textColor="#ffffff"
+        android:textSize="@dimen/activity_title_text_size"
+        android:textStyle="bold"
+        android:typeface="normal" />
+
+    <LinearLayout
+        android:id="@+id/tab_search_input_bar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/activity_search_bar_height"
+        android:background="@drawable/bg_search"
+        android:orientation="horizontal"
+        android:paddingBottom="@dimen/margin_h2"
+        android:paddingRight="@dimen/margin_h5"
+        android:paddingTop="@dimen/margin_h2" >
+        <ImageView
+            android:id="@+id/input_bar_imageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/input_bar_img"
+            android:paddingBottom="@dimen/margin_h2"
+            android:paddingLeft="@dimen/margin_h3"
+            android:paddingRight="@dimen/margin_h3"
+            android:paddingTop="@dimen/margin_h2"
+            android:src="@drawable/btn_input_en" />
+        <EditText
+            android:id="@+id/input_bar_editText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:ems="10"
+            android:hint="@string/searchbox_hint"
+            android:inputType="textAutoCorrect"
+            android:paddingBottom="@dimen/margin_h1"
+            android:paddingLeft="@dimen/margin_h1"
+            android:paddingRight="@dimen/margin_h5"
+            android:paddingTop="@dimen/margin_h1" />
+    </LinearLayout>
+    <ImageView
+        android:id="@+id/main_activity_prompt_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="@string/activity_main_prompt_img"
+        android:scaleType="fitXY"
+        android:src="@drawable/prompt" />
+</LinearLayout>

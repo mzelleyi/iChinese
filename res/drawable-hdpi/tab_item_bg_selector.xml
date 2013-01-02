@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- selected state -->
+    <item android:drawable="@drawable/bg_wordmap_tab"
+          android:state_selected="true"
+          android:state_pressed="true" />
+    <!-- unselected state (default) -->
+    <item android:drawable="@drawable/navigationbar_bg" />
+</selector>

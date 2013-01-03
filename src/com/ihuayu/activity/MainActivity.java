@@ -78,8 +78,23 @@ public class MainActivity extends FragmentActivity implements
 		super.onResume();
 		mTabHost.setOnTabChangedListener(this);
 		mTabHost.setCurrentTab(mCurrentTabIndex);
-
-		this.updateTab(TAB_SEARCH, R.id.tab_content_search);
+		
+		switch (mCurrentTabIndex) {
+		case 0:
+			this.updateTab(TAB_SEARCH, R.id.tab_content_search);
+			break;
+		case 1:
+			this.updateTab(TAB_SCENARIO, R.id.tab_content_scenario);
+			break;
+		case 2:
+			this.updateTab(TAB_BOOKMARK, R.id.tab_content_bookmark);
+			break;
+		case 3:
+			this.updateTab(TAB_INFO, R.id.tab_content_info);
+			break;
+		default:
+			break;
+		}
 		Log.d(TAG, "[onResume] + End");
 	}
 
@@ -164,7 +179,7 @@ public class MainActivity extends FragmentActivity implements
 			// Replace the fragment
 			ft.replace(viewHolderId, newFragment);
 			ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-			ft.commit();
+			//ft.commit();
 		}
 		Log.d(TAG,"[updateTab] + End");
 	}

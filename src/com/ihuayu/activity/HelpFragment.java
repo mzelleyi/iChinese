@@ -22,21 +22,16 @@ import android.widget.Button;
  * @author Kesen
  *
  */
-public class InfoFragment extends Fragment {
+public class HelpFragment extends Fragment {
 
-	private static final String TAG = "iHuayu:InfoFragment";
+	private static final String TAG = "iHuayu:HelpFragment";
 
     /**
-     * Create a new instance of InfoFragment
+     * Create a new instance of HelpFragment
      */
-    static InfoFragment newInstance( ) {
+    static HelpFragment newInstance( ) {
     	Log.d(TAG, "[newInstance] + Begin");
-    	InfoFragment fragment = new InfoFragment();
-
-        // Supply num input as an argument.
-        //Bundle args = new Bundle();
-        //args.putInt("num", num);
-        //f.setArguments(args);
+    	HelpFragment fragment = new HelpFragment();
         return fragment;
     }
     
@@ -45,7 +40,6 @@ public class InfoFragment extends Fragment {
 		Log.d(TAG, "[onCreate] + Begin");
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
-		//mNum = getArguments() != null ? getArguments().getInt("num") : 1;
 	}
 	
     /**
@@ -55,7 +49,7 @@ public class InfoFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
     	Log.d(TAG, "[onCreateView] + Begin");
-        View v = inflater.inflate(R.layout.info_fragment, container, false);
+        View v = inflater.inflate(R.layout.help_fragment, container, false);
         return v;
     }
 
@@ -64,8 +58,8 @@ public class InfoFragment extends Fragment {
 		Log.d(TAG, "[onViewCreated] + Begin");
 		// TODO Auto-generated method stub
 		super.onViewCreated(view, savedInstanceState);
-		WebView webView = (WebView)view.findViewById(R.id.fragment_info_webView);
-		webView.loadUrl("file:///android_asset/about.html");
+		WebView webView = (WebView)view.findViewById(R.id.fragment_help_webView);
+		webView.loadUrl("file:///android_asset/help.html");
 		WebSettings websetting = webView.getSettings();
 		websetting.setBuiltInZoomControls(true);
 	}
@@ -76,16 +70,15 @@ public class InfoFragment extends Fragment {
 		// TODO Auto-generated method stub
 		super.onResume();
 		final FragmentActivity activity = this.getActivity();
-		Button helpBtn = (Button)activity.findViewById(R.id.fragment_info_title_button);
-		helpBtn.setOnClickListener(new View.OnClickListener() {
+		Button backBtn = (Button)activity.findViewById(R.id.fragment_help_title_button);
+		backBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				FragmentManager fm = activity.getSupportFragmentManager();
 				FragmentTransaction ft = fm.beginTransaction();
-				Fragment newFragment = HelpFragment.newInstance();
+				Fragment newFragment = InfoFragment.newInstance();
 				ft.replace(R.id.tab_content_info, newFragment);
 				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-				ft.addToBackStack(null);
 				ft.commit();
 			}
 		});

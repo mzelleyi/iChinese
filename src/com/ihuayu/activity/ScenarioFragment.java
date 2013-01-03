@@ -21,7 +21,7 @@ public class ScenarioFragment extends Fragment {
 	private static final String TAG = "iHuayu:ScenarioFragment";
 
     /**
-     * Create a new instance of SearchFragment
+     * Create a new instance of ScenarioFragment
      */
     static ScenarioFragment newInstance( ) {
     	Log.d(TAG, "[newInstance] + Begin");

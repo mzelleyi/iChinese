@@ -19,5 +19,8 @@
     
     <string name="title_bar_search">SPEAK MANDARIN CAMPAIGN</string>
     <string name="title_bar_help">HELP</string>
+    <string name="title_bar_back">Back</string>
+    <string name="title_bar_help_imagebutton">help button</string>
+    
 
 </resources>

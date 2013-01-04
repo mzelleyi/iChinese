@@ -9,6 +9,9 @@
     
     <string name="activity_main_prompt_img">prompt img</string>
     
+    <string name="img_des_scenario_listitem_icon_left">scenario list item icon left</string>
+    <string name="img_des_scenario_listitem_icon_right">scenario list item icon right</string>
+    
     <string name="input_bar_img">ENCN</string>
     <string name="searchbox_hint">Search</string>
     

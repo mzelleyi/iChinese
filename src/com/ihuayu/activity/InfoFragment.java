@@ -85,7 +85,7 @@ public class InfoFragment extends Fragment {
 				Fragment newFragment = HelpFragment.newInstance();
 				ft.replace(R.id.tab_content_info, newFragment);
 				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-				ft.addToBackStack(null);
+				//ft.addToBackStack(null);
 				ft.commit();
 			}
 		});

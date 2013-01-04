@@ -95,14 +95,13 @@ public class ScenarioFragment extends Fragment {
 	
 	public static class ScenarioListFragment extends ListFragment implements 
 		LoaderManager.LoaderCallbacks<List<ScenarioEntry>> {
-		//OnQueryTextListenerCompat mOnQueryTextListenerCompat;
+		
 		// This is the Adapter being used to display the list's data.
 		ScenarioListAdapter mAdapter;
-		// If non-null, this is the current filter the user has provided.
-		String mCurFilter;
 		
 		@Override
 		public void onActivityCreated(Bundle savedInstanceState) {
+			Log.d(TAG, "[ScenarioListFragment][onActivityCreated] + Begin");
 			super.onActivityCreated(savedInstanceState);
 
 			// Give some text to display if there is no data. In a real
@@ -126,29 +125,31 @@ public class ScenarioFragment extends Fragment {
 
 		@Override
 		public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-			// Place an action bar item for searching.
+			Log.d(TAG, "[ScenarioListFragment][onCreateOptionsMenu] + Begin");
+			// Since we no need action bar and menu,Choose close
 			menu.close();
 		}
 
 		@Override
 		public void onListItemClick(ListView l, View v, int position, long id) {
 			// Insert desired behavior here.
-			Log.i(TAG, "[onListItemClick] Item clicked: " + id);
+			Log.i(TAG, "[ScenarioListFragment][onListItemClick] Item clicked: " + id);
 		}
 
 		public Loader<List<ScenarioEntry>> onCreateLoader(int id, Bundle args) {
+			Log.d(TAG, "[ScenarioListFragment][onCreateLoader] + Begin");
 			// This is called when a new Loader needs to be created. This
 			// sample only has one Loader with no arguments, so it is simple.
 			return new ScenarioListLoader(this.getActivity());
 		}
 
-		public void onLoadFinished(Loader<List<ScenarioEntry>> loader,
-				List<ScenarioEntry> data) {
+		public void onLoadFinished(Loader<List<ScenarioEntry>> loader, List<ScenarioEntry> data) {
+			Log.d(TAG, "[ScenarioListFragment][onLoadFinished] + Begin");
 			// Set the new data in the adapter.
 			mAdapter.setData(data);
 
 			// The list should now be shown.
-			if (isResumed()) {
+			if (this.isResumed()) {
 				this.setListShown(true);
 			} else {
 				this.setListShownNoAnimation(true);
@@ -156,6 +157,7 @@ public class ScenarioFragment extends Fragment {
 		}
 
 		public void onLoaderReset(Loader<List<ScenarioEntry>> loader) {
+			Log.d(TAG, "[ScenarioListFragment][onLoaderReset] + Begin");
 			// Clear the data in the adapter.
 			mAdapter.setData(null);
 		}
@@ -236,7 +238,7 @@ public class ScenarioFragment extends Fragment {
 	    final InterestingConfigChanges mLastConfig = new InterestingConfigChanges();
 	    final PackageManager mPm;
 
-	    List<ScenarioEntry> mApps;
+	    List<ScenarioEntry> mScenarioList;
 	    PackageIntentReceiver mPackageObserver;
 
 	    public ScenarioListLoader(Context context) {
@@ -253,7 +255,9 @@ public class ScenarioFragment extends Fragment {
 	     * called in a background thread and should generate a new set of
 	     * data to be published by the loader.
 	     */
-	    @Override public List<ScenarioEntry> loadInBackground() {
+	    @Override 
+	    public List<ScenarioEntry> loadInBackground() {
+	    	Log.d(TAG, "[ScenarioListLoader][loadInBackground] + Begin");
 	        // Retrieve all known applications.
 	        List<ApplicationInfo> apps = mPm.getInstalledApplications(
 	                PackageManager.GET_UNINSTALLED_PACKAGES |
@@ -274,7 +278,9 @@ public class ScenarioFragment extends Fragment {
 
 	        // Sort the list.
 	        Collections.sort(entries, ALPHA_COMPARATOR);
-
+	        
+	        Log.d(TAG, "[ScenarioListLoader][loadInBackground] List Size ="+String.valueOf(entries.size()));
+	        Log.d(TAG, "[ScenarioListLoader][loadInBackground] + End");
 	        // Done!
 	        return entries;
 	    }
@@ -284,39 +290,44 @@ public class ScenarioFragment extends Fragment {
 	     * super class will take care of delivering it; the implementation
 	     * here just adds a little more logic.
 	     */
-	    @Override public void deliverResult(List<ScenarioEntry> apps) {
-	        if (isReset()) {
+	    @Override 
+	    public void deliverResult(List<ScenarioEntry> scenarioList) {
+	    	Log.d(TAG, "[ScenarioListLoader][deliverResult] + Begin");
+	        if (this.isReset()) {
 	            // An async query came in while the loader is stopped.  We
 	            // don't need the result.
-	            if (apps != null) {
-	                onReleaseResources(apps);
+	            if (scenarioList != null) {
+	                this.onReleaseResources(scenarioList);
 	            }
 	        }
-	        List<ScenarioEntry> oldApps = apps;
-	        mApps = apps;
+	        List<ScenarioEntry> oldScenarioList = scenarioList;
+	        mScenarioList = scenarioList;
 
-	        if (isStarted()) {
+	        if (this.isStarted()) {
 	            // If the Loader is currently started, we can immediately
 	            // deliver its results.
-	            super.deliverResult(apps);
+	            super.deliverResult(scenarioList);
 	        }
 
 	        // At this point we can release the resources associated with
-	        // 'oldApps' if needed; now that the new result is delivered we
+	        // 'oldScenarioList' if needed; now that the new result is delivered we
 	        // know that it is no longer in use.
-	        if (oldApps != null) {
-	            onReleaseResources(oldApps);
+	        if (oldScenarioList != null) {
+	            this.onReleaseResources(oldScenarioList);
 	        }
+	        Log.d(TAG, "[ScenarioListLoader][deliverResult] + End");
 	    }
 
 	    /**
 	     * Handles a request to start the Loader.
 	     */
-	    @Override protected void onStartLoading() {
-	        if (mApps != null) {
+	    @Override 
+	    protected void onStartLoading() {
+	    	Log.d(TAG, "[ScenarioListLoader][onStartLoading] + Begin");
+	        if (mScenarioList != null) {
 	            // If we currently have a result available, deliver it
 	            // immediately.
-	            deliverResult(mApps);
+	            this.deliverResult(mScenarioList);
 	        }
 
 	        // Start watching for changes in the app data.
@@ -325,54 +336,59 @@ public class ScenarioFragment extends Fragment {
 	        }
 
 	        // Has something interesting in the configuration changed since we
-	        // last built the app list?
+	        // last built the list?
 	        boolean configChange = mLastConfig.applyNewConfig(getContext().getResources());
 
-	        if (takeContentChanged() || mApps == null || configChange) {
+	        if (takeContentChanged() || mScenarioList == null || configChange) {
 	            // If the data has changed since the last time it was loaded
 	            // or is not currently available, start a load.
-	            forceLoad();
+	            this.forceLoad();
 	        }
+	        Log.d(TAG, "[ScenarioListLoader][onStartLoading] + End");
 	    }
 
 	    /**
 	     * Handles a request to stop the Loader.
 	     */
-	    @Override protected void onStopLoading() {
+	    @Override 
+	    protected void onStopLoading() {
+	    	Log.d(TAG, "[ScenarioListLoader][onStopLoading] + Begin");
 	        // Attempt to cancel the current load task if possible.
-	        cancelLoad();
+	        this.cancelLoad();
 	    }
 
 	    /**
 	     * Handles a request to cancel a load.
 	     */
-	    @Override public void onCanceled(List<ScenarioEntry> apps) {
-	        super.onCanceled(apps);
+	    @Override 
+	    public void onCanceled(List<ScenarioEntry> scenarioList) {
+	    	Log.d(TAG, "[ScenarioListLoader][onCanceled] + Begin");
+	        super.onCanceled(scenarioList);
 
-	        // At this point we can release the resources associated with 'apps'
-	        // if needed.
-	        onReleaseResources(apps);
+	        // At this point we can release the resources associated with 'scenarioList' if needed.
+	        this.onReleaseResources(scenarioList);
 	    }
 
 	    /**
 	     * Handles a request to completely reset the Loader.
 	     */
-	    @Override protected void onReset() {
+	    @Override 
+	    protected void onReset() {
+	    	Log.d(TAG, "[ScenarioListLoader][onReset] + Begin");
 	        super.onReset();
 
 	        // Ensure the loader is stopped
-	        onStopLoading();
+	        this.onStopLoading();
 
-	        // At this point we can release the resources associated with 'apps'
-	        // if needed.
-	        if (mApps != null) {
-	            onReleaseResources(mApps);
-	            mApps = null;
+	        // At this point we can release the resources associated with 'scenarioList' if needed.
+	        if (mScenarioList != null) {
+	            this.onReleaseResources(mScenarioList);
+	            mScenarioList = null;
 	        }
 
 	        // Stop monitoring for changes.
 	        if (mPackageObserver != null) {
-	            getContext().unregisterReceiver(mPackageObserver);
+	            this.getContext().unregisterReceiver(mPackageObserver);
 	            mPackageObserver = null;
 	        }
 	    }
@@ -381,7 +397,7 @@ public class ScenarioFragment extends Fragment {
 	     * Helper function to take care of releasing resources associated
 	     * with an actively loaded data set.
 	     */
-	    protected void onReleaseResources(List<ScenarioEntry> apps) {
+	    protected void onReleaseResources(List<ScenarioEntry> scenarioList) {
 	        // For a simple List<> there is nothing to do.  For something
 	        // like a Cursor, we would close it here.
 	    }
@@ -391,36 +407,69 @@ public class ScenarioFragment extends Fragment {
 	    private final LayoutInflater mInflater;
 
 	    public ScenarioListAdapter(Context context) {
-	        super(context, android.R.layout.simple_list_item_2);
+	        //super(context, android.R.layout.simple_list_item_2);
+	        //super(context, R.layout.scenario_list_item);
+	    	super(context, android.R.layout.two_line_list_item);
 	        mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	    }
 
 	    public void setData(List<ScenarioEntry> data) {
-	        clear();
+	    	Log.d(TAG, "[ScenarioListAdapter][setData] + Begin");
+	        this.clear();
 	        if (data != null) {
 	            for (ScenarioEntry scenarioEntry : data) {
-	                add(scenarioEntry);
+	                this.add(scenarioEntry);
 	            }
 	        }
 	    }
+	    
+		class ViewHolder
+		{
+			public ImageView	listImageLeft	= null;
+			public TextView		listTextView1	= null;
+			public TextView		listTextView2	= null;
+			public TextView		listTextView3	= null;
+			public ImageView	listImageRight	= null;
+		}
 
 	    /**
-	 * Populate new items in the list.
-	 */
-	    @Override public View getView(int position, View convertView, ViewGroup parent) {
-	        View view;
+		 * Populate new items in the list.
+		 */
+	    @Override 
+	    public View getView(int position, View convertView, ViewGroup parent) {
+	    	Log.d(TAG, "[ScenarioListAdapter][getView] + pos="+position);
+	        //View view;
+			ViewHolder holder;
+			if (convertView == null) {
+				Log.d(TAG, "convertView == null,Then inflate and new holder");
+				convertView = mInflater.inflate(R.layout.scenario_list_item, parent, false);
+				holder = new ViewHolder();
+				holder.listImageLeft = (ImageView) convertView.findViewById(R.id.scenario_listitem_icon_left);
+				holder.listTextView1 = (TextView) convertView.findViewById(R.id.scenario_listitem_text_first_line);
+				holder.listTextView2 = (TextView) convertView.findViewById(R.id.scenario_listitem_text_second_line);
+				holder.listTextView3 = (TextView) convertView.findViewById(R.id.scenario_listitem_text_third_line);
+				holder.listImageRight = (ImageView) convertView.findViewById(R.id.scenario_listitem_icon_right);
+				convertView.setTag(holder);
+			} else {
+				Log.d(TAG, "convertView != null,Then get Holder");
+				holder = (ViewHolder) convertView.getTag();
+			}
+			
+//	        if (convertView == null) {
+//	            view = mInflater.inflate(R.layout.scenario_list_item, parent, false);
+//	        } else {
+//	            view = convertView;
+//	        }
 
-	        if (convertView == null) {
-	            view = mInflater.inflate(R.layout.list_item_icon_text, parent, false);
-	        } else {
-	            view = convertView;
-	        }
-
-	        ScenarioEntry item = getItem(position);
-	        ((ImageView)view.findViewById(R.id.icon)).setImageDrawable(item.getIcon());
-	        ((TextView)view.findViewById(R.id.text)).setText(item.getLabel());
-
-	        return view;
+	        ScenarioEntry item = this.getItem(position);
+			if (holder != null && item != null) {
+				holder.listImageLeft.setImageDrawable(item.getIcon());
+				holder.listTextView1.setText(item.getLabel());
+				holder.listTextView2.setText(item.getLabel());
+				holder.listTextView3.setText(item.getLabel());
+				holder.listImageRight.setImageResource(R.drawable.icn_accessoryview_2x);
+			}
+	        return convertView;
 	    }
 	}
 
@@ -445,7 +494,8 @@ public class ScenarioFragment extends Fragment {
 	        mLoader.getContext().registerReceiver(this, sdFilter);
 	    }
 
-	    @Override public void onReceive(Context context, Intent intent) {
+	    @Override 
+	    public void onReceive(Context context, Intent intent) {
 	        // Tell the loader about the change.
 	        mLoader.onContentChanged();
 	    }
@@ -463,7 +513,7 @@ public class ScenarioFragment extends Fragment {
 
 	/**
 	 * Helper for determining if the configuration has changed in an interesting
-	 * way so we need to rebuild the app list.
+	 * way so we need to rebuild the list.
 	 */
 	public static class InterestingConfigChanges {
 	    final Configuration mLastConfiguration = new Configuration();

@@ -10,6 +10,15 @@
     <dimen name="fragment_info_title_button_width">52dp</dimen>
     <dimen name="fragment_help_title_button_width">52dp</dimen>
     
+    <dimen name="scenario_listitem_icon_left_width">48dp</dimen>
+    <dimen name="scenario_listitem_icon_left_height">48dp</dimen>
+    <dimen name="scenario_listitem_icon_right_width">48dp</dimen>
+    <dimen name="scenario_listitem_icon_right_height">48dp</dimen>
+    
+    <dimen name="listview_primary_text_size">14sp</dimen>
+    <dimen name="listview_second_text_size">12sp</dimen>
+    <dimen name="listview_third_text_size">10sp</dimen>
+    
     <dimen name="margin_h1">2dp</dimen>
     <dimen name="margin_h2">6dp</dimen>
     <dimen name="margin_h3">8dp</dimen>

@@ -18,6 +18,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 /**
  * @author Kesen
@@ -96,7 +98,17 @@ public class ScenarioDetailFragment extends Fragment implements
 		Log.d(TAG, "[onLoadFinished] + Begin");
 		// Set the new data in the adapter.
 		//mAdapter.setData(data);
-
+		
+		ImageView leftImg = (ImageView)parentActivity.findViewById(R.id.scenario_detail_item_icon_left);
+		leftImg.setImageResource(R.drawable.icn_paper_2x);
+		
+		TextView TextView1 = (TextView) parentActivity.findViewById(R.id.scenario_detail_item_text_first_line);
+		TextView1.setText(data.getLabel());
+		TextView TextView2 = (TextView) parentActivity.findViewById(R.id.scenario_detail_item_text_second_line);
+		TextView2.setText(data.getLabel());
+		TextView TextView3 = (TextView) parentActivity.findViewById(R.id.scenario_detail_item_text_third_line);
+		TextView3.setText(data.getLabel());
+		
 		// The list should now be shown.
 //		if (this.isResumed()) {
 //			this.setListShown(true);

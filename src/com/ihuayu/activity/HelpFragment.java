@@ -62,26 +62,44 @@ public class HelpFragment extends Fragment {
 		webView.loadUrl("file:///android_asset/help.html");
 		WebSettings websetting = webView.getSettings();
 		websetting.setBuiltInZoomControls(true);
-	}
-
-	@Override
-	public void onResume() {
-		Log.d(TAG, "[onResume] + Begin");
-		// TODO Auto-generated method stub
-		super.onResume();
+		
 		final FragmentActivity activity = this.getActivity();
 		Button backBtn = (Button)activity.findViewById(R.id.fragment_help_title_button);
 		backBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				FragmentManager fm = activity.getSupportFragmentManager();
-				FragmentTransaction ft = fm.beginTransaction();
-				Fragment newFragment = InfoFragment.newInstance();
-				ft.replace(R.id.tab_content_info, newFragment);
-				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-				ft.commit();
+				fm.popBackStack();
+				
+				Fragment currentFragment = fm.findFragmentById(R.id.tab_content_info);
+				if (currentFragment != null) {
+					FragmentTransaction ft = fm.beginTransaction();
+					ft.remove(currentFragment);
+					ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
+					ft.commit();
+				}
 			}
 		});
-		Log.d(TAG, "[onResume] + End");
 	}
+
+//	@Override
+//	public void onResume() {
+//		Log.d(TAG, "[onResume] + Begin");
+//		// TODO Auto-generated method stub
+//		super.onResume();
+//		final FragmentActivity activity = this.getActivity();
+//		Button backBtn = (Button)activity.findViewById(R.id.fragment_help_title_button);
+//		backBtn.setOnClickListener(new View.OnClickListener() {
+//			public void onClick(View v) {
+//				// TODO Auto-generated method stub
+//				FragmentManager fm = activity.getSupportFragmentManager();
+//				FragmentTransaction ft = fm.beginTransaction();
+//				Fragment newFragment = InfoFragment.newInstance();
+//				ft.replace(R.id.tab_content_info, newFragment);
+//				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+//				ft.commit();
+//			}
+//		});
+//		Log.d(TAG, "[onResume] + End");
+//	}
 }

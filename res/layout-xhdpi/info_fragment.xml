@@ -25,7 +25,7 @@
 	        android:typeface="normal" />
         <Button
             android:id="@+id/fragment_info_title_button"
-            android:layout_width="@dimen/fragment_info_title_button_width"
+            android:layout_width="@dimen/title_bar_side_button_width"
             android:layout_height="match_parent"
             android:layout_margin="@dimen/margin_h4"
             android:layout_alignParentRight="true"

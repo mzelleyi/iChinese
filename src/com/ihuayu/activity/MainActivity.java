@@ -28,7 +28,6 @@ public class MainActivity extends FragmentActivity implements
 	private static final String TAB_BOOKMARK = "Bookmark";
 	private static final String TAB_INFO = "Info";
 	private TabHost mTabHost = null;
-	private int mCurrentTabIndex = 0;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -50,6 +49,10 @@ public class MainActivity extends FragmentActivity implements
 		mTabHost.addTab(mTabHost.newTabSpec(TAB_INFO)
 				.setIndicator("Info", this.getResources().getDrawable(R.drawable.tabbar_info))
 				.setContent(R.id.tab_content_info));
+		
+		mTabHost.setCurrentTabByTag(TAB_SEARCH);
+		this.updateTab(TAB_SEARCH, R.id.tab_content_search);
+		
 		Log.d(TAG, "[onCreate] + End");
 	}
 
@@ -77,24 +80,7 @@ public class MainActivity extends FragmentActivity implements
 		// TODO Auto-generated method stub
 		super.onResume();
 		mTabHost.setOnTabChangedListener(this);
-		mTabHost.setCurrentTab(mCurrentTabIndex);
 		
-		switch (mCurrentTabIndex) {
-		case 0:
-			this.updateTab(TAB_SEARCH, R.id.tab_content_search);
-			break;
-		case 1:
-			this.updateTab(TAB_SCENARIO, R.id.tab_content_scenario);
-			break;
-		case 2:
-			this.updateTab(TAB_BOOKMARK, R.id.tab_content_bookmark);
-			break;
-		case 3:
-			this.updateTab(TAB_INFO, R.id.tab_content_info);
-			break;
-		default:
-			break;
-		}
 		Log.d(TAG, "[onResume] + End");
 	}
 
@@ -122,7 +108,6 @@ public class MainActivity extends FragmentActivity implements
 		// TODO Auto-generated method stub
 		super.onDestroy();
 		mTabHost = null;
-		mCurrentTabIndex = 0;
 
 		Log.d(TAG, "[onDestory] + End");
 	}
@@ -132,19 +117,15 @@ public class MainActivity extends FragmentActivity implements
 		// TODO Auto-generated method stub
 		if (TAB_SEARCH.equals(tabTag)) {
 			updateTab(tabTag, R.id.tab_content_search);
-			mCurrentTabIndex = 0;
 			return;
 		} else if (TAB_SCENARIO.equals(tabTag)) {
 			updateTab(tabTag, R.id.tab_content_scenario);
-			mCurrentTabIndex = 1;
 			return;
 		} else if (TAB_BOOKMARK.equals(tabTag)) {
 			updateTab(tabTag, R.id.tab_content_bookmark);
-			mCurrentTabIndex = 2;
 			return;
 		} else if (TAB_INFO.equals(tabTag)) {
 			updateTab(tabTag, R.id.tab_content_info);
-			mCurrentTabIndex = 3;
 			return;
 		} else {
 			Log.e(TAG, "Error Tab Type");
@@ -175,11 +156,12 @@ public class MainActivity extends FragmentActivity implements
 			ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 			ft.commit();
 		} else {
-			Log.d(TAG,"[updateTab] find fragment != null, do replace");
+			Log.d(TAG,"[updateTab] find fragment != null, do setCurrentTabByTag");
 			// Replace the fragment
-			ft.replace(viewHolderId, newFragment);
-			ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+			//ft.replace(viewHolderId, newFragment);
+			//ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 			//ft.commit();
+			mTabHost.setCurrentTabByTag(tabTag);
 		}
 		Log.d(TAG,"[updateTab] + End");
 	}

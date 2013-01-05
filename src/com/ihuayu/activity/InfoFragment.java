@@ -68,27 +68,42 @@ public class InfoFragment extends Fragment {
 		webView.loadUrl("file:///android_asset/about.html");
 		WebSettings websetting = webView.getSettings();
 		websetting.setBuiltInZoomControls(true);
-	}
-
-	@Override
-	public void onResume() {
-		Log.d(TAG, "[onResume] + Begin");
-		// TODO Auto-generated method stub
-		super.onResume();
+		
 		final FragmentActivity activity = this.getActivity();
 		Button helpBtn = (Button)activity.findViewById(R.id.fragment_info_title_button);
 		helpBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				FragmentManager fm = activity.getSupportFragmentManager();
-				FragmentTransaction ft = fm.beginTransaction();
 				Fragment newFragment = HelpFragment.newInstance();
-				ft.replace(R.id.tab_content_info, newFragment);
+				FragmentTransaction ft = fm.beginTransaction();
+				ft.add(R.id.tab_content_info, newFragment);
 				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-				//ft.addToBackStack(null);
+				ft.addToBackStack(null);
 				ft.commit();
 			}
 		});
-		Log.d(TAG, "[onResume] + End");
 	}
+
+//	@Override
+//	public void onResume() {
+//		Log.d(TAG, "[onResume] + Begin");
+//		// TODO Auto-generated method stub
+//		super.onResume();
+//		final FragmentActivity activity = this.getActivity();
+//		Button helpBtn = (Button)activity.findViewById(R.id.fragment_info_title_button);
+//		helpBtn.setOnClickListener(new View.OnClickListener() {
+//			public void onClick(View v) {
+//				// TODO Auto-generated method stub
+//				FragmentManager fm = activity.getSupportFragmentManager();
+//				FragmentTransaction ft = fm.beginTransaction();
+//				Fragment newFragment = HelpFragment.newInstance();
+//				ft.replace(R.id.tab_content_info, newFragment);
+//				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+//				//ft.addToBackStack(null);
+//				ft.commit();
+//			}
+//		});
+//		Log.d(TAG, "[onResume] + End");
+//	}
 }

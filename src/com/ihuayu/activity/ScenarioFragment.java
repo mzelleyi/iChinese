@@ -48,6 +48,7 @@ import android.widget.TextView;
 public class ScenarioFragment extends Fragment {
 
 	private static final String TAG = "iHuayu:ScenarioFragment";
+	private static FragmentActivity parentActivity = null;
 
     /**
      * Create a new instance of ScenarioFragment
@@ -82,14 +83,26 @@ public class ScenarioFragment extends Fragment {
 		// TODO Auto-generated method stub
 		super.onViewCreated(view, savedInstanceState);
 		
-		FragmentActivity activity = this.getActivity();
-		FragmentManager fm = activity.getSupportFragmentManager();
+		parentActivity = this.getActivity();
+		
+		FragmentManager fm = parentActivity.getSupportFragmentManager();
 		FragmentTransaction ft = fm.beginTransaction();
-
+		ScenarioListFragment list = (ScenarioListFragment) fm.findFragmentById(R.id.fragment_scenario_listview);
         // Create the list fragment and add it as our sole content.
-        if (fm.findFragmentById(R.id.fragment_scenario_listview) == null) {
-        	ScenarioListFragment list = new ScenarioListFragment();
-        	ft.add(R.id.fragment_scenario_listview, list).commit();
+        if (list == null) {
+        	Log.d(TAG, "[onViewCreated] new ScenarioListFragment, do add");
+        	list = new ScenarioListFragment();
+			ft.add(R.id.fragment_scenario_listview, list);
+			ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+			//ft.addToBackStack(null);
+			ft.commit();
+        } else {
+        	Log.d(TAG, "[onViewCreated] used ScenarioListFragment, do replace");
+        	list = new ScenarioListFragment();
+			ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+			ft.replace(R.id.fragment_scenario_listview, list);
+			//ft.addToBackStack(null);
+			ft.commit();
         }
 	}
 	
@@ -134,6 +147,7 @@ public class ScenarioFragment extends Fragment {
 		public void onListItemClick(ListView l, View v, int position, long id) {
 			// Insert desired behavior here.
 			Log.i(TAG, "[ScenarioListFragment][onListItemClick] Item clicked: " + id);
+			
 		}
 
 		public Loader<List<ScenarioEntry>> onCreateLoader(int id, Bundle args) {
@@ -409,7 +423,7 @@ public class ScenarioFragment extends Fragment {
 	    public ScenarioListAdapter(Context context) {
 	        //super(context, android.R.layout.simple_list_item_2);
 	        //super(context, R.layout.scenario_list_item);
-	    	super(context, android.R.layout.two_line_list_item);
+	    	super(context, R.layout.scenario_list_item);
 	        mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	    }
 
@@ -461,13 +475,27 @@ public class ScenarioFragment extends Fragment {
 //	            view = convertView;
 //	        }
 
-	        ScenarioEntry item = this.getItem(position);
+	        final ScenarioEntry item = this.getItem(position);
 			if (holder != null && item != null) {
 				holder.listImageLeft.setImageDrawable(item.getIcon());
 				holder.listTextView1.setText(item.getLabel());
 				holder.listTextView2.setText(item.getLabel());
 				holder.listTextView3.setText(item.getLabel());
 				holder.listImageRight.setImageResource(R.drawable.icn_accessoryview_2x);
+				holder.listImageRight.setOnClickListener(new View.OnClickListener()	{
+					@Override
+					public void onClick(View v)
+					{
+						// TODO Auto-generated method stub
+						FragmentManager fm = parentActivity.getSupportFragmentManager();
+						Fragment newFragment = ScenarioDetailFragment.newInstance(item);
+						FragmentTransaction ft = fm.beginTransaction();
+						ft.add(R.id.tab_content_scenario, newFragment);
+						ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+						ft.addToBackStack(null);
+						ft.commit();
+					}
+				});
 			}
 	        return convertView;
 	    }

@@ -1,44 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/fragment_info_layout"
+    android:id="@+id/scenario_detail_fragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
     
     <RelativeLayout 
-        android:id="@+id/fragment_info_title_bar"
+        android:id="@+id/scenario_detail_title_bar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/title_bar_height"
         android:background="@drawable/navigationbar_bg_2x"
         android:orientation="horizontal" >
         <TextView
-	        android:id="@+id/fragment_info_title_textview"
+	        android:id="@+id/scenario_detail_title_textview"
 	        android:layout_width="match_parent"
 	        android:layout_height="match_parent"
 	        android:gravity="center"
 	        android:maxLines="1"
-	        android:text="@string/tab_bar_info"
+	        android:text="@string/tab_bar_scenario"
 	        android:textColor="#ffffff"
 	        android:textSize="@dimen/title_bar_center_text_size"
 	        android:textStyle="bold"
 	        android:typeface="normal" />
         <Button
-            android:id="@+id/fragment_info_title_button"
+            android:id="@+id/scenario_detail_backbtn"
             android:layout_width="@dimen/title_bar_side_button_width"
             android:layout_height="match_parent"
             android:layout_margin="@dimen/margin_h4"
-            android:layout_alignParentRight="true"
-            android:text="@string/title_bar_help"
+            android:layout_alignParentLeft="true"
+            android:text="@string/title_bar_back"
             android:textColor="#ffffff"
             android:textStyle="bold"
             android:textSize="@dimen/title_bar_side_text_size"
-            android:background="#00F5FF" />
+            android:background="@drawable/btn_back" />
     </RelativeLayout>
-
-    <WebView
-        android:id="@+id/fragment_info_webView"
+    <FrameLayout
+        android:id="@+id/scenario_detail_content"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-   
+        android:layout_height="match_parent" >
+        <TextView
+	        android:id="@+id/scenario_detail_content_textview"
+	        android:layout_width="match_parent"
+	        android:layout_height="match_parent"
+	        android:background="#BBFFFF"
+	        android:gravity="center"
+	        android:maxLines="1"
+	        android:text="This is dummy info"
+	        android:textColor="#FF0000"
+	        android:textSize="@dimen/title_bar_center_text_size"
+	        android:textStyle="bold"
+	        android:typeface="normal" />
+    </FrameLayout>
 </LinearLayout>

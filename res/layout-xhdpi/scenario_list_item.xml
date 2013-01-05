@@ -25,7 +25,7 @@
         android:layout_centerVertical="true"
         android:layout_alignParentLeft="true"
         android:layout_margin="@dimen/margin_h3"
-        android:contentDescription="@string/img_des_scenario_listitem_icon_left" />
+        android:contentDescription="@string/img_des_dummy" />
     
     <LinearLayout
         android:id="@+id/text_content_layout"
@@ -72,5 +72,5 @@
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
         android:layout_margin="@dimen/margin_h3"
-        android:contentDescription="@string/img_des_scenario_listitem_icon_left" />
+        android:contentDescription="@string/img_des_dummy" />
 </RelativeLayout>

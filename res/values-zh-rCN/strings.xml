@@ -7,7 +7,7 @@
 	<!-- Menu Setting -->
     <string name="menu_settings">Settings</string>
     
-    <string name="activity_main_prompt_img">prompt img</string>
+    <string name="img_des_dummy">image description dummy string</string>
     
     <string name="input_bar_img">ENCN</string>
     <string name="searchbox_hint">Search</string>

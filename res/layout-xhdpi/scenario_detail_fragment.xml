@@ -53,7 +53,7 @@
 		        android:layout_centerVertical="true"
 		        android:layout_alignParentLeft="true"
 		        android:layout_margin="@dimen/margin_h3"
-		        android:contentDescription="@string/img_des_scenario_listitem_icon_left" />
+		        android:contentDescription="@string/img_des_dummy" />
 		    <LinearLayout
 		        android:layout_width="match_parent"
 		        android:layout_height="match_parent"
@@ -97,22 +97,11 @@
 			        android:gravity="left" />
 		    </LinearLayout>
 		</RelativeLayout>
-		<LinearLayout
+		<FrameLayout
 	        android:id="@+id/scenario_detail_dialog_listview"
 	        android:layout_width="match_parent"
-	        android:layout_height="match_parent" >
-		    <TextView
-		        android:id="@+id/scenario_detail_content_textview"
-		        android:layout_width="match_parent"
-		        android:layout_height="match_parent"
-		        android:background="#BBFFFF"
-		        android:gravity="center"
-		        android:maxLines="1"
-		        android:text="This is dummy info"
-		        android:textColor="#FF0000"
-		        android:textSize="@dimen/title_bar_center_text_size"
-		        android:textStyle="bold"
-		        android:typeface="normal" />
-    	</LinearLayout>
+	        android:layout_height="match_parent"
+	        android:background="#BBFFFF" >
+    	</FrameLayout>
     </LinearLayout>
 </LinearLayout>

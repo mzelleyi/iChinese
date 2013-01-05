@@ -36,21 +36,72 @@
             android:textSize="@dimen/title_bar_side_text_size"
             android:background="@drawable/btn_back" />
     </RelativeLayout>
-    <FrameLayout
+    <LinearLayout
         android:id="@+id/scenario_detail_content"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-        <TextView
-	        android:id="@+id/scenario_detail_content_textview"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+        <RelativeLayout
+            android:id="@+id/scenario_detail_list_item"
+		    android:layout_width="match_parent"
+		    android:layout_height="@dimen/scenario_listitem_height"
+		    android:background="@drawable/bg_scenario" >
+		    <ImageView 
+		        android:id="@+id/scenario_detail_item_icon_left"
+		        android:layout_width="@dimen/scenario_listitem_icon_left_width"
+		        android:layout_height="@dimen/scenario_listitem_icon_left_height"
+		        android:layout_centerVertical="true"
+		        android:layout_alignParentLeft="true"
+		        android:layout_margin="@dimen/margin_h3"
+		        android:contentDescription="@string/img_des_dummy" />
+		    <LinearLayout
+		        android:layout_width="match_parent"
+		        android:layout_height="match_parent"
+		        android:layout_toRightOf="@id/scenario_detail_item_icon_left"
+		        android:orientation="vertical" >
+		        <TextView android:id="@+id/scenario_detail_item_text_first_line"
+			        android:layout_gravity="center_vertical"
+			        android:layout_width="match_parent"
+			        android:layout_height="wrap_content"
+			        android:layout_weight="1"
+			        android:padding="@dimen/margin_h1"
+			        android:textSize="@dimen/listview_primary_text_size"
+			        android:textColor="#FFFFFF"
+			        android:singleLine="true"
+				    android:ellipsize="marquee"
+				    android:marqueeRepeatLimit="1"
+			        android:gravity="left" />
+		        <TextView android:id="@+id/scenario_detail_item_text_second_line"
+			        android:layout_gravity="center_vertical"
+			        android:layout_width="match_parent"
+			        android:layout_height="wrap_content"
+			        android:layout_weight="1"
+			        android:padding="@dimen/margin_h1"
+			        android:textSize="@dimen/listview_primary_text_size"
+			        android:textColor="#FFFFFF"
+			        android:singleLine="true"
+				    android:ellipsize="marquee"
+				    android:marqueeRepeatLimit="1"
+			        android:gravity="left" />
+		        <TextView android:id="@+id/scenario_detail_item_text_third_line"
+			        android:layout_gravity="center_vertical"
+			        android:layout_width="match_parent"
+			        android:layout_height="wrap_content"
+			        android:layout_weight="1"
+			        android:textSize="@dimen/listview_primary_text_size"
+			        android:textColor="#FFFFFF"
+			        android:padding="@dimen/margin_h1"
+			        android:singleLine="true"
+				    android:ellipsize="marquee"
+				    android:marqueeRepeatLimit="1"
+			        android:gravity="left" />
+		    </LinearLayout>
+		</RelativeLayout>
+		<FrameLayout
+	        android:id="@+id/scenario_detail_dialog_listview"
 	        android:layout_width="match_parent"
 	        android:layout_height="match_parent"
-	        android:background="#BBFFFF"
-	        android:gravity="center"
-	        android:maxLines="1"
-	        android:text="This is dummy info"
-	        android:textColor="#FF0000"
-	        android:textSize="@dimen/title_bar_center_text_size"
-	        android:textStyle="bold"
-	        android:typeface="normal" />
-    </FrameLayout>
+	        android:background="#BBFFFF" >
+    	</FrameLayout>
+    </LinearLayout>
 </LinearLayout>

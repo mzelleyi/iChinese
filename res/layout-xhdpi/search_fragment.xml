@@ -55,7 +55,7 @@
         android:id="@+id/main_activity_prompt_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:contentDescription="@string/img_des_dummy"
+        android:contentDescription="@string/dummy_img_des"
         android:scaleType="fitXY"
         android:src="@drawable/prompt" />
 </LinearLayout>

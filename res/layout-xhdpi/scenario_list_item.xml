@@ -16,7 +16,8 @@
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="@dimen/scenario_listitem_height"
+    android:background="#BBFFFF" >
 
     <ImageView 
         android:id="@+id/scenario_listitem_icon_left"
@@ -25,7 +26,7 @@
         android:layout_centerVertical="true"
         android:layout_alignParentLeft="true"
         android:layout_margin="@dimen/margin_h3"
-        android:contentDescription="@string/img_des_dummy" />
+        android:contentDescription="@string/dummy_img_des" />
     
     <LinearLayout
         android:id="@+id/text_content_layout"
@@ -72,5 +73,5 @@
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
         android:layout_margin="@dimen/margin_h3"
-        android:contentDescription="@string/img_des_dummy" />
+        android:contentDescription="@string/dummy_img_des" />
 </RelativeLayout>

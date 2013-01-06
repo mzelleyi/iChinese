@@ -29,7 +29,7 @@
 	        android:layout_width="@dimen/scenario_dialog_item_image_icon_width"
 	        android:layout_height="match_parent"
 	        android:layout_alignParentRight="true"
-	        android:contentDescription="@string/img_des_dummy" />
+	        android:contentDescription="@string/dummy_img_des" />
     	<TextView
 	        android:id="@+id/scenario_dialog_textview_name"
 	        android:layout_width="match_parent"
@@ -77,7 +77,7 @@
 		        android:layout_toRightOf="@id/scenario_dialog_text_first_line"
 		        android:layout_marginLeft="@dimen/margin_h3"
 		        android:layout_gravity="center_vertical"
-		        android:contentDescription="@string/img_des_dummy" />
+		        android:contentDescription="@string/dummy_img_des" />
     	</RelativeLayout>
         <TextView android:id="@+id/scenario_dialog_text_second_line"
 	        android:layout_gravity="center_vertical"

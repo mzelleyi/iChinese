@@ -28,6 +28,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * @author Kesen
@@ -339,9 +340,9 @@ public class ScenarioDetailFragment extends Fragment {
 
 	    public void setData(List<ScenarioEntry> data) {
 	    	Log.d(TAG, "[ScenarioDialogAdapter][setData] + Begin");
-	    	Log.d(TAG, "[ScenarioDialogAdapter][setData] Size"+data.size());
 	        this.clear();
 	        if (data != null) {
+	        	Log.d(TAG, "[ScenarioDialogAdapter][setData] Size"+data.size());
 	            for (ScenarioEntry scenarioEntry : data) {
 	                this.add(scenarioEntry);
 	            }
@@ -393,7 +394,7 @@ public class ScenarioDetailFragment extends Fragment {
 					public void onClick(View v)
 					{
 						// TODO Auto-generated method stub
-						
+						Toast.makeText(parentActivity, "Not Ready", Toast.LENGTH_SHORT).show();
 					}
 				});
 			}

@@ -431,6 +431,7 @@ public class ScenarioFragment extends Fragment {
 	    	Log.d(TAG, "[ScenarioListAdapter][setData] + Begin");
 	        this.clear();
 	        if (data != null) {
+	        	Log.d(TAG, "[ScenarioListAdapter][setData] Size"+data.size());
 	            for (ScenarioEntry scenarioEntry : data) {
 	                this.add(scenarioEntry);
 	            }

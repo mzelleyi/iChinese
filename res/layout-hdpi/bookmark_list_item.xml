@@ -87,8 +87,8 @@
 
     <ImageView
         android:id="@+id/bookmark_listitem_icon_speaker"
-        android:layout_width="@dimen/bookmark_listitem_speaker_width"
-        android:layout_height="@dimen/bookmark_listitem_speaker_height"
+        android:layout_width="@dimen/icon_speaker_width_normal"
+        android:layout_height="@dimen/icon_speaker_height_normal"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:layout_margin="@dimen/margin_h3"

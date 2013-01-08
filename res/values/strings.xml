@@ -20,9 +20,14 @@
     
     <string name="title_bar_search">SPEAK MANDARIN CAMPAIGN</string>
     
+    <string name="title_bar_text_detail">DETAILS</string>
+    
     <string name="title_bar_btn_help">HELP</string>
     <string name="title_bar_btn_back">Back</string>
     <string name="title_bar_btn_edit">Edit</string>
     <string name="title_bar_btn_done">Done</string>
+    
+    <string name="foot_bar_btn_prev">Prev</string>
+    <string name="foot_bar_btn_next">Next</string>
 
 </resources>

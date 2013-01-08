@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/result_detail_fragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    
+    <RelativeLayout 
+        android:id="@+id/result_detail_title_bar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/title_bar_height"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/navigationbar_bg_2x"
+        android:orientation="horizontal" >
+        <TextView
+	        android:id="@+id/result_detail_title_bar_textview"
+	        android:layout_width="match_parent"
+	        android:layout_height="match_parent"
+	        android:gravity="center"
+	        android:maxLines="1"
+	        android:text="@string/title_bar_text_detail"
+	        android:textColor="#ffffff"
+	        android:textSize="@dimen/title_bar_center_text_size"
+	        android:textStyle="bold"
+	        android:typeface="normal" />
+        <Button
+            android:id="@+id/result_detail_title_bar_backbtn"
+            android:layout_width="@dimen/title_bar_side_button_width"
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/margin_h3"
+            android:layout_alignParentLeft="true"
+            android:text="@string/title_bar_btn_back"
+            android:textColor="#ffffff"
+            android:textStyle="bold"
+            android:textSize="@dimen/title_bar_side_text_size"
+            android:background="@drawable/btn_back" />
+    </RelativeLayout>
+    
+    <LinearLayout
+        android:id="@+id/result_detail_content_outline"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/result_detail_title_bar"
+        android:background="@color/normal_light_green"
+        android:orientation="vertical" >
+        <RelativeLayout
+            android:id="@+id/result_detail_item_description"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content" >
+		    <LinearLayout
+		        android:layout_width="match_parent"
+		        android:layout_height="match_parent"
+		        android:layout_alignParentLeft="true"
+		        android:orientation="vertical" >
+		        <TextView android:id="@+id/result_detail_item_des_first_line"
+			        android:layout_gravity="center_vertical"
+			        android:layout_width="match_parent"
+			        android:layout_height="wrap_content"
+			        android:layout_weight="1"
+			        android:padding="@dimen/margin_h1"
+			        android:textSize="@dimen/listview_primary_text_size"
+			        android:hint="@string/dummy_text"
+			        android:textColor="#FFFFFF"
+			        android:singleLine="true"
+				    android:ellipsize="marquee"
+				    android:marqueeRepeatLimit="1"
+			        android:gravity="left" />
+		        <RelativeLayout
+            		android:id="@+id/result_detail_item_des_second_line"
+		    		android:layout_width="match_parent"
+		   			android:layout_height="wrap_content" >
+		        	<TextView android:id="@+id/result_detail_item_des_second_text"
+				        android:layout_gravity="center_vertical"
+				        android:layout_width="match_parent"
+				        android:layout_height="wrap_content"
+				        android:padding="@dimen/margin_h1"
+				        android:textSize="@dimen/listview_primary_text_size"
+				        android:hint="@string/dummy_text"
+				        android:textColor="#FFFFFF"
+				        android:singleLine="true"
+					    android:ellipsize="marquee"
+					    android:marqueeRepeatLimit="1"
+				        android:gravity="left" />
+		        	<ImageView 
+				        android:id="@+id/result_detail_item_des_second_icon"
+        				android:layout_width="@dimen/icon_speaker_width_normal"
+       					android:layout_height="@dimen/icon_speaker_height_normal"
+				        android:layout_centerVertical="true"
+				        android:src="@drawable/btn_speaker_sb"
+				        android:layout_toRightOf="@id/result_detail_item_des_second_text"
+				        android:layout_margin="@dimen/margin_h3"
+				        android:contentDescription="@string/dummy_img_des" />
+		        </RelativeLayout>
+		        <TextView 
+		            android:id="@+id/result_detail_item_des_third_line"
+			        android:layout_gravity="center_vertical"
+			        android:layout_width="match_parent"
+			        android:layout_height="wrap_content"
+			        android:layout_weight="1"
+			        android:textSize="@dimen/listview_primary_text_size"
+			        android:textColor="#FFFFFF"
+			        android:padding="@dimen/margin_h1"
+			        android:hint="@string/dummy_text"
+			        android:singleLine="false"
+				    android:ellipsize="marquee"
+				    android:marqueeRepeatLimit="1"
+			        android:gravity="left" />
+		    </LinearLayout>
+		    
+		    <LinearLayout
+		        android:layout_width="match_parent"
+		        android:layout_height="match_parent"
+		        android:layout_alignParentRight="true"
+		        android:orientation="vertical" >
+		        <ImageView 
+			        android:id="@+id/result_detail_item_des_favorite_img"
+       				android:layout_width="@dimen/icon_mark_width"
+      				android:layout_height="@dimen/icon_mark_height"
+			        android:layout_gravity="center_vertical"
+			        android:src="@drawable/btn_mark_off_2x"
+			        android:layout_margin="@dimen/margin_h3"
+			        android:contentDescription="@string/dummy_img_des" />
+	        	<TextView android:id="@+id/result_detail_item_des_source_text"
+			        android:layout_gravity="center_vertical"
+			        android:layout_width="match_parent"
+			        android:layout_height="wrap_content"
+			        android:padding="@dimen/margin_h1"
+			        android:textSize="@dimen/listview_primary_text_size"
+			        android:hint="@string/dummy_text"
+			        android:textColor="#FFFFFF"
+			        android:singleLine="true"
+				    android:ellipsize="marquee"
+				    android:marqueeRepeatLimit="1"
+			        android:gravity="left" />
+		        <TextView 
+		            android:id="@+id/result_detail_item_des_source_info"
+			        android:layout_gravity="center_vertical"
+			        android:layout_width="match_parent"
+			        android:layout_height="wrap_content"
+			        android:textSize="@dimen/listview_primary_text_size"
+			        android:textColor="#FFFFFF"
+			        android:padding="@dimen/margin_h1"
+			        android:hint="@string/dummy_text"
+			        android:singleLine="false"
+				    android:ellipsize="marquee"
+				    android:marqueeRepeatLimit="1"
+			        android:gravity="left" />
+		    </LinearLayout>
+		</RelativeLayout>
+		<FrameLayout
+	        android:id="@+id/result_detail_item_listview"
+	        android:layout_width="match_parent"
+	        android:layout_height="match_parent" >
+    	</FrameLayout>
+    </LinearLayout>
+    
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/foot_bar_height"
+        android:layout_alignParentBottom="true" >
+        <Button
+            android:id="@+id/result_detail_footbar_btn_prev"
+            android:layout_width="@dimen/foot_bar_side_button_width"
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/margin_h3"
+            android:layout_alignParentLeft="true"
+            android:text="@string/foot_bar_btn_prev"
+            android:textColor="#ffffff"
+            android:textStyle="bold"
+            android:textSize="@dimen/foot_bar_side_text_size"
+            android:background="@drawable/btn_previous" />
+        <Button
+            android:id="@+id/result_detail_footbar_btn_next"
+            android:layout_width="@dimen/foot_bar_side_button_width"
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/margin_h3"
+            android:layout_alignParentRight="true"
+            android:text="@string/foot_bar_btn_next"
+            android:textColor="#ffffff"
+            android:textStyle="bold"
+            android:textSize="@dimen/foot_bar_side_text_size"
+            android:background="@drawable/btn_next" />
+    </RelativeLayout>
+</RelativeLayout>

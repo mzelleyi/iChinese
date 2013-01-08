@@ -131,6 +131,11 @@ public class BookmarkFragment extends Fragment {
 		// This is the Adapter being used to display the list's data.
 		BookmarkListAdapter mAdapter;
 		
+		List<BookmarkEntry> mOriginBookmarkList = null;
+		List<BookmarkEntry> mWithDividerList = new ArrayList<BookmarkEntry>();
+		List<BookmarkEntry> mRemoveBookmarkList = new ArrayList<BookmarkEntry>();
+		List<BookmarkEntry> mRemoveDividerList = new ArrayList<BookmarkEntry>();
+		
 		@Override
 		public void onActivityCreated(Bundle savedInstanceState) {
 			Log.d(TAG, "[BookmarkListFragment][onActivityCreated] + Begin");
@@ -181,7 +186,55 @@ public class BookmarkFragment extends Fragment {
 		public void onLoadFinished(Loader<List<BookmarkEntry>> loader, List<BookmarkEntry> data) {
 			Log.d(TAG, "[BookmarkListFragment][onLoadFinished] + Begin");
 			// Set the new data in the adapter.
-			mAdapter.setData(data);
+			Log.d(TAG, "[BookmarkListFragment] mOriginBookmarkList Size = "+ data.size());
+			
+			//Save origin get data list
+			mOriginBookmarkList = data;
+			
+//			mOriginBookmarkList = new ArrayList<BookmarkEntry>(data.size());
+//	        for (int i=0; i<data.size(); i++) {
+//	            mOriginBookmarkList.add(data.get(i));
+//	        }
+//			mWithDividerList = new ArrayList<BookmarkEntry>(data.size());
+//			for (int i = 0; i < data.size(); i++) {
+//				mWithDividerList.add(data.get(i));
+//			}
+	        
+        	BookmarkEntry firstEntry = data.get(0);
+        	String temp = String.valueOf(firstEntry.getLabel().charAt(0));
+        	
+        	//New First Entry As Divider
+        	BookmarkEntry firstAddEntry = new BookmarkEntry(data.get(0).getApplicationInfo());
+        	firstAddEntry.loadLabel(this.getActivity());
+        	firstAddEntry.misDivider = true;
+        	mWithDividerList.add(firstAddEntry);
+        	Log.d(TAG, "add isDivider = "+firstAddEntry.misDivider+"; entry = "+firstAddEntry.getLabel());
+            for (int i = 0; i < data.size() ; i++) {
+            	Log.d(TAG, " i = "+i);
+            	//Add char flag for divider
+            	BookmarkEntry entry = data.get(i);
+            	Character thisChar = entry.getLabel().charAt(0);
+            	if(String.valueOf(thisChar).equalsIgnoreCase(temp)) {
+    	        	Log.d(TAG, "add isDivider = "+entry.misDivider+	"; entry = "+entry.getLabel());
+    	        	mWithDividerList.add(entry);
+            	} else {
+            		temp = String.valueOf(thisChar);
+            		
+            		//New duplicate fist char entry as list item
+            		BookmarkEntry addEntry = new BookmarkEntry(data.get(i).getApplicationInfo());
+    	        	addEntry.loadLabel(this.getActivity());
+    	        	addEntry.misDivider = true;
+    	        	Log.d(TAG, "add isDivider = "+addEntry.misDivider+"; entry = "+addEntry.getLabel());
+    	        	mWithDividerList.add(addEntry);
+	            	
+                	//Add Normal Item
+    	        	Log.d(TAG, "add isDivider = "+entry.misDivider+"; entry = "+entry.getLabel());
+    	        	mWithDividerList.add(entry);
+            	}
+            }
+            Log.d(TAG, "[BookmarkListFragment] mWithDividerList Size = "+ mWithDividerList.size());
+			mAdapter.setData(mWithDividerList);
+			Log.d(TAG, "[BookmarkListFragment] Behind Set Data Size = "+ mAdapter.getCount());
 	
 			// The list should now be shown.
 			if (this.isResumed()) {
@@ -200,6 +253,7 @@ public class BookmarkFragment extends Fragment {
 		
 		public void enterEditMode() {
 			Log.d(TAG, "[BookmarkListFragment][enterEditMode] + Begin");
+			Log.d(TAG, "[BookmarkListFragment] adpater size = "+mAdapter.getCount());
 			mAdapter.bEditMode = true;
 			mAdapter.notifyDataSetChanged();
 			Log.d(TAG, "[BookmarkListFragment][enterEditMode] + End");
@@ -207,20 +261,81 @@ public class BookmarkFragment extends Fragment {
 		
 		public void leaveEditMode() {
 			Log.d(TAG, "[BookmarkListFragment][leaveEditMode] + Begin");
+			Log.d(TAG, "[BookmarkListFragment] Adapter.getCount = "+mAdapter.getCount());
 			mAdapter.bEditMode = false;
 			
-			int count = mAdapter.getCount();
-			Log.d(TAG, "[BookmarkListFragment] Adapter.getCount = "+count);
-			for (int i = 0 ; i < count; i++) {
-				Log.d(TAG, "[BookmarkListFragment] i = "+i);
-				BookmarkEntry entry = mAdapter.getItem(i);
+			Log.d(TAG, "[BookmarkListFragment] === Remove Delete Item ===");
+			Log.d(TAG, "[BookmarkListFragment] mWithDividerList size = "+mWithDividerList.size());
+//			for (int i = 0 ; i < mAdapter.getCount(); i++) {
+//				Log.d(TAG, "[BookmarkListFragment] i = "+i);
+//				BookmarkEntry entry = mAdapter.getItem(i);
+//				if (entry.mNeedDelete) {
+//					Log.d(TAG, "[BookmarkListFragment] remove item i ="+i);
+//					mAdapter.remove(entry);
+//					Log.d(TAG, "[BookmarkListFragment] now count ="+mAdapter.getCount());
+//				}
+//			}
+//			Log.d(TAG, "[BookmarkListFragment] === Remove Unused Divider ===");
+//			Log.d(TAG, "[BookmarkListFragment] Adapter.getCount = "+mAdapter.getCount());
+//			for (int i = 0 ; i < mAdapter.getCount(); i++) {
+//				Log.d(TAG, "[BookmarkListFragment] i = "+i);
+//				BookmarkEntry entry = mAdapter.getItem(i);
+//				if (entry.misDivider) {
+//		        	BookmarkEntry nextEntry = mAdapter.getItem(i+1);
+//		        	if (nextEntry.misDivider) {
+//		        		Log.d(TAG, "[BookmarkListAdapter] remove divider i = "+i);
+//			        	mAdapter.remove(entry);
+//			        	Log.d(TAG, "[BookmarkListFragment] now count ="+mAdapter.getCount());
+//		        	}
+//				}
+//			}
+			for (int i = 0 ; i < mWithDividerList.size(); i++) {
+				Log.d(TAG, " i = "+i);
+				BookmarkEntry entry = mWithDividerList.get(i);
 				if (entry.mNeedDelete) {
-					Log.d(TAG, "[BookmarkListFragment] remove item i ="+i);
-					count--;
-					Log.d(TAG, "[BookmarkListFragment] now count ="+count);
-					mAdapter.remove(entry);
+					Log.d(TAG, "remove item i ="+i);
+					mRemoveBookmarkList.add(entry);
+					//mWithDividerList.remove(entry);
+					Log.d(TAG, "delete item count ="+mRemoveBookmarkList.size());
+					//Log.d(TAG, "now count ="+mWithDividerList.size());
 				}
 			}
+            for (BookmarkEntry entry : mRemoveBookmarkList) {
+            	mWithDividerList.remove(entry);
+            }
+            Log.d(TAG, "[BookmarkListFragment] After Remove Delete Item, The Size ="+mWithDividerList.size());
+            
+			
+			Log.d(TAG, "[BookmarkListFragment] === Remove Unused Divider ===");
+			Log.d(TAG, "[BookmarkListFragment] mWithDividerList size = "+mWithDividerList.size());
+			for (int i = 0 ; i < mWithDividerList.size(); i++) {
+				Log.d(TAG, " i = "+i);
+				BookmarkEntry entry = mWithDividerList.get(i);
+				if (entry.misDivider) {
+					int nextPos = i + 1;
+					if (nextPos < mWithDividerList.size()) {
+						BookmarkEntry nextEntry = mWithDividerList.get(nextPos);
+						if (nextEntry.misDivider) {
+			        		Log.d(TAG, " remove divider i = "+i);
+			        		mRemoveDividerList.add(entry);
+			        		//mWithDividerList.remove(entry);
+			        		Log.d(TAG, " delete divider count ="+mRemoveDividerList.size());
+				        	//Log.d(TAG, " now count ="+mWithDividerList.size());
+			        	}
+					} else {
+						Log.d(TAG, " remove the last divider i = "+i);
+						mRemoveDividerList.add(entry);
+						Log.d(TAG, " delete divider count ="+mRemoveDividerList.size());
+					}
+				}
+			}
+            for (BookmarkEntry entry : mRemoveDividerList) {
+            	mWithDividerList.remove(entry);
+            }
+            Log.d(TAG, "[BookmarkListFragment] After Remove Unused Divider, The Size ="+mWithDividerList.size());
+			
+            
+			mAdapter.setData(mWithDividerList);
 			mAdapter.notifyDataSetChanged();
 			Log.d(TAG, "[BookmarkListFragment][leaveEditMode] + End");
 		}
@@ -473,42 +588,8 @@ public class BookmarkFragment extends Fragment {
 	        this.clear();
 	        if (data != null) {
 	        	Log.d(TAG, "[BookmarkListAdapter][setData] Size = "+data.size());
-	        	BookmarkEntry firstEntry = data.get(0);
-	        	String temp = String.valueOf(firstEntry.getLabel().charAt(0));
-	        	
-	        	//New First Entry As Divider
-	        	BookmarkEntry firstAddEntry = new BookmarkEntry(data.get(0).getApplicationInfo());
-	        	firstAddEntry.loadLabel(this.getContext());
-	        	firstAddEntry.misDivider = true;
-	        	Log.d(TAG, "[BookmarkListAdapter] add isDivider = "+firstAddEntry.misDivider+
-	        			"; entry = "+firstAddEntry.getLabel());
-            	this.add(firstAddEntry);
-            	
-	            for (int i = 0; i < data.size() ; i++) {
-	            	Log.d(TAG, "[BookmarkListAdapter] i = "+i);
-	            	//Add char flag for divider
-	            	BookmarkEntry entry = data.get(i);
-	            	Character thisChar = entry.getLabel().charAt(0);
-	            	if(String.valueOf(thisChar).equalsIgnoreCase(temp)) {
-	    	        	Log.d(TAG, "[BookmarkListAdapter] add isDivider = "+entry.misDivider+
-	    	        			"; entry = "+entry.getLabel());
-	            		this.add(entry);
-	            	} else {
-	            		temp = String.valueOf(thisChar);
-	            		
-	            		//New duplicate fist char entry as list item
-	            		BookmarkEntry addEntry = new BookmarkEntry(data.get(i).getApplicationInfo());
-	    	        	addEntry.loadLabel(this.getContext());
-	    	        	addEntry.misDivider = true;
-	    	        	Log.d(TAG, "[BookmarkListAdapter] add isDivider = "+addEntry.misDivider+
-	    	        			"; entry = "+addEntry.getLabel());
-	                	this.add(addEntry);
-		            	
-	                	//Add 
-	    	        	Log.d(TAG, "[BookmarkListAdapter] add isDivider = "+entry.misDivider+
-	    	        			"; entry = "+entry.getLabel());
-		            	this.add(entry);
-	            	}
+	            for (BookmarkEntry entry : data) {
+	                this.add(entry);
 	            }
 	        }
 	        Log.d(TAG, "[BookmarkListAdapter][setData] + End");
@@ -571,18 +652,21 @@ public class BookmarkFragment extends Fragment {
 						Log.d(TAG, "convertView == null, inflate -> find bookmark_list_item");
 						holder = new ViewHolder();
 						convertView = mInflater.inflate(R.layout.bookmark_list_item, parent, false);
-						if (bEditMode) {
-//							ViewStub stub = (ViewStub) convertView.findViewById(R.id.bookmark_listitem_left_viewStub);
-//							View inflated = stub.inflate();
-						    holder.listImageDelete  = (ImageView) convertView.findViewById(R.id.bookmark_listview_viewstub_img);
-						} else {
-							ViewStub stub = (ViewStub) convertView.findViewById(R.id.bookmark_listitem_left_viewStub);
-							if (stub != null) {
-								stub.setVisibility(View.GONE);
-								holder.listImageDelete = null;
-							}
-						}
+//						if (bEditMode) {
+//							
+////							ViewStub stub = (ViewStub) convertView.findViewById(R.id.bookmark_listitem_left_viewStub);
+////							View inflated = stub.inflate();
+//						    holder.listImageDelete  = (ImageView) convertView.findViewById(R.id.bookmark_listview_viewstub_img);
+//						} else {
+////							ViewStub stub = (ViewStub) convertView.findViewById(R.id.bookmark_listitem_left_viewStub);
+////							if (stub != null) {
+////								stub.setVisibility(View.GONE);
+////								holder.listImageDelete = null;
+////							}
+//							holder.listImageDelete  = (ImageView) convertView.findViewById(R.id.bookmark_listview_viewstub_img);
+//						}
 						
+						holder.listImageDelete  = (ImageView) convertView.findViewById(R.id.bookmark_listview_viewstub_img);
 						holder.listImageSpearker = (ImageView) convertView.findViewById(R.id.bookmark_listitem_icon_speaker);
 						holder.listTextView1 = (TextView) convertView.findViewById(R.id.bookmark_listitem_text_first_line);
 						holder.listTextView2 = (TextView) convertView.findViewById(R.id.bookmark_listitem_text_second_line);
@@ -616,14 +700,16 @@ public class BookmarkFragment extends Fragment {
 					} else {
 						Log.d(TAG, "set ListItem Data");
 						
+						
+						final ImageView deleteImg = holder.listImageDelete;
 						if (bEditMode) {
-							ViewStub stub = (ViewStub) convertView.findViewById(R.id.bookmark_listitem_left_viewStub);
-							if (holder.listImageDelete == null) {
-								View inflated = stub.inflate();
-								holder.listImageDelete = (ImageView) inflated.findViewById(R.id.bookmark_listview_viewstub_img);
-							}
-							final ImageView deleteImg = holder.listImageDelete;
+//							ViewStub stub = (ViewStub) convertView.findViewById(R.id.bookmark_listitem_left_viewStub);
+//							if (holder.listImageDelete == null) {
+//								View inflated = stub.inflate();
+//								holder.listImageDelete = (ImageView) inflated.findViewById(R.id.bookmark_listview_viewstub_img);
+//							}
 							
+							deleteImg.setVisibility(View.VISIBLE);
 							if (item.mNeedDelete) {
 								deleteImg.setImageResource(R.drawable.btn_clear_on);
 							} else {
@@ -645,11 +731,12 @@ public class BookmarkFragment extends Fragment {
 								}
 							});
 						} else {
-							ViewStub stub = (ViewStub) convertView.findViewById(R.id.bookmark_listitem_left_viewStub);
-							if (stub != null) {
-								stub.setVisibility(View.GONE);
-								holder.listImageDelete = null;
-							}
+//							ViewStub stub = (ViewStub) convertView.findViewById(R.id.bookmark_listitem_left_viewStub);
+//							if (stub != null) {
+//								stub.setVisibility(View.GONE);
+								holder.listImageDelete.setVisibility(View.GONE);
+								item.mNeedDelete = false;
+//							}
 						}
 	
 						if (holder.listImageSpearker != null) {

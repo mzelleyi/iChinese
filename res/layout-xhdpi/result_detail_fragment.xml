@@ -44,15 +44,19 @@
         android:layout_below="@id/result_detail_title_bar"
         android:background="@color/normal_light_green"
         android:orientation="vertical" >
-        <RelativeLayout
+        <LinearLayout
             android:id="@+id/result_detail_item_description"
 		    android:layout_width="match_parent"
-		    android:layout_height="wrap_content" >
+		    android:layout_height="wrap_content"
+		    android:weightSum="2"
+		    android:orientation="horizontal" >
+
 		    <LinearLayout
 		        android:layout_width="match_parent"
 		        android:layout_height="match_parent"
-		        android:layout_alignParentLeft="true"
-		        android:orientation="vertical" >
+		        android:orientation="vertical"
+		        android:weightSum="1" >
+
 		        <TextView android:id="@+id/result_detail_item_des_first_line"
 			        android:layout_gravity="center_vertical"
 			        android:layout_width="match_parent"
@@ -71,7 +75,7 @@
 		    		android:layout_width="match_parent"
 		   			android:layout_height="wrap_content" >
 		        	<TextView android:id="@+id/result_detail_item_des_second_text"
-				        android:layout_gravity="center_vertical"
+				        android:layout_centerVertical="true"
 				        android:layout_width="match_parent"
 				        android:layout_height="wrap_content"
 				        android:padding="@dimen/margin_h1"
@@ -111,7 +115,7 @@
 		    <LinearLayout
 		        android:layout_width="match_parent"
 		        android:layout_height="match_parent"
-		        android:layout_alignParentRight="true"
+		        android:weightSum="1"
 		        android:orientation="vertical" >
 		        <ImageView 
 			        android:id="@+id/result_detail_item_des_favorite_img"
@@ -147,9 +151,9 @@
 				    android:marqueeRepeatLimit="1"
 			        android:gravity="left" />
 		    </LinearLayout>
-		</RelativeLayout>
+		</LinearLayout>
 		<FrameLayout
-	        android:id="@+id/result_detail_item_listview"
+	        android:id="@+id/result_detail_demo_listview"
 	        android:layout_width="match_parent"
 	        android:layout_height="match_parent" >
     	</FrameLayout>

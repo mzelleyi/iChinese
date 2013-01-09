@@ -15,6 +15,8 @@
 -->
 
 <resources>
+   <color name="black_normal">#000000</color>
+   <color name="white_normal">#FFFFFF</color>
    <color name="normal_light_green">#BBFFFF</color>
    <color name="translucent_red">#80ff0000</color>
 </resources>

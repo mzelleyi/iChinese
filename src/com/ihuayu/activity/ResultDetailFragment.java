@@ -38,15 +38,17 @@ public class ResultDetailFragment extends Fragment {
 
 	private static final String TAG = "iHuayu:ResultDetailFragment";
 	private static FragmentActivity parentActivity = null;
-	private static ScenarioEntry mScenarioEntry = null;
+	private static List<ScenarioEntry> mResultList = null;
+	private static int mCurrentPos = 0;
 
     /**
      * Create a new instance of ResultDetailFragment
      */
-    static ResultDetailFragment newInstance(ScenarioEntry item) {
+    static ResultDetailFragment newInstance(List<ScenarioEntry> list, int position) {
     	Log.d(TAG, "[newInstance] + Begin");
     	ResultDetailFragment fragment = new ResultDetailFragment();
-    	mScenarioEntry = item;
+    	mResultList = list;
+    	mCurrentPos = position;
         return fragment;
     }
     
@@ -75,8 +77,27 @@ public class ResultDetailFragment extends Fragment {
 		super.onViewCreated(view, savedInstanceState);
 		parentActivity = this.getActivity();
 		
-		//Init Item Outline Info
-		final ImageView favoriteImg = (ImageView)parentActivity.findViewById(R.id.result_detail_item_des_favorite_img);
+		Button btnPrev = (Button)parentActivity.findViewById(R.id.result_detail_footbar_btn_prev);
+		btnPrev.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				mCurrentPos--;
+				updateDataFragment();
+			}
+		});
+		
+		Button btnNext = (Button)parentActivity.findViewById(R.id.result_detail_footbar_btn_next);
+		btnNext.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				mCurrentPos++;
+				updateDataFragment();
+			}
+		});
+		
+		final ImageView favoriteImg = (ImageView)parentActivity.findViewById(R.id.result_detail_des_favorite_img);
 		favoriteImg.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -84,18 +105,6 @@ public class ResultDetailFragment extends Fragment {
 				favoriteImg.setImageResource(R.drawable.btn_mark_on_2x);
 			}
 		});
-		
-		TextView TextView1 = (TextView) parentActivity.findViewById(R.id.result_detail_item_des_first_line);
-		TextView1.setText(mScenarioEntry.getLabel());
-		TextView TextView2 = (TextView) parentActivity.findViewById(R.id.result_detail_item_des_second_line);
-		TextView2.setText(mScenarioEntry.getLabel());
-		TextView TextView3 = (TextView) parentActivity.findViewById(R.id.result_detail_item_des_third_line);
-		TextView3.setText(mScenarioEntry.getLabel());
-		
-		TextView TextViewSourceLabel = (TextView) parentActivity.findViewById(R.id.result_detail_item_des_source_info);
-		TextViewSourceLabel.setText(mScenarioEntry.getLabel());
-		TextView TextView1SourceInfo = (TextView) parentActivity.findViewById(R.id.result_detail_item_des_source_text);
-		TextView1SourceInfo.setText(mScenarioEntry.getLabel());
 		
 		//Set Back Button On Click Listener
 		Button backBtn = (Button)parentActivity.findViewById(R.id.result_detail_title_bar_backbtn);
@@ -105,7 +114,7 @@ public class ResultDetailFragment extends Fragment {
 				FragmentManager fm = parentActivity.getSupportFragmentManager();
 				fm.popBackStack();
 				
-				Fragment currentFragment = fm.findFragmentById(R.id.tab_content_search);
+				Fragment currentFragment = fm.findFragmentById(R.id.tab_content_scenario);
 				FragmentTransaction ft = fm.beginTransaction();
 				ft.remove(currentFragment);
 				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
@@ -113,6 +122,10 @@ public class ResultDetailFragment extends Fragment {
 			}
 		});
 		
+		this.updateDataFragment();
+	}
+	
+	public void updateDataFragment() {
 		//Add Detail Dialog Fragment
 		FragmentManager fm = parentActivity.getSupportFragmentManager();
 		FragmentTransaction ft = fm.beginTransaction();
@@ -121,7 +134,7 @@ public class ResultDetailFragment extends Fragment {
         if (list == null) {
         	Log.d(TAG, "[onViewCreated] new ResultDemoFragment, do add");
         	list = new ResultDemoFragment();
-			ft.add(R.id.scenario_detail_dialog_listview, list);
+			ft.add(R.id.result_detail_demo_listview, list);
 			ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 			//ft.addToBackStack(null);
 			ft.commit();
@@ -190,6 +203,19 @@ public class ResultDetailFragment extends Fragment {
 			Log.d(TAG, "[ResultDemoFragment][onLoadFinished] + Begin");
 			// Set the new data in the adapter.
 			mAdapter.setData(data);
+			
+			ScenarioEntry currentEntry = mResultList.get(mCurrentPos);
+			TextView TextView1 = (TextView) parentActivity.findViewById(R.id.result_detail_des_first_line);
+			TextView1.setText(currentEntry.getLabel());
+			TextView TextView2 = (TextView) parentActivity.findViewById(R.id.result_detail_des_second_line_text);
+			TextView2.setText(currentEntry.getLabel());
+			TextView TextView3 = (TextView) parentActivity.findViewById(R.id.result_detail_des_third_line);
+			TextView3.setText(currentEntry.getLabel());
+			
+			TextView TextViewSourceLabel = (TextView) parentActivity.findViewById(R.id.result_detail_des_source_info);
+			TextViewSourceLabel.setText(currentEntry.getLabel());
+			TextView TextView1SourceInfo = (TextView) parentActivity.findViewById(R.id.result_detail_des_source_text);
+			TextView1SourceInfo.setText(currentEntry.getLabel());
 	
 			// The list should now be shown.
 			if (this.isResumed()) {
@@ -229,7 +255,7 @@ public class ResultDetailFragment extends Fragment {
 	    	//TODO:Dummy Data
 	    	List<ScenarioEntry> entries = new ArrayList<ScenarioEntry>(3);
 	    	for (int i=0; i<3; i++) {
-	            entries.add(mScenarioEntry);
+	            entries.add(mResultList.get(mCurrentPos));
 	        }
 	        Log.d(TAG, "[ResultDemoLoader][loadInBackground] + End");
 	        // Done!
@@ -367,7 +393,7 @@ public class ResultDetailFragment extends Fragment {
 		 */
 	    @Override 
 	    public View getView(int position, View convertView, ViewGroup parent) {
-	    	Log.d(TAG, "[ScenarioDetailAdapter][getView] + pos="+position);
+	    	Log.d(TAG, "[ResultDemoAdapter][getView] + pos="+position);
 	        View view;
 			
 	        if (convertView == null) {

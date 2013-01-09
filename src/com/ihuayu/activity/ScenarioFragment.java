@@ -112,6 +112,8 @@ public class ScenarioFragment extends Fragment {
 		// This is the Adapter being used to display the list's data.
 		ScenarioListAdapter mAdapter;
 		
+		List<ScenarioEntry> mOriginScenarioList = null;
+		
 		@Override
 		public void onActivityCreated(Bundle savedInstanceState) {
 			Log.d(TAG, "[ScenarioListFragment][onActivityCreated] + Begin");
@@ -147,7 +149,13 @@ public class ScenarioFragment extends Fragment {
 		public void onListItemClick(ListView l, View v, int position, long id) {
 			// Insert desired behavior here.
 			Log.i(TAG, "[ScenarioListFragment][onListItemClick] Item clicked: " + id);
-			
+			FragmentManager fm = parentActivity.getSupportFragmentManager();
+			Fragment newFragment = ResultDetailFragment.newInstance(mOriginScenarioList,position);
+			FragmentTransaction ft = fm.beginTransaction();
+			ft.add(R.id.tab_content_scenario, newFragment);
+			ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+			ft.addToBackStack(null);
+			ft.commit();
 		}
 
 		public Loader<List<ScenarioEntry>> onCreateLoader(int id, Bundle args) {
@@ -159,6 +167,8 @@ public class ScenarioFragment extends Fragment {
 
 		public void onLoadFinished(Loader<List<ScenarioEntry>> loader, List<ScenarioEntry> data) {
 			Log.d(TAG, "[ScenarioListFragment][onLoadFinished] + Begin");
+			
+			mOriginScenarioList = data; 
 			// Set the new data in the adapter.
 			mAdapter.setData(data);
 

@@ -16,8 +16,10 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -32,6 +34,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.WindowManager.LayoutParams;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -44,12 +49,13 @@ import android.widget.TextView;
  */
 public class BookmarkFragment extends Fragment {
 
-	private static final String		TAG						= "iHuayu:BookmarkFragment";
-	private static FragmentActivity	mParentActivity			= null;
-	private static Resources		mRes					= null;
-	private BookmarkListFragment	mBookmarkListFragment	= null;
-	private static final int		VIEW_TYPE_NORMAL		= 0;
-	private static final int		VIEW_TYPE_DIVIDER		= 1;
+	private static final String			TAG						= "iHuayu:BookmarkFragment";
+	private static final int			VIEW_TYPE_NORMAL		= 0;
+	private static final int			VIEW_TYPE_DIVIDER		= 1;
+	private static FragmentActivity		mParentActivity			= null;
+	private static LayoutInflater	    mInflater				= null;
+	private static Resources			mRes					= null;
+	private BookmarkListFragment		mBookmarkListFragment	= null;
 
     /**
      * Create a new instance of SearchFragment
@@ -74,7 +80,8 @@ public class BookmarkFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
     	Log.d(TAG, "[onCreateView] + Begin");
-        View v = inflater.inflate(R.layout.bookmark_fragment, container, false);
+    	mInflater = inflater;
+        View v = mInflater.inflate(R.layout.bookmark_fragment, container, false);
         return v;
     }
 
@@ -130,16 +137,34 @@ public class BookmarkFragment extends Fragment {
 		// This is the Adapter being used to display the list's data.
 		BookmarkListAdapter mAdapter;
 		
+		//Handle indicate case.
+		ListView mListView = null;
+	    private RemoveWindow mRemoveWindow = new RemoveWindow();
+	    Handler mHandler = new Handler();
+	    private WindowManager mWindowManager;
+	    private TextView mDialogText;
+	    private boolean mShowing;
+	    private boolean mReady;
+	    private char mPrevLetter = Character.MIN_VALUE;
+	    //List<Character> sDividerCharList = new ArrayList<Character>();
+		
+		//The origin data that get from DB.
 		List<BookmarkEntry> mOriginBookmarkList = null;
+		//The data that fill with divider elements.
 		List<BookmarkEntry> mWithDividerList = new ArrayList<BookmarkEntry>();
+		//The list used to keep need remove list normal item.
 		List<BookmarkEntry> mRemoveBookmarkList = new ArrayList<BookmarkEntry>();
+		//The list used to keep need remove list divider item.
 		List<BookmarkEntry> mRemoveDividerList = new ArrayList<BookmarkEntry>();
 		
 		@Override
 		public void onActivityCreated(Bundle savedInstanceState) {
 			Log.d(TAG, "[BookmarkListFragment][onActivityCreated] + Begin");
 			super.onActivityCreated(savedInstanceState);
-	
+			
+			mInflater = (LayoutInflater)mParentActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+	        mWindowManager = (WindowManager)mParentActivity.getSystemService(Context.WINDOW_SERVICE);
+	        
 			// Give some text to display if there is no data. In a real
 			// application this would come from a resource.
 			this.setEmptyText("No Bookmarks");
@@ -157,8 +182,31 @@ public class BookmarkFragment extends Fragment {
 			// Prepare the loader. Either re-connect with an existing one,
 			// or start a new one.
 			this.getLoaderManager().initLoader(0, null, this);
+			Log.d(TAG, "[BookmarkListFragment][onActivityCreated] + End");
 		}
+		
+	    @Override
+		public void onResume() {
+	        super.onResume();
+	        mReady = true;
+	    }
+
+	    
+	    @Override
+	    public void onPause() {
+	        super.onPause();
+	        removeWindow();
+	        mReady = false;
+	    }
+
+	    @Override
+	    public void onDestroy() {
+	        super.onDestroy();
+	        mWindowManager.removeView(mDialogText);
+	        mReady = false;
+	    }
 	
+
 		@Override
 		public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 			Log.d(TAG, "[BookmarkListFragment][onCreateOptionsMenu] + Begin");
@@ -207,6 +255,8 @@ public class BookmarkFragment extends Fragment {
         	firstAddEntry.loadLabel(this.getActivity());
         	firstAddEntry.misDivider = true;
         	mWithDividerList.add(firstAddEntry);
+        	//Add to dividers list
+        	//sDividerCharList.add(firstAddEntry.getLabel().charAt(0));
         	Log.d(TAG, "add isDivider = "+firstAddEntry.misDivider+"; entry = "+firstAddEntry.getLabel());
             for (int i = 0; i < data.size() ; i++) {
             	Log.d(TAG, " i = "+i);
@@ -216,6 +266,7 @@ public class BookmarkFragment extends Fragment {
             	if(String.valueOf(thisChar).equalsIgnoreCase(temp)) {
     	        	Log.d(TAG, "add isDivider = "+entry.misDivider+	"; entry = "+entry.getLabel());
     	        	mWithDividerList.add(entry);
+    	        	//sDividerChars[i] = thisChar;
             	} else {
             		temp = String.valueOf(thisChar);
             		
@@ -224,6 +275,7 @@ public class BookmarkFragment extends Fragment {
     	        	addEntry.loadLabel(this.getActivity());
     	        	addEntry.misDivider = true;
     	        	Log.d(TAG, "add isDivider = "+addEntry.misDivider+"; entry = "+addEntry.getLabel());
+    	        	//sDividerCharList.add(addEntry.getLabel().charAt(0));
     	        	mWithDividerList.add(addEntry);
 	            	
                 	//Add Normal Item
@@ -233,6 +285,7 @@ public class BookmarkFragment extends Fragment {
             }
             Log.d(TAG, "[BookmarkListFragment] mWithDividerList Size = "+ mWithDividerList.size());
 			mAdapter.setData(mWithDividerList);
+			//Log.d(TAG, "[BookmarkListFragment] sDividerChars length = "+ sDividerCharList.size());
 			Log.d(TAG, "[BookmarkListFragment] Behind Set Data Size = "+ mAdapter.getCount());
 	
 			// The list should now be shown.
@@ -240,6 +293,56 @@ public class BookmarkFragment extends Fragment {
 				this.setListShown(true);
 			} else {
 				this.setListShownNoAnimation(true);
+			}
+			
+			// Set Indicate For ListView
+	        mDialogText = (TextView) mInflater.inflate(R.layout.list_position_indicate, null);
+	        mDialogText.setVisibility(View.INVISIBLE);
+	        mHandler.post(new Runnable() {
+	            public void run() {
+	                mReady = true;
+	                WindowManager.LayoutParams lp = new WindowManager.LayoutParams(
+	                        LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT,
+	                        WindowManager.LayoutParams.TYPE_APPLICATION,
+	                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+	                                | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+	                        PixelFormat.TRANSLUCENT);
+	                mWindowManager.addView(mDialogText, lp);
+	            }});
+			
+			mListView = this.getListView();
+			if (null != mListView) {
+				mListView.setOnScrollListener(new AbsListView.OnScrollListener()
+				{
+					
+					@Override
+					public void onScrollStateChanged(AbsListView view, int scrollState)
+					{
+						// TODO Auto-generated method stub
+						Log.d(TAG, "[onScrollStateChanged] + scrollState = "+scrollState);
+						
+					}
+					
+					@Override
+					public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount)
+					{
+						// TODO Auto-generated method stub
+						Log.d(TAG, "[onScroll] + firstVisibleItem = "+firstVisibleItem
+								+",visibleItemCount = "+visibleItemCount+",totalItemCount = "+totalItemCount);
+				        if (mReady) {
+				            char firstLetter = mWithDividerList.get(firstVisibleItem).getLabel().charAt(0);
+				            
+				            if (!mShowing && firstLetter != mPrevLetter) {
+				                mShowing = true;
+				                mDialogText.setVisibility(View.VISIBLE);
+				            }
+				            mDialogText.setText(((Character)firstLetter).toString());
+				            mHandler.removeCallbacks(mRemoveWindow);
+				            mHandler.postDelayed(mRemoveWindow, 3000);
+				            mPrevLetter = firstLetter;
+				        }
+					}
+				});
 			}
 		}
 	
@@ -250,7 +353,14 @@ public class BookmarkFragment extends Fragment {
 			mAdapter.setData(null);
 		}
 		
-		public void enterEditMode() {
+	    private void removeWindow() {
+	        if (mShowing) {
+	            mShowing = false;
+	            mDialogText.setVisibility(View.INVISIBLE);
+	        }
+	    }
+	    
+	    private void enterEditMode() {
 			Log.d(TAG, "[BookmarkListFragment][enterEditMode] + Begin");
 			Log.d(TAG, "[BookmarkListFragment] adpater size = "+mAdapter.getCount());
 			mAdapter.bEditMode = true;
@@ -258,7 +368,7 @@ public class BookmarkFragment extends Fragment {
 			Log.d(TAG, "[BookmarkListFragment][enterEditMode] + End");
 		}
 		
-		public void leaveEditMode() {
+		private void leaveEditMode() {
 			Log.d(TAG, "[BookmarkListFragment][leaveEditMode] + Begin");
 			Log.d(TAG, "[BookmarkListFragment] Adapter.getCount = "+mAdapter.getCount());
 			mAdapter.bEditMode = false;
@@ -330,14 +440,22 @@ public class BookmarkFragment extends Fragment {
 			}
             for (BookmarkEntry entry : mRemoveDividerList) {
             	mWithDividerList.remove(entry);
+            	//sDividerCharList.remove(entry.getLabel().charAt(0));
             }
-            Log.d(TAG, "[BookmarkListFragment] After Remove Unused Divider, The Size ="+mWithDividerList.size());
+            //Log.d(TAG, "[BookmarkListFragment] After Remove Unused Divider, The sDividerCharList Size ="+sDividerCharList.size());
+            Log.d(TAG, "[BookmarkListFragment] After Remove Unused Divider, The mWithDividerList Size ="+mWithDividerList.size());
 			
-            
 			mAdapter.setData(mWithDividerList);
 			mAdapter.notifyDataSetChanged();
 			Log.d(TAG, "[BookmarkListFragment][leaveEditMode] + End");
 		}
+	
+		//The class used to show indicate for list view 
+	    private final class RemoveWindow implements Runnable {
+	        public void run() {
+	            removeWindow();
+	        }
+	    }
 	}
 	
 	/**
@@ -572,14 +690,14 @@ public class BookmarkFragment extends Fragment {
 	}
 
 	public static class BookmarkListAdapter extends ArrayAdapter<BookmarkEntry> {
-	    private final LayoutInflater mInflater;
+	    
 	    private boolean bEditMode = false;
 	    
 	    public BookmarkListAdapter(Context context) {
 	        //super(context, android.R.layout.simple_list_item_2);
 	        //super(context, R.layout.Bookmark_list_item);
 	    	super(context, R.layout.bookmark_list_item);
-	        mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+	        //mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	    }
 
 	    public void setData(List<BookmarkEntry> data) {

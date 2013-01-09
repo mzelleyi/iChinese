@@ -7,14 +7,14 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
     <TextView
-        android:id="@+id/search_fragment_title"
+        android:id="@+id/search_fragment_titlebar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/title_bar_height"
         android:background="@drawable/navigationbar_bg_2x"
         android:gravity="center"
         android:maxLines="1"
         android:text="@string/title_bar_search"
-        android:textColor="#ffffff"
+        android:textColor="@color/white_normal"
         android:textSize="@dimen/title_bar_center_text_size"
         android:textStyle="bold"
         android:typeface="normal" />
@@ -24,32 +24,29 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/search_bar_height"
         android:background="@drawable/bg_search"
-        android:orientation="horizontal"
-        android:paddingBottom="@dimen/margin_h2"
-        android:paddingRight="@dimen/margin_h5"
-        android:paddingTop="@dimen/margin_h2" >
-        <ImageView
-            android:id="@+id/input_bar_imageButton"
-            android:layout_width="wrap_content"
+        android:orientation="horizontal" >
+        <Button
+            android:id="@+id/input_bar_btn"
+            android:layout_width="@dimen/title_bar_side_button_width"
             android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_marginLeft="@dimen/margin_h3"
+            android:layout_marginTop="@dimen/margin_h2"
+            android:layout_marginRight="@dimen/margin_h3"
+            android:layout_marginBottom="@dimen/margin_h2"
             android:contentDescription="@string/input_bar_img"
-            android:paddingBottom="@dimen/margin_h2"
-            android:paddingLeft="@dimen/margin_h3"
-            android:paddingRight="@dimen/margin_h3"
-            android:paddingTop="@dimen/margin_h2"
-            android:src="@drawable/btn_input_en" />
+            android:background="@drawable/btn_input_en" />
         <EditText
             android:id="@+id/input_bar_editText"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:ems="10"
             android:hint="@string/searchbox_hint"
             android:inputType="textAutoCorrect"
-            android:paddingBottom="@dimen/margin_h1"
-            android:paddingLeft="@dimen/margin_h1"
-            android:paddingRight="@dimen/margin_h5"
-            android:paddingTop="@dimen/margin_h1" />
+            android:layout_marginLeft="@dimen/margin_h2"
+            android:layout_marginTop="@dimen/margin_h2"
+            android:layout_marginRight="@dimen/margin_h4"
+            android:layout_marginBottom="@dimen/margin_h2" />
     </LinearLayout>
     <ImageView
         android:id="@+id/main_activity_prompt_image"

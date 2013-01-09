@@ -29,5 +29,8 @@
     
     <string name="foot_bar_btn_prev">Prev</string>
     <string name="foot_bar_btn_next">Next</string>
+    
+    <string name="dialog_msg_add_to_bookmark">Add To Bookmark?</string>
+    <string name="dialog_msg_add_success">Successful</string>
 
 </resources>

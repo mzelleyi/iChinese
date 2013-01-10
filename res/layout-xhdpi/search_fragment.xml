@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/tab_search_fragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
+
     <TextView
         android:id="@+id/search_fragment_titlebar"
         android:layout_width="match_parent"
@@ -20,13 +20,13 @@
         android:typeface="normal" />
 
     <LinearLayout
-        android:id="@+id/tab_search_input_bar"
+        android:id="@+id/search_fragment_search_bar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/search_bar_height"
         android:background="@drawable/bg_search"
         android:orientation="horizontal" >
         <Button
-            android:id="@+id/input_bar_btn"
+            android:id="@+id/search_bar_btn"
             android:layout_width="@dimen/title_bar_side_button_width"
             android:layout_height="match_parent"
             android:layout_gravity="center"
@@ -34,25 +34,70 @@
             android:layout_marginTop="@dimen/margin_h2"
             android:layout_marginRight="@dimen/margin_h3"
             android:layout_marginBottom="@dimen/margin_h2"
-            android:contentDescription="@string/input_bar_img"
-            android:background="@drawable/btn_input_en" />
-        <EditText
-            android:id="@+id/input_bar_editText"
+            android:contentDescription="@string/dummy_img_des"
+            android:background="@drawable/btn_english" >
+        </Button>
+
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:hint="@string/searchbox_hint"
-            android:inputType="textAutoCorrect"
-            android:layout_marginLeft="@dimen/margin_h2"
-            android:layout_marginTop="@dimen/margin_h2"
-            android:layout_marginRight="@dimen/margin_h4"
-            android:layout_marginBottom="@dimen/margin_h2" />
+            android:paddingRight="@dimen/margin_h2" >
+
+            <EditText
+                android:id="@+id/search_bar_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentLeft="true"
+                android:layout_gravity="center"
+                android:layout_marginBottom="@dimen/margin_h2"
+                android:layout_marginLeft="@dimen/margin_h2"
+                android:layout_marginRight="@dimen/margin_h2"
+                android:layout_marginTop="@dimen/margin_h2"
+                android:focusable="true" 
+				android:focusableInTouchMode="true"
+                android:duplicateParentState="false"
+                android:hint="@string/searchbox_hint"
+                android:imeOptions="actionSearch"
+                android:inputType="textAutoCorrect" />
+
+            <ImageView
+		        android:id="@+id/search_bar_edit_clear"
+		        android:contentDescription="@string/dummy_img_des"
+		        android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_centerVertical="true"
+	            android:layout_alignParentRight="true"
+	            android:padding="@dimen/margin_h2"
+	            android:visibility="gone"
+		        android:src="@drawable/btn_clear_rest" >
+            	<requestFocus />
+             </ImageView>
+        </RelativeLayout>
+        
     </LinearLayout>
     <ImageView
-        android:id="@+id/main_activity_prompt_image"
+        android:id="@+id/search_fragment_prompt_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:contentDescription="@string/dummy_img_des"
         android:scaleType="fitXY"
         android:src="@drawable/prompt" />
+    <ListView
+	        android:id="@+id/search_result_list"
+	        android:layout_width="match_parent"
+	        android:layout_height="match_parent"
+	        android:background="@color/green_light"  />
+    <!-- 
+<LinearLayout 
+        android:id="@+id/search_fragment_list_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/prompt" >
+        <ListView
+	        android:id="@+id/search_result_list"
+	        android:layout_width="match_parent"
+	        android:layout_height="match_parent"
+	        android:layout_weight="1"
+	        android:background="@color/green_light"  />
+    </LinearLayout> -->
 </LinearLayout>

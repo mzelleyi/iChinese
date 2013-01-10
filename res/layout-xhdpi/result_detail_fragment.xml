@@ -42,7 +42,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/result_detail_title_bar"
-        android:background="@color/normal_light_green"
+        android:background="@color/green_light"
         android:orientation="vertical" >
         
         <LinearLayout

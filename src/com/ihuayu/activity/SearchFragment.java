@@ -16,7 +16,6 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -34,7 +33,7 @@ public class SearchFragment extends Fragment {
 	private static final String TAG = "iHuayu:SearchFragment";
 	private static final int DELAY_REFRESH_LIST_VIEW = 300;
 	private static final int MSG_REFRESH_LISTVIEW = 1;
-	private static final int MSG_UPDATE_SEARCH_LIST = 2;
+	//private static final int MSG_UPDATE_SEARCH_LIST = 2;
 	private static final int MSG_DO_ALL_SEARCH = 3;
 	
 	private static FragmentActivity parentActivity = null;
@@ -89,7 +88,6 @@ public class SearchFragment extends Fragment {
 		final Button btnLanguage = (Button)parentActivity.findViewById(R.id.search_bar_btn);
 		//Tag "EN" represent input type is English while "CN" represent Chinese.
 		btnLanguage.setTag("EN");
-		btnLanguage.requestFocus();
 		btnLanguage.setBackgroundResource(R.drawable.btn_english);
 		btnLanguage.setOnClickListener(new View.OnClickListener()
 		{
@@ -110,12 +108,12 @@ public class SearchFragment extends Fragment {
 		mAdapter = new ArrayAdapter<String>(parentActivity,
 		            android.R.layout.simple_list_item_1, mStrings);
 		
+		mListView = (ListView)parentActivity.findViewById(R.id.search_result_list);
+		
 		final ImageView mPromptImg = (ImageView)parentActivity.findViewById(R.id.search_fragment_prompt_image);
 		final ImageView mClearImg = (ImageView)parentActivity.findViewById(R.id.search_bar_edit_clear);
-	    
-		mListView = (ListView)parentActivity.findViewById(R.id.search_result_list);
-	    
-	    EditText mEditText = (EditText)parentActivity.findViewById(R.id.search_bar_edit_text);
+		
+	    final EditText mEditText = (EditText)parentActivity.findViewById(R.id.search_bar_edit_text);
 //	    mEditText.setOnFocusChangeListener(new View.OnFocusChangeListener()
 //		{
 //			@Override
@@ -141,7 +139,7 @@ public class SearchFragment extends Fragment {
 				// TODO Auto-generated method stub
 				Log.d(TAG, "[onTextChanged] + Begin");
 				String text = s.toString().trim();
-				Log.d(TAG, "[afterTextChanged] text string is :"+text);
+				Log.d(TAG, "[onTextChanged] text string is :"+text);
 				if (text == null || text.equals("")) {
 					sendSearchMsg(null, DELAY_REFRESH_LIST_VIEW);
 					mClearImg.setVisibility(View.GONE);
@@ -151,6 +149,7 @@ public class SearchFragment extends Fragment {
 					mClearImg.setVisibility(View.VISIBLE);
 					mPromptImg.setVisibility(View.GONE);
 				}
+				Log.d(TAG, "[onTextChanged] + End");
 			}
 			
 			@Override
@@ -165,7 +164,15 @@ public class SearchFragment extends Fragment {
 			{
 				// TODO Auto-generated method stub
 				Log.d(TAG, "[afterTextChanged] + Begin");
-
+			}
+		});
+	    
+		mClearImg.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Log.d(TAG, "[onClick] mClearImg + Begin");
+				mEditText.getText().clear();
 			}
 		});
 	}

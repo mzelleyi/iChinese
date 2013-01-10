@@ -70,7 +70,6 @@
 	            android:padding="@dimen/margin_h2"
 	            android:visibility="gone"
 		        android:src="@drawable/btn_clear_rest" >
-            	<requestFocus />
              </ImageView>
         </RelativeLayout>
         

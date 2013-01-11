@@ -6,11 +6,9 @@ import java.util.List;
 
 import com.ihuayu.R;
 import com.ihuayu.activity.ScenarioFragment.ScenarioEntry;
+import com.ihuayu.view.MyDialogFragment;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -41,15 +39,12 @@ import android.widget.Toast;
 public class ResultDetailFragment extends Fragment {
 
 	private static final String TAG = "iHuayu:ResultDetailFragment";
-	private static final int ADD_TO_BOOKMARK = 0;
-	private static final int ADD_SUCCESS = 1;
 	private static FragmentActivity parentActivity = null;
 	private static List<ScenarioEntry> mResultList = null;
 	private static int mCurrentPos = 0;
 	private static int mDialogType = -1;
 	private static boolean mBeFavorited = false;
 
-	
     /**
      * Create a new instance of ResultDetailFragment
      */
@@ -112,7 +107,7 @@ public class ResultDetailFragment extends Fragment {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				if (!mBeFavorited) {
-					mDialogType = ADD_TO_BOOKMARK;
+					mDialogType = MyDialogFragment.ADD_TO_BOOKMARK;
 					showDialog(mDialogType);
 				} else {
 					favoriteImg.setImageResource(R.drawable.btn_mark_off_2x);
@@ -143,11 +138,11 @@ public class ResultDetailFragment extends Fragment {
 	}
 	
     public static void showDialog(int dialogType) {
-    	if (dialogType == ADD_TO_BOOKMARK) {
-    		DialogFragment newFragment = MyAlertDialogFragment.newInstance(ADD_TO_BOOKMARK);
+    	if (dialogType == MyDialogFragment.ADD_TO_BOOKMARK) {
+    		DialogFragment newFragment = MyDialogFragment.newInstance(parentActivity, MyDialogFragment.ADD_TO_BOOKMARK);
             newFragment.show(parentActivity.getSupportFragmentManager(), "dialog_add");
     	} else {
-    		DialogFragment newFragment = MyAlertDialogFragment.newInstance(ADD_SUCCESS);
+    		DialogFragment newFragment = MyDialogFragment.newInstance(parentActivity, MyDialogFragment.ADD_SUCCESS);
             newFragment.show(parentActivity.getSupportFragmentManager(), "dialog_success");
     	}
     }
@@ -155,12 +150,12 @@ public class ResultDetailFragment extends Fragment {
     public static void doPositiveClick() {
         // Do stuff here.
         Log.i(TAG, "Positive click!");
-        if (mDialogType == ADD_TO_BOOKMARK) {
+        if (mDialogType == MyDialogFragment.ADD_TO_BOOKMARK) {
         	ImageView favoriteImg = (ImageView)parentActivity.findViewById(R.id.result_detail_des_favorite_img);
         	favoriteImg.setImageResource(R.drawable.btn_mark_on_2x);
-        	mDialogType = ADD_SUCCESS;
-        	showDialog(ADD_SUCCESS);
-        } else if (mDialogType == ADD_SUCCESS) {
+        	mDialogType = MyDialogFragment.ADD_SUCCESS;
+        	showDialog(MyDialogFragment.ADD_SUCCESS);
+        } else if (mDialogType == MyDialogFragment.ADD_SUCCESS) {
         	mBeFavorited = true;
         	mDialogType = -1;
         } else {
@@ -198,54 +193,6 @@ public class ResultDetailFragment extends Fragment {
 			ft.commit();
         }
 	}
-	
-    public static class MyAlertDialogFragment extends DialogFragment {
-
-        public static MyAlertDialogFragment newInstance(int dialogType) {
-            MyAlertDialogFragment frag = new MyAlertDialogFragment();
-            Bundle args = new Bundle();
-            args.putInt("dialogType", dialogType);
-            frag.setArguments(args);
-            return frag;
-        }
-        
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            int dialogType = getArguments().getInt("dialogType");
-            if (dialogType == ADD_TO_BOOKMARK) {
-            	return new AlertDialog.Builder(parentActivity)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle(R.string.dialog_msg_add_to_bookmark)
-                .setPositiveButton(android.R.string.ok,
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                        	doPositiveClick();
-                        }
-                    }
-                )
-                .setNegativeButton(android.R.string.cancel,
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                        	doNegativeClick();
-                        }
-                    }
-                )
-                .create();
-            } else {
-            	return new AlertDialog.Builder(parentActivity)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle(R.string.dialog_msg_add_success)
-                .setPositiveButton(android.R.string.ok,
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                        	doPositiveClick();
-                        }
-                    }
-                )
-                .create();
-            }
-        }
-    }
 	
 	public static class ResultDemoFragment extends ListFragment implements 
 		LoaderManager.LoaderCallbacks<List<ScenarioEntry>> {

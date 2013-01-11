@@ -54,6 +54,7 @@
                 android:layout_marginRight="@dimen/margin_h2"
                 android:layout_marginTop="@dimen/margin_h2"
                 android:focusable="true" 
+                android:singleLine="true"
 				android:focusableInTouchMode="true"
                 android:duplicateParentState="false"
                 android:hint="@string/searchbox_hint"
@@ -84,8 +85,32 @@
     <ListView
 	        android:id="@+id/search_result_list"
 	        android:layout_width="match_parent"
-	        android:layout_height="match_parent"
-	        android:background="@color/green_light"  />
+	        android:layout_height="match_parent" />
+    <LinearLayout
+        android:id="@+id/search_fragment_emptyview"
+	    android:orientation="vertical"
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:paddingTop="@dimen/margin_h7" >
+	    <TextView android:id="@+id/search_empty_view_text_firstline"
+	        android:layout_gravity="center_vertical"
+	        android:gravity="center"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:hint="@string/search_no_result_hint_first_line"
+	        android:textStyle="bold"
+	        android:textSize="@dimen/search_result_empty_text_hint_size"
+	        android:textColor="@color/red_normal" />
+	    <TextView android:id="@+id/search_empty_view_text_second_line"
+	        android:layout_gravity="center_vertical"
+	        android:gravity="center"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:textColor="@color/blue_normal"
+	        android:textSize="@dimen/search_result_empty_text_hint_size"
+	        android:textStyle="bold"
+	        android:hint="@string/search_no_result_hint_second_line" />
+	</LinearLayout>
     <!-- 
 <LinearLayout 
         android:id="@+id/search_fragment_list_layout"

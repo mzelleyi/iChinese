@@ -11,6 +11,8 @@
     <string name="dummy_text">Just For Test</string>
     
     <string name="searchbox_hint">Search</string>
+    <string name="search_no_result_hint_first_line">No Result Found!</string>
+    <string name="search_no_result_hint_second_line">Suggest</string>
     
     <string name="tab_bar_search">SEARCH</string>
     <string name="tab_bar_scenario">SCENARIOS</string>

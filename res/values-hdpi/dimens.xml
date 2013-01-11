@@ -40,6 +40,9 @@
     <dimen name="icon_mark_height">40dp</dimen>
     <dimen name="icon_mark_width">40dp</dimen>
     
+    <dimen name="search_result_empty_text_hint_size">20sp</dimen>
+    
+    <dimen name="listview_normal_height">40dp</dimen>
     <dimen name="listview_primary_text_size">16sp</dimen>
     <dimen name="listview_second_text_size">14sp</dimen>
     <dimen name="listview_third_text_size">12sp</dimen>
@@ -49,5 +52,7 @@
     <dimen name="margin_h3">12dp</dimen>
     <dimen name="margin_h4">20dp</dimen>
     <dimen name="margin_h5">32dp</dimen>
+    <dimen name="margin_h6">52dp</dimen>
+    <dimen name="margin_h7">84dp</dimen>
 
 </resources>

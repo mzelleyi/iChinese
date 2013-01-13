@@ -20,7 +20,7 @@ import com.ihuayu.activity.operation.IhuayuOperationImpl;
 public class DBDemo {
 
 	public DBDemo(Context context) {
-		DBManager dbManager = new DBManager(context);
+		DBSqlite dbManager = new DBSqlite(context);
 		IhuayuOperationImpl operation = new IhuayuOperationImpl(dbManager);
 		long startTime = System.currentTimeMillis();
 		//Search

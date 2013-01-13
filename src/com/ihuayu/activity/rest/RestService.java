@@ -8,10 +8,8 @@ import java.security.InvalidKeyException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
@@ -23,7 +21,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
@@ -41,7 +38,7 @@ public class RestService {
 	public static final String GET_SCENARIO_UPDATE_URL = "http://ihuayu.gistxl.com/smc/WebServices/SMCWCFService.svc/GetScenariosV1_1";
 	private static final String KEY = "NLBkey1111111111";
 	
-	public void getNumberIfDownloads(String lastUpdateTime) throws ClientProtocolException, IOException, InvalidKeyException, ParseException {
+	public int getNumberIfDownloads(String lastUpdateTime) throws ClientProtocolException, IOException, InvalidKeyException, ParseException {
 		HttpClient client=new DefaultHttpClient();  
 		HttpPost httpPost=new HttpPost(GET_NUMBER_OF_DOWNLOADS_URL);  
 		StringEntity entity = new StringEntity(getRequestJsonString(lastUpdateTime), "UTF-8");
@@ -49,8 +46,8 @@ public class RestService {
 		entity.setContentType("application/json"); 
 		httpPost.setEntity(entity);  
 		HttpResponse response=client.execute(httpPost); 
-		System.out.println("Wangzai 1111 " + EntityUtils.toString(response.getEntity()));
-		System.out.println(response);
+//		System.out.println("Wangzai 1111 " + EntityUtils.toString(response.getEntity()));
+		return Integer.parseInt(EntityUtils.toString(response.getEntity()));
 	}
 	
 	public List<ContentValues> getDictionary(String lastUpdateTime) throws ClientProtocolException, IOException, ParseException, JSONException {

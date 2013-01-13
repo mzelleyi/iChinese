@@ -3,15 +3,20 @@
  */
 package com.ihuayu.activity.operation;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.ihuayu.activity.db.DBManager;
+import com.ihuayu.activity.db.DBSqlite;
 import com.ihuayu.activity.db.entity.Dialog;
 import com.ihuayu.activity.db.entity.DialogKeywords;
 import com.ihuayu.activity.db.entity.Dictionary;
@@ -23,9 +28,9 @@ import com.ihuayu.activity.db.entity.Scenario;
  */
 public class IhuayuOperationImpl {
 	private SQLiteDatabase db = null;
-	DBManager manager;
+	DBSqlite manager;
 	
-	public IhuayuOperationImpl(DBManager manager) {
+	public IhuayuOperationImpl(DBSqlite manager) {
 		this.db = manager.getSqlDB();
 		this.manager = manager;
 	}
@@ -40,7 +45,6 @@ public class IhuayuOperationImpl {
 		for(ContentValues values : params) {
 			long result = this.db.insert("name", null, values);
 		}
-		return ;
 	} 
 	
 	public void insertIntoScenarioDialogKeyWord(HashMap<ContentValues, HashMap<ContentValues, List<ContentValues>>> scenarioDialogKeyword) {
@@ -69,9 +73,27 @@ public class IhuayuOperationImpl {
 		
 	}
 	
-	public void insertTable(String name, ContentValues contentValues) {
+	public long insertToBookmark(String dictionaryID) {
+		try {
+			ContentValues contentValues = new ContentValues();
+			contentValues.put("Dictionary_ID", dictionaryID);
+			contentValues.put("Update_date", getStandardTimeStr());
+			return this.db.insert("Favorites", null, contentValues);
+		} catch (Exception e) {
+			return -1;
+		}
+	}
+	
+	@SuppressLint("SimpleDateFormat")
+	private String getStandardTimeStr() throws ParseException {
+		DateFormat  format2 = new SimpleDateFormat("yyyyMMddHHmmss");
+		Date now = new Date(); 
+		return format2.format(now);
+	}
+	
+	public long insertTable(String name, ContentValues contentValues) {
 		long result = this.db.insert(name, null, contentValues);
-		return ;
+		return result;
 	} 
 	
 	public List<Dialog> queryDialog(String condition, String[] params) {

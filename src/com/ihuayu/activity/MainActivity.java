@@ -1,7 +1,13 @@
 package com.ihuayu.activity;
 
+import java.util.List;
+
 import com.ihuayu.R;
 import com.ihuayu.activity.db.DBDemo;
+import com.ihuayu.activity.db.entity.Dialog;
+import com.ihuayu.activity.db.entity.DialogKeywords;
+import com.ihuayu.activity.db.entity.Scenario;
+import com.ihuayu.activity.operation.DBManagerment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -115,7 +121,11 @@ public class MainActivity extends FragmentActivity implements
 
 	public void onTabChanged(String tabTag) {
 		Log.d(TAG, "[onTabChanged] + Begin,tabTag:" + tabTag);
-		DBDemo demo = new DBDemo(this);
+		DBManagerment management = new DBManagerment(this);
+		List<Scenario> list = management.getAllScenarios();
+		for(Scenario scenario : list) {
+			System.out.println("Dialog ==========" + scenario.getTitle_cn());
+		}			
 		// TODO Auto-generated method stub
 		if (TAB_SEARCH.equals(tabTag)) {
 			updateTab(tabTag, R.id.tab_content_search);

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ihuayu.R;
-import com.ihuayu.activity.ScenarioFragment.ScenarioEntry;
+import com.ihuayu.activity.db.entity.Dictionary;
 import com.ihuayu.view.MyDialogFragment;
 
 import android.content.Context;
@@ -40,15 +40,15 @@ public class ResultDetailFragment extends Fragment {
 
 	private static final String TAG = "iHuayu:ResultDetailFragment";
 	private static FragmentActivity parentActivity = null;
-	private static List<ScenarioEntry> mResultList = null;
-	private static int mCurrentPos = 0;
+	private static List<Dictionary> mResultList = new ArrayList<Dictionary>();
+	private static int mCurrentPos = -1;
 	private static int mDialogType = -1;
 	private static boolean mBeFavorited = false;
 
     /**
      * Create a new instance of ResultDetailFragment
      */
-    static ResultDetailFragment newInstance(List<ScenarioEntry> list, int position) {
+    static ResultDetailFragment newInstance(List<Dictionary> list, int position) {
     	Log.d(TAG, "[newInstance] + Begin");
     	ResultDetailFragment fragment = new ResultDetailFragment();
     	mResultList = list;
@@ -126,11 +126,11 @@ public class ResultDetailFragment extends Fragment {
 				FragmentManager fm = parentActivity.getSupportFragmentManager();
 				fm.popBackStack();
 				
-				Fragment currentFragment = fm.findFragmentById(R.id.tab_content_scenario);
-				FragmentTransaction ft = fm.beginTransaction();
-				ft.remove(currentFragment);
-				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
-				ft.commit();
+//				Fragment currentFragment = fm.findFragmentById(R.id.tab_content_scenario);
+//				FragmentTransaction ft = fm.beginTransaction();
+//				ft.remove(currentFragment);
+//				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
+//				ft.commit();
 			}
 		});
 		
@@ -195,7 +195,7 @@ public class ResultDetailFragment extends Fragment {
 	}
 	
 	public static class ResultDemoFragment extends ListFragment implements 
-		LoaderManager.LoaderCallbacks<List<ScenarioEntry>> {
+		LoaderManager.LoaderCallbacks<List<Dictionary>> {
 		
 		// This is the Adapter being used to display the list's data.
 		ResultDemoAdapter mAdapter;
@@ -238,30 +238,36 @@ public class ResultDetailFragment extends Fragment {
 			
 		}
 	
-		public Loader<List<ScenarioEntry>> onCreateLoader(int id, Bundle args) {
+		public Loader<List<Dictionary>> onCreateLoader(int id, Bundle args) {
 			Log.d(TAG, "[ResultDemoFragment][onCreateLoader] + Begin");
 			// This is called when a new Loader needs to be created. This
 			// sample only has one Loader with no arguments, so it is simple.
 			return new ResultDemoLoader(this.getActivity());
 		}
 	
-		public void onLoadFinished(Loader<List<ScenarioEntry>> loader, List<ScenarioEntry> data) {
+		public void onLoadFinished(Loader<List<Dictionary>> loader, List<Dictionary> data) {
 			Log.d(TAG, "[ResultDemoFragment][onLoadFinished] + Begin");
 			// Set the new data in the adapter.
-			mAdapter.setData(data);
+			Dictionary currentDic = null;
+			if (mCurrentPos > -1 && mCurrentPos <= mResultList.size()) {
+				currentDic = mResultList.get(mCurrentPos);
+				TextView TextView1 = (TextView) parentActivity.findViewById(R.id.result_detail_des_first_line);
+				TextView1.setText(currentDic.getKeyword());
+				TextView TextView2 = (TextView) parentActivity.findViewById(R.id.result_detail_des_second_line_text);
+				TextView2.setText(currentDic.getDestiontion());
+				TextView TextView3 = (TextView) parentActivity.findViewById(R.id.result_detail_des_third_line);
+				TextView3.setText(currentDic.getChineser_tone_py());
+				TextView TextViewSourceLabel = (TextView) parentActivity.findViewById(R.id.result_detail_des_source_text);
+				TextViewSourceLabel.setText(R.string.dic_detail_source_text);
+				TextView TextView1SourceInfo = (TextView) parentActivity.findViewById(R.id.result_detail_des_source_info);
+				TextView1SourceInfo.setText(currentDic.getDic_catagory());
+			}
 			
-			ScenarioEntry currentEntry = mResultList.get(mCurrentPos);
-			TextView TextView1 = (TextView) parentActivity.findViewById(R.id.result_detail_des_first_line);
-			TextView1.setText(currentEntry.getLabel());
-			TextView TextView2 = (TextView) parentActivity.findViewById(R.id.result_detail_des_second_line_text);
-			TextView2.setText(currentEntry.getLabel());
-			TextView TextView3 = (TextView) parentActivity.findViewById(R.id.result_detail_des_third_line);
-			TextView3.setText(currentEntry.getLabel());
-			
-			TextView TextViewSourceLabel = (TextView) parentActivity.findViewById(R.id.result_detail_des_source_info);
-			TextViewSourceLabel.setText(currentEntry.getLabel());
-			TextView TextView1SourceInfo = (TextView) parentActivity.findViewById(R.id.result_detail_des_source_text);
-			TextView1SourceInfo.setText(currentEntry.getLabel());
+			List<Dictionary> sample = new ArrayList<Dictionary>(3);
+			for (int i = 0; i < 3; i++) {
+				sample.add(currentDic);
+			}
+		    mAdapter.setData(sample);
 	
 			// The list should now be shown.
 			if (this.isResumed()) {
@@ -271,7 +277,7 @@ public class ResultDetailFragment extends Fragment {
 			}
 		}
 	
-		public void onLoaderReset(Loader<List<ScenarioEntry>> loader) {
+		public void onLoaderReset(Loader<List<Dictionary>> loader) {
 			Log.d(TAG, "[ResultDemoFragment][onLoaderReset] + Begin");
 			// Clear the data in the adapter.
 			mAdapter.setData(null);
@@ -282,10 +288,10 @@ public class ResultDetailFragment extends Fragment {
 	/**
 	 * A custom Loader that loads all of the installed applications.
 	 */
-	public static class ResultDemoLoader extends AsyncTaskLoader<List<ScenarioEntry>> {
+	public static class ResultDemoLoader extends AsyncTaskLoader<List<Dictionary>> {
 
-		List<ScenarioEntry> mScenarioList;
-	    //ScenarioEntry mScenarioEntry;
+		List<Dictionary> mDicList;
+		
 	    public ResultDemoLoader(Context context) {
 	        super(context);
 	    }
@@ -296,11 +302,11 @@ public class ResultDetailFragment extends Fragment {
 	     * data to be published by the loader.
 	     */
 	    @Override 
-	    public List<ScenarioEntry> loadInBackground() {
+	    public List<Dictionary> loadInBackground() {
 	    	Log.d(TAG, "[ResultDemoLoader][loadInBackground] + Begin");
-	    	//TODO:Dummy Data
-	    	List<ScenarioEntry> entries = new ArrayList<ScenarioEntry>(3);
-	    	for (int i=0; i<3; i++) {
+	    	int size = mResultList.size();
+	    	List<Dictionary> entries = new ArrayList<Dictionary>(size);
+	    	for (int i=0; i<size; i++) {
 	            entries.add(mResultList.get(mCurrentPos));
 	        }
 	        Log.d(TAG, "[ResultDemoLoader][loadInBackground] + End");
@@ -314,30 +320,30 @@ public class ResultDetailFragment extends Fragment {
 	     * here just adds a little more logic.
 	     */
 	    @Override 
-	    public void deliverResult(List<ScenarioEntry> scenarioList) {
+	    public void deliverResult(List<Dictionary> dicList) {
 	    	Log.d(TAG, "[ResultDemoLoader][deliverResult] + Begin");
 	        if (this.isReset()) {
 	            // An async query came in while the loader is stopped.  We
 	            // don't need the result.
-	            if (scenarioList != null) {
-	                this.onReleaseResources(scenarioList);
+	            if (dicList != null) {
+	                this.onReleaseResources(dicList);
 	            }
 	        }
-	        Log.d(TAG, "[ResultDemoLoader][deliverResult] List Size="+scenarioList.size());
-	        List<ScenarioEntry> oldScenarioList = scenarioList;
-	        mScenarioList = scenarioList;
+	        Log.d(TAG, "[ResultDemoLoader][deliverResult] List Size="+dicList.size());
+	        List<Dictionary> oldDicList = dicList;
+	        mResultList = dicList;
 
 	        if (this.isStarted()) {
 	            // If the Loader is currently started, we can immediately
 	            // deliver its results.
-	            super.deliverResult(scenarioList);
+	            super.deliverResult(dicList);
 	        }
 
 	        // At this point we can release the resources associated with
 	        // 'oldScenarioList' if needed; now that the new result is delivered we
 	        // know that it is no longer in use.
-	        if (oldScenarioList != null) {
-	            this.onReleaseResources(oldScenarioList);
+	        if (oldDicList != null) {
+	            this.onReleaseResources(oldDicList);
 	        }
 	        Log.d(TAG, "[ResultDemoLoader][deliverResult] + End");
 	    }
@@ -348,14 +354,14 @@ public class ResultDetailFragment extends Fragment {
 	    @Override 
 	    protected void onStartLoading() {
 	    	Log.d(TAG, "[ScenarioListLoader][onStartLoading] + Begin");
-	        if (mScenarioList != null) {
+	        if (mResultList != null) {
 	            // If we currently have a result available, deliver it
 	            // immediately.
-	            this.deliverResult(mScenarioList);
+	            this.deliverResult(mResultList);
 	        }
 
 
-	        if (takeContentChanged() || mScenarioList == null) {
+	        if (takeContentChanged() || mResultList == null) {
 	            // If the data has changed since the last time it was loaded
 	            // or is not currently available, start a load.
 	            this.forceLoad();
@@ -377,12 +383,12 @@ public class ResultDetailFragment extends Fragment {
 	     * Handles a request to cancel a load.
 	     */
 	    @Override 
-	    public void onCanceled(List<ScenarioEntry> scenarioList) {
+	    public void onCanceled(List<Dictionary> dicList) {
 	    	Log.d(TAG, "[ResultDemoLoader][onCanceled] + Begin");
-	        super.onCanceled(scenarioList);
+	        super.onCanceled(dicList);
 
 	        // At this point we can release the resources associated with 'scenarioList' if needed.
-	        this.onReleaseResources(scenarioList);
+	        this.onReleaseResources(dicList);
 	    }
 
 	    /**
@@ -397,9 +403,9 @@ public class ResultDetailFragment extends Fragment {
 	        this.onStopLoading();
 
 	        // At this point we can release the resources associated with 'scenarioList' if needed.
-	        if (mScenarioList != null) {
-	            this.onReleaseResources(mScenarioList);
-	            mScenarioList = null;
+	        if (mResultList != null) {
+	            this.onReleaseResources(mResultList);
+	            mResultList = null;
 	        }
 	    }
 
@@ -407,13 +413,13 @@ public class ResultDetailFragment extends Fragment {
 	     * Helper function to take care of releasing resources associated
 	     * with an actively loaded data set.
 	     */
-	    protected void onReleaseResources(List<ScenarioEntry> scenario) {
+	    protected void onReleaseResources(List<Dictionary> data) {
 	        // For a simple List<> there is nothing to do.  For something
 	        // like a Cursor, we would close it here.
 	    }
 	}
 	
-	public static class ResultDemoAdapter extends ArrayAdapter<ScenarioEntry> {
+	public static class ResultDemoAdapter extends ArrayAdapter<Dictionary> {
 	    private final LayoutInflater mInflater;
 
 	    public ResultDemoAdapter(Context context) {
@@ -422,13 +428,13 @@ public class ResultDetailFragment extends Fragment {
 	        mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	    }
 
-	    public void setData(List<ScenarioEntry> data) {
+	    public void setData(List<Dictionary> data) {
 	    	Log.d(TAG, "[ResultDemoAdapter][setData] + Begin");
 	        this.clear();
 	        if (data != null) {
 	        	Log.d(TAG, "[ResultDemoAdapter][setData] Size"+data.size());
-	            for (ScenarioEntry scenarioEntry : data) {
-	                this.add(scenarioEntry);
+	            for (Dictionary dicEntry : data) {
+	                this.add(dicEntry);
 	            }
 	        }
 	        Log.d(TAG, "[ResultDemoAdapter][setData] + End");
@@ -448,25 +454,41 @@ public class ResultDetailFragment extends Fragment {
 	        } else {
 	            view = convertView;
 	        }
+	        
+	        TextView TextLine = (TextView)view.findViewById(R.id.result_detail_listitem_text);
+	        ImageView speakIcon = (ImageView)view.findViewById(R.id.result_detail_listitem_icon);
 
-	        final ScenarioEntry item = this.getItem(position);
+	        final Dictionary item = this.getItem(position);
 			if (item != null) {
-				
-				TextView TextLine = (TextView)view.findViewById(R.id.result_detail_listitem_text);
-				TextLine.setText(item.getLabel());
-				
-				ImageView speakIcon = (ImageView)view.findViewById(R.id.result_detail_listitem_icon);
-				speakIcon.setImageResource(R.drawable.btn_speaker_s);
-				speakIcon.setOnClickListener(new View.OnClickListener()	{
-					@Override
-					public void onClick(View v)
+				switch(position) 
+				{
+					case 0:
 					{
-						// TODO Auto-generated method stub
-						Toast.makeText(parentActivity, "Not Ready", Toast.LENGTH_SHORT).show();
+						TextLine.setText(item.getSample_sentance_en());
+						break;
 					}
-				});
+					case 1:
+					{
+						TextLine.setText(item.getSample_sentence_ch());
+						speakIcon.setImageResource(R.drawable.btn_speaker);
+						speakIcon.setVisibility(View.VISIBLE);
+						speakIcon.setOnClickListener(new View.OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								// TODO Auto-generated method stub
+								Log.d(TAG, "[onClick], speakIcon "+item.getSample_sentance_audio());
+							}
+						});
+						break;
+					}
+					case 2:
+					{
+						TextLine.setText(item.getSample_sentance_py());
+						break;
+					}
+				}
 			}
-	        return view;
+			return view;
 	    }
 	}
 }

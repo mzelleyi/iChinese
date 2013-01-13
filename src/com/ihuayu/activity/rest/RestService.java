@@ -24,6 +24,7 @@ import org.json.JSONException;
 
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
+import android.util.Log;
 
 import com.ihuayu.activity.aes.AESUtils;
 import com.ihuayu.activity.operation.OperationUtils;
@@ -37,6 +38,7 @@ public class RestService {
 	public static final String GET_DICTIONARY_UPDATE_URL = "http://ihuayu.gistxl.com/smc/WebServices/SMCWCFService.svc/GetDictionariesV1_1";
 	public static final String GET_SCENARIO_UPDATE_URL = "http://ihuayu.gistxl.com/smc/WebServices/SMCWCFService.svc/GetScenariosV1_1";
 	private static final String KEY = "NLBkey1111111111";
+	private static final String TAG = "iHuayu:DatabaseHelper";
 	
 	public int getNumberIfDownloads(String lastUpdateTime) throws ClientProtocolException, IOException, InvalidKeyException, ParseException {
 		HttpClient client=new DefaultHttpClient();  
@@ -73,8 +75,8 @@ public class RestService {
 		httpPost.setEntity(entity);  
 		HttpResponse response=client.execute(httpPost); 
 		String result =  EntityUtils.toString(response.getEntity()).replace("\\", "");
-		System.out.println("Wangzai 2222 " + result);
-		System.out.println(response);
+		Log.d(TAG,"Wangzai 2222 " + result);
+		Log.d(TAG,"respone:"+response);
 		String finalResult = result.substring(1, result.length()-1);
 		JSONArray resultArray = new JSONArray(finalResult);
 		

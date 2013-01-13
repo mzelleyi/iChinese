@@ -6,10 +6,10 @@ package com.ihuayu.activity.db;
 import java.util.List;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.ihuayu.activity.db.entity.Dialog;
 import com.ihuayu.activity.db.entity.DialogKeywords;
-import com.ihuayu.activity.db.entity.Dictionary;
 import com.ihuayu.activity.db.entity.Scenario;
 import com.ihuayu.activity.operation.IhuayuOperationImpl;
 
@@ -18,25 +18,27 @@ import com.ihuayu.activity.operation.IhuayuOperationImpl;
  *
  */
 public class DBDemo {
+	
+	private static final String TAG = "iHuayu:DBDemo";
 
 	public DBDemo(Context context) {
 		DBSqlite dbManager = new DBSqlite(context);
 		IhuayuOperationImpl operation = new IhuayuOperationImpl(dbManager);
 		long startTime = System.currentTimeMillis();
 		//Search
-		List<Dictionary> dicList = operation.searchDictionary("en2sc", "acc");
+		//List<Dictionary> dicList = operation.searchDictionary("en2sc", "acc");
 		long endtime = System.currentTimeMillis();
-		System.out.println("Time====" + (double)(endtime - startTime)/1000);
+		Log.d(TAG,"Time====" + (double)(endtime - startTime)/1000);
 		
 		//Query from scenarios
 		List<Scenario> scenarios = operation.queryScenario("select * from Scenario_Category where title_id = ?", new String[]{"1"});
 		for(Scenario scenario : scenarios) {
 			List<Dialog> dialogList = operation.queryDialog("select * from Dialog where title_id = ? ", new String[]{scenario.getTitle_id()});
 			for(Dialog dialog : dialogList) {
-				System.out.println("Dialog ==========" + dialog.getSentence());
+				Log.d(TAG,"Dialog ==========" + dialog.getSentence());
 				List<DialogKeywords> keywards = operation.queryDialogKeywords("select * from Dialog_Keyword where Dialog_ID = ? ", new String[]{dialog.getId()});
 				for(DialogKeywords keyword : keywards) {
-					System.out.println("Keyword ==========" + keyword.getDest_keyword());
+					Log.d(TAG,"Keyword ==========" + keyword.getDest_keyword());
 				}
 			}
 		}

@@ -7,7 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ihuayu.R;
-import com.ihuayu.entry.Cheeses;
+import com.ihuayu.activity.db.entity.Dictionary;
+import com.ihuayu.activity.db.entity.QueryType;
 import com.ihuayu.view.MyDialogFragment;
 
 import android.content.Context;
@@ -17,6 +18,8 @@ import android.os.Message;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -26,6 +29,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -48,11 +52,16 @@ public class SearchFragment extends Fragment {
 	private static final int MSG_REFRESH_SEARCH_RESULT = 4;
 	
 	private static FragmentActivity parentActivity = null;
-	private static String[] mStrings = Cheeses.sCheeseStrings;
+	//private static String[] mStrings = Cheeses.sCheeseStrings;
 	private static SearchListAdapter mAdapter;
 	private static ListView mListView;
 	private static LayoutInflater mInflater;
 	private static DialogFragment searchDialog;
+	private static QueryType mSearchKeyType = null;
+	
+	private static List<Dictionary> mDicList = new ArrayList<Dictionary>();
+	
+	InputMethodManager inputMethodManager = null;
 	
  // If non-null, this is the current filter the user has provided.
     String mCurFilter;
@@ -99,9 +108,11 @@ public class SearchFragment extends Fragment {
 		
 		parentActivity = this.getActivity();
 		
+		inputMethodManager = (InputMethodManager)parentActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+		
 		final Button btnLanguage = (Button)parentActivity.findViewById(R.id.search_bar_btn);
 		//Tag "EN" represent input type is English while "CN" represent Chinese.
-		btnLanguage.setTag("EN");
+		mSearchKeyType = QueryType.EN;
 		btnLanguage.setBackgroundResource(R.drawable.btn_english);
 		btnLanguage.setOnClickListener(new View.OnClickListener()
 		{
@@ -109,38 +120,43 @@ public class SearchFragment extends Fragment {
 			public void onClick(View v)
 			{
 				// TODO Auto-generated method stub
-				if (btnLanguage.getTag().equals("EN")) {
+				if (mSearchKeyType == QueryType.EN) {
 					btnLanguage.setBackgroundResource(R.drawable.btn_chinese);
-					btnLanguage.setTag("CN");
+					mSearchKeyType = QueryType.CN;
 				} else {
 					btnLanguage.setBackgroundResource(R.drawable.btn_english);
-					btnLanguage.setTag("EN");
+					mSearchKeyType = QueryType.EN;
 				}
-			}
-		});
-		
-		mAdapter = new SearchListAdapter(parentActivity);
-		int size = mStrings.length;
-		List<String> data = new ArrayList<String>(size);
-		for (int i = 0; i < size; i++) {
-			data.add(mStrings[i]);
-		}
-		mAdapter.setData(data);
-		
-		mListView = (ListView)parentActivity.findViewById(R.id.search_result_list);
-		mListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
-		{
-			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3)
-			{
-				// TODO Auto-generated method stub
-				Log.d(TAG, "[onItemClick] + arg 1="+arg1+",arg 2="+arg2+",arg 3="+arg3);
 			}
 		});
 		
 		final ImageView mPromptImg = (ImageView)parentActivity.findViewById(R.id.search_fragment_prompt_image);
 		final ImageView mClearImg = (ImageView)parentActivity.findViewById(R.id.search_bar_edit_clear);
 	    final EditText mEditText = (EditText)parentActivity.findViewById(R.id.search_bar_edit_text);
+		
+	    mAdapter = new SearchListAdapter(parentActivity);
+		mListView = (ListView)parentActivity.findViewById(R.id.search_result_list);
+		mListView.setAdapter(mAdapter);
+		mListView.setEmptyView(parentActivity.findViewById(R.id.search_fragment_emptyview));
+		
+		mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3)
+			{
+				// TODO Auto-generated method stub
+				Log.d(TAG, "[onItemClick] + arg 1="+arg1+",arg 2="+arg2+",arg 3="+arg3);
+				FragmentManager fm = parentActivity.getSupportFragmentManager();
+				Fragment newFragment = ResultDetailFragment.newInstance(mDicList,arg2);
+				FragmentTransaction ft = fm.beginTransaction();
+				ft.add(R.id.tab_content_search, newFragment);
+				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+				ft.addToBackStack(null);
+				ft.commit();
+				
+				inputMethodManager.hideSoftInputFromWindow(mEditText.getWindowToken(),0);
+			}
+		});
+		
 	    mEditText.addTextChangedListener(new TextWatcher()
 		{
 			@Override
@@ -233,70 +249,73 @@ public class SearchFragment extends Fragment {
 		@Override
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
-			case SearchFragment.MSG_REFRESH_SUGGEST_LISTVIEW:
+			case SearchFragment.MSG_REFRESH_SUGGEST_LISTVIEW: {
 				Log.d(TAG, "[mUiHandler][MSG_REFRESH_SUGGEST_LISTVIEW]");
-				if (parentActivity == null) {
-					Log.e(TAG, "mActivity == null.");
-					break;
-				}
-				String resultStr = (String) msg.obj;
-				
-				mCurFilter = !TextUtils.isEmpty(resultStr) ? resultStr : null;
-				mAdapter.getFilter().filter(mCurFilter);
-				mListView.setAdapter(mAdapter);
-				mListView.setEmptyView(parentActivity.findViewById(R.id.search_fragment_emptyview));
-				//mAdapter.notifyDataSetChanged();
+				List<Dictionary> dicList = (List<Dictionary>) msg.obj;
+				mDicList = dicList;
+
+				// mCurFilter = !TextUtils.isEmpty(resultStr) ? resultStr :
+				// null;
+				// mAdapter.getFilter().filter(mCurFilter);
+				mAdapter.setData(dicList);
+				// mListView.setAdapter(mAdapter);
+				mAdapter.notifyDataSetChanged();
 				break;
-			case SearchFragment.MSG_REFRESH_SEARCH_RESULT:
+			}
+			case SearchFragment.MSG_REFRESH_SEARCH_RESULT: {
 				Log.d(TAG, "[mUiHandler][MSG_REFRESH_SEARCH_RESULT]");
 				searchDialog.dismiss();
-				
+
 				String searchResultStr = (String) msg.obj;
-				
+
 				mCurFilter = !TextUtils.isEmpty(searchResultStr) ? searchResultStr : null;
 				mAdapter.getFilter().filter(mCurFilter);
 				int resultCount = mAdapter.getCount();
-				Log.d(TAG, "[mUiHandler] Result Count = "+resultCount);
-				//if (resultCount == 0) {
-					mAdapter.notifyDataSetChanged();
-				//}
+				Log.d(TAG, "[mUiHandler] Result Count = " + resultCount);
 				break;
-			case SearchFragment.MSG_DO_SUGGEST_SEARCH:
+			}
+			case SearchFragment.MSG_DO_SUGGEST_SEARCH: {
 				Log.d(TAG, "[mUiHandler][MSG_DO_SUGGEST_SEARCH]");
 				String searchStr = (String) msg.obj;
 				
-				//TODO:Search DB then generate arraylist
-				//initLocalSearch(searchStr);
-				
-				Message msg1 = mUiHandler.obtainMessage(MSG_REFRESH_SUGGEST_LISTVIEW);
-				msg1.obj = searchStr;
+				List<Dictionary> dicList = MainActivity.dbManagerment.searchDictionary(mSearchKeyType, searchStr);
+
+				Message msg1 = mUiHandler
+						.obtainMessage(MSG_REFRESH_SUGGEST_LISTVIEW);
+				msg1.obj = dicList;
 				this.sendMessage(msg1);
 				break;
-			case SearchFragment.MSG_DO_ALL_SEARCH:
+			}
+			case SearchFragment.MSG_DO_ALL_SEARCH: {
 				Log.d(TAG, "[mUiHandler][MSG_DO_ALL_SEARCH]");
-				searchDialog = MyDialogFragment.newInstance(parentActivity, MyDialogFragment.DO_SEARCH_DB);
-				searchDialog.show(parentActivity.getSupportFragmentManager(), "dialog_search_db");
-				
+				searchDialog = MyDialogFragment.newInstance(parentActivity,
+						MyDialogFragment.DO_SEARCH_DB);
+				searchDialog.show(parentActivity.getSupportFragmentManager(),
+						"dialog_search_db");
+
 				String doSearchStr = (String) msg.obj;
-				Message msg3 = mUiHandler.obtainMessage(MSG_REFRESH_SEARCH_RESULT);
-				msg3.obj = doSearchStr;
-				this.sendMessageDelayed(msg3, 1000);
+				List<Dictionary> dicList = MainActivity.dbManagerment.searchDictionary(mSearchKeyType, doSearchStr);
+				Message msg2 = mUiHandler
+						.obtainMessage(MSG_REFRESH_SUGGEST_LISTVIEW);
+				msg2.obj = dicList;
+				this.sendMessageDelayed(msg2, 1000);
 				break;
+			}
 			}
 		}
 	};
 	
-    public static class SearchListAdapter extends ArrayAdapter<String> {
+    public static class SearchListAdapter extends ArrayAdapter<Dictionary> {
 
         public SearchListAdapter(Context context) {
             super(context, android.R.layout.simple_list_item_2);
         }
 
-        public void setData(List<String> data) {
-            clear();
+        public void setData(List<Dictionary> data) {
+            this.clear();
             if (data != null) {
-                for (String str : data) {
-                    add(str);
+                for (Dictionary str : data) {
+                    this.add(str);
                 }
             }
         }
@@ -313,8 +332,8 @@ public class SearchFragment extends Fragment {
                 view = convertView;
             }
 
-            String item = getItem(position);
-            ((TextView)view.findViewById(R.id.search_result_listitem_text)).setText(item);
+            Dictionary item = getItem(position);
+            ((TextView)view.findViewById(R.id.search_result_listitem_text)).setText(item.getKeyword());
 
             return view;
         }

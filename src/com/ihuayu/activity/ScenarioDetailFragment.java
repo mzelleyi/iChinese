@@ -1,11 +1,15 @@
 package com.ihuayu.activity;
 
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 
 import com.ihuayu.R;
-import com.ihuayu.activity.ScenarioFragment.ScenarioEntry;
+import com.ihuayu.activity.db.entity.Dialog;
+import com.ihuayu.activity.db.entity.DialogKeywords;
+import com.ihuayu.activity.db.entity.Scenario;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -28,7 +32,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 /**
  * @author Kesen
@@ -38,15 +41,15 @@ public class ScenarioDetailFragment extends Fragment {
 
 	private static final String TAG = "iHuayu:ScenarioDetailFragment";
 	private static FragmentActivity parentActivity = null;
-	private static ScenarioEntry mScenarioEntry = null;
+	private static Scenario mScenario = null;
 
     /**
      * Create a new instance of ScenarioFragment
      */
-    static ScenarioDetailFragment newInstance(ScenarioEntry item) {
+    static ScenarioDetailFragment newInstance(Scenario item) {
     	Log.d(TAG, "[newInstance] + Begin");
     	ScenarioDetailFragment fragment = new ScenarioDetailFragment();
-    	mScenarioEntry = item;
+    	mScenario = item;
         return fragment;
     }
     
@@ -79,11 +82,11 @@ public class ScenarioDetailFragment extends Fragment {
 		ImageView leftImg = (ImageView)parentActivity.findViewById(R.id.scenario_detail_item_icon_left);
 		leftImg.setImageResource(R.drawable.icn_paper_2x);
 		TextView TextView1 = (TextView) parentActivity.findViewById(R.id.scenario_detail_item_text_first_line);
-		TextView1.setText(mScenarioEntry.getLabel());
+		TextView1.setText(mScenario.getTitle_en());
 		TextView TextView2 = (TextView) parentActivity.findViewById(R.id.scenario_detail_item_text_second_line);
-		TextView2.setText(mScenarioEntry.getLabel());
+		TextView2.setText(mScenario.getTitle_cn());
 		TextView TextView3 = (TextView) parentActivity.findViewById(R.id.scenario_detail_item_text_third_line);
-		TextView3.setText(mScenarioEntry.getLabel());
+		TextView3.setText(mScenario.getTitle_py());
 		
 		//Set Back Button On Click Listener
 		Button backBtn = (Button)parentActivity.findViewById(R.id.scenario_detail_backbtn);
@@ -124,7 +127,7 @@ public class ScenarioDetailFragment extends Fragment {
 	}
 	
 	public static class ScenarioDialogFragment extends ListFragment implements 
-		LoaderManager.LoaderCallbacks<List<ScenarioEntry>> {
+		LoaderManager.LoaderCallbacks<List<HashMap<Dialog, List<DialogKeywords>>>> {
 		
 		// This is the Adapter being used to display the list's data.
 		ScenarioDialogAdapter mAdapter;
@@ -167,14 +170,15 @@ public class ScenarioDetailFragment extends Fragment {
 			
 		}
 	
-		public Loader<List<ScenarioEntry>> onCreateLoader(int id, Bundle args) {
+		public Loader<List<HashMap<Dialog, List<DialogKeywords>>>> onCreateLoader(int id, Bundle args) {
 			Log.d(TAG, "[ScenarioDialogFragment][onCreateLoader] + Begin");
 			// This is called when a new Loader needs to be created. This
 			// sample only has one Loader with no arguments, so it is simple.
 			return new ScenarioDialogLoader(this.getActivity());
 		}
 	
-		public void onLoadFinished(Loader<List<ScenarioEntry>> loader, List<ScenarioEntry> data) {
+		public void onLoadFinished(Loader<List<HashMap<Dialog, List<DialogKeywords>>>> loader, 
+				List<HashMap<Dialog, List<DialogKeywords>>> data) {
 			Log.d(TAG, "[ScenarioDialogFragment][onLoadFinished] + Begin");
 			// Set the new data in the adapter.
 			mAdapter.setData(data);
@@ -187,7 +191,7 @@ public class ScenarioDetailFragment extends Fragment {
 			}
 		}
 	
-		public void onLoaderReset(Loader<List<ScenarioEntry>> loader) {
+		public void onLoaderReset(Loader<List<HashMap<Dialog, List<DialogKeywords>>>> loader) {
 			Log.d(TAG, "[ScenarioDialogFragment][onLoaderReset] + Begin");
 			// Clear the data in the adapter.
 			mAdapter.setData(null);
@@ -198,10 +202,10 @@ public class ScenarioDetailFragment extends Fragment {
 	/**
 	 * A custom Loader that loads all of the installed applications.
 	 */
-	public static class ScenarioDialogLoader extends AsyncTaskLoader<List<ScenarioEntry>> {
+	public static class ScenarioDialogLoader extends AsyncTaskLoader<List<HashMap<Dialog, List<DialogKeywords>>>> {
 
-		List<ScenarioEntry> mScenarioList;
-	    //ScenarioEntry mScenarioEntry;
+		List<HashMap<Dialog, List<DialogKeywords>>> mDialogList = null;
+		
 	    public ScenarioDialogLoader(Context context) {
 	        super(context);
 	    }
@@ -212,16 +216,14 @@ public class ScenarioDetailFragment extends Fragment {
 	     * data to be published by the loader.
 	     */
 	    @Override 
-	    public List<ScenarioEntry> loadInBackground() {
+	    public List<HashMap<Dialog, List<DialogKeywords>>> loadInBackground() {
 	    	Log.d(TAG, "[ScenarioDialogLoader][loadInBackground] + Begin");
-	    	//TODO:Dummy Data
-	    	List<ScenarioEntry> entries = new ArrayList<ScenarioEntry>(3);
-	    	for (int i=0; i<3; i++) {
-	            entries.add(mScenarioEntry);
-	        }
-	        Log.d(TAG, "[ScenarioDialogLoader][loadInBackground] + End");
-	        // Done!
-	        return entries;
+	    	
+	    	mDialogList = MainActivity.dbManagerment.getDialogList(mScenario.getTitle_id());
+	        
+	    	Log.d(TAG, "[ScenarioDialogLoader][loadInBackground] + Dialog Size = "+mDialogList.size());
+	    	Log.d(TAG, "[ScenarioDialogLoader][loadInBackground] + End");
+	    	return mDialogList;
 	    }
 
 	    /**
@@ -230,30 +232,30 @@ public class ScenarioDetailFragment extends Fragment {
 	     * here just adds a little more logic.
 	     */
 	    @Override 
-	    public void deliverResult(List<ScenarioEntry> scenarioList) {
+	    public void deliverResult(List<HashMap<Dialog, List<DialogKeywords>>> dialogList) {
 	    	Log.d(TAG, "[ScenarioDialogLoader][deliverResult] + Begin");
 	        if (this.isReset()) {
 	            // An async query came in while the loader is stopped.  We
 	            // don't need the result.
-	            if (scenarioList != null) {
-	                this.onReleaseResources(scenarioList);
+	            if (dialogList != null) {
+	                this.onReleaseResources(dialogList);
 	            }
 	        }
-	        Log.d(TAG, "[ScenarioDialogLoader][deliverResult] List Size="+scenarioList.size());
-	        List<ScenarioEntry> oldScenarioList = scenarioList;
-	        mScenarioList = scenarioList;
+	        Log.d(TAG, "[ScenarioDialogLoader][deliverResult] List Size="+dialogList.size());
+	        List<HashMap<Dialog, List<DialogKeywords>>> oldDialogList = dialogList;
+	        mDialogList = dialogList;
 
 	        if (this.isStarted()) {
 	            // If the Loader is currently started, we can immediately
 	            // deliver its results.
-	            super.deliverResult(scenarioList);
+	            super.deliverResult(dialogList);
 	        }
 
 	        // At this point we can release the resources associated with
 	        // 'oldScenarioList' if needed; now that the new result is delivered we
 	        // know that it is no longer in use.
-	        if (oldScenarioList != null) {
-	            this.onReleaseResources(oldScenarioList);
+	        if (dialogList != null) {
+	            this.onReleaseResources(oldDialogList);
 	        }
 	        Log.d(TAG, "[ScenarioDialogLoader][deliverResult] + End");
 	    }
@@ -264,14 +266,14 @@ public class ScenarioDetailFragment extends Fragment {
 	    @Override 
 	    protected void onStartLoading() {
 	    	Log.d(TAG, "[ScenarioListLoader][onStartLoading] + Begin");
-	        if (mScenarioList != null) {
+	        if (mDialogList != null) {
 	            // If we currently have a result available, deliver it
 	            // immediately.
-	            this.deliverResult(mScenarioList);
+	            this.deliverResult(mDialogList);
 	        }
 
 
-	        if (takeContentChanged() || mScenarioList == null) {
+	        if (takeContentChanged() || mDialogList == null) {
 	            // If the data has changed since the last time it was loaded
 	            // or is not currently available, start a load.
 	            this.forceLoad();
@@ -293,7 +295,7 @@ public class ScenarioDetailFragment extends Fragment {
 	     * Handles a request to cancel a load.
 	     */
 	    @Override 
-	    public void onCanceled(List<ScenarioEntry> scenarioList) {
+	    public void onCanceled(List<HashMap<Dialog, List<DialogKeywords>>> scenarioList) {
 	    	Log.d(TAG, "[ScenarioDialogLoader][onCanceled] + Begin");
 	        super.onCanceled(scenarioList);
 
@@ -313,9 +315,9 @@ public class ScenarioDetailFragment extends Fragment {
 	        this.onStopLoading();
 
 	        // At this point we can release the resources associated with 'scenarioList' if needed.
-	        if (mScenarioList != null) {
-	            this.onReleaseResources(mScenarioList);
-	            mScenarioList = null;
+	        if (mDialogList != null) {
+	            this.onReleaseResources(mDialogList);
+	            mDialogList = null;
 	        }
 	    }
 
@@ -323,13 +325,13 @@ public class ScenarioDetailFragment extends Fragment {
 	     * Helper function to take care of releasing resources associated
 	     * with an actively loaded data set.
 	     */
-	    protected void onReleaseResources(List<ScenarioEntry> scenario) {
+	    protected void onReleaseResources(List<HashMap<Dialog, List<DialogKeywords>>> scenario) {
 	        // For a simple List<> there is nothing to do.  For something
 	        // like a Cursor, we would close it here.
 	    }
 	}
 	
-	public static class ScenarioDialogAdapter extends ArrayAdapter<ScenarioEntry> {
+	public static class ScenarioDialogAdapter extends ArrayAdapter<HashMap<Dialog, List<DialogKeywords>>> {
 	    private final LayoutInflater mInflater;
 
 	    public ScenarioDialogAdapter(Context context) {
@@ -338,13 +340,14 @@ public class ScenarioDetailFragment extends Fragment {
 	        mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	    }
 
-	    public void setData(List<ScenarioEntry> data) {
+	    public void setData(List<HashMap<Dialog, List<DialogKeywords>>> data) {
 	    	Log.d(TAG, "[ScenarioDialogAdapter][setData] + Begin");
 	        this.clear();
+	        
 	        if (data != null) {
 	        	Log.d(TAG, "[ScenarioDialogAdapter][setData] Size"+data.size());
-	            for (ScenarioEntry scenarioEntry : data) {
-	                this.add(scenarioEntry);
+	            for (HashMap<Dialog, List<DialogKeywords>> dialog : data) {
+	                this.add(dialog);
 	            }
 	        }
 	        Log.d(TAG, "[ScenarioDialogAdapter][setData] + End");
@@ -357,23 +360,36 @@ public class ScenarioDetailFragment extends Fragment {
 	    public View getView(int position, View convertView, ViewGroup parent) {
 	    	Log.d(TAG, "[ScenarioDetailAdapter][getView] + pos="+position);
 	        View view;
+	        
+	        String dialogGender = null;
+	        //String dialogAudio = null;
+	        Dialog dialogItem = null;
 			
+	        final HashMap<Dialog, List<DialogKeywords>> mapItem = this.getItem(position);
+	        
+	        Iterator<Dialog> iterator = mapItem.keySet().iterator();
+	        while(iterator.hasNext()) {
+	        	dialogItem = (Dialog) iterator.next();
+	        	dialogGender = dialogItem.getGender();
+	        	//dialogAudio = dialogItem.getAudio();
+	        }
+
 	        if (convertView == null) {
-	        	if (position%2 == 0) {
-	        		Log.d(TAG, "[ScenarioDetailAdapter][getView] new female item");
+	        	if (dialogGender.equalsIgnoreCase("f")) {
+	        		Log.d(TAG, "[ScenarioDialogAdapter][getView] new female item");
 	        		view = mInflater.inflate(R.layout.scenario_detail_listitem_female, parent, false);
 	        	} else {
-	        		Log.d(TAG, "[ScenarioDetailAdapter][getView] new male item");
+	        		Log.d(TAG, "[ScenarioDialogAdapter][getView] new male item");
 	        		view = mInflater.inflate(R.layout.scenario_detail_listitem_male, parent, false);
 	        	}
 	        } else {
 	            view = convertView;
 	        }
 
-	        final ScenarioEntry item = this.getItem(position);
-			if (item != null) {
+
+			if (dialogItem != null) {
 				ImageView sexIcon = (ImageView)view.findViewById(R.id.scenario_dialog_img_icon);
-				if (position%2 == 0) {
+				if (dialogGender.equalsIgnoreCase("f")) {
 					sexIcon.setImageResource(R.drawable.icn_female);
 				} else {
 					sexIcon.setImageResource(R.drawable.icn_male);
@@ -382,9 +398,9 @@ public class ScenarioDetailFragment extends Fragment {
 				TextView firstLine = (TextView)view.findViewById(R.id.scenario_dialog_text_first_line);
 				TextView secondLine = (TextView)view.findViewById(R.id.scenario_dialog_text_second_line);
 				TextView nameLine = (TextView)view.findViewById(R.id.scenario_dialog_textview_name);
-				nameLine.setText(item.getLabel());
-				firstLine.setText(item.getLabel());
-				secondLine.setText(item.getLabel());
+				nameLine.setText(dialogItem.getNarrator());
+				firstLine.setText(dialogItem.getSentence());
+				secondLine.setText(dialogItem.getSentence_py());
 				
 				ImageView speakIcon = (ImageView)view.findViewById(R.id.scenario_dialog_img_speaker);
 				speakIcon.setImageResource(R.drawable.btn_speaker_s);
@@ -394,7 +410,7 @@ public class ScenarioDetailFragment extends Fragment {
 					public void onClick(View v)
 					{
 						// TODO Auto-generated method stub
-						Toast.makeText(parentActivity, "Not Ready", Toast.LENGTH_SHORT).show();
+						//Log.d(TAG, "[ScenarioDialogAdapter][onClick] URL = "+dialogAudio);
 					}
 				});
 			}

@@ -1,6 +1,7 @@
 package com.ihuayu.activity;
 
 import com.ihuayu.R;
+import com.ihuayu.activity.db.DBDemo;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -114,6 +115,7 @@ public class MainActivity extends FragmentActivity implements
 
 	public void onTabChanged(String tabTag) {
 		Log.d(TAG, "[onTabChanged] + Begin,tabTag:" + tabTag);
+		DBDemo demo = new DBDemo(this);
 		// TODO Auto-generated method stub
 		if (TAB_SEARCH.equals(tabTag)) {
 			updateTab(tabTag, R.id.tab_content_search);

@@ -240,10 +240,10 @@ public class ResultDetailFragment extends Fragment {
 			// Create an empty adapter we will use to display the loaded data.
 			mAdapter = new ResultDemoAdapter(this.getActivity());
 			this.setListAdapter(mAdapter);
-	
+			
 			// Start out with a progress indicator.
 			this.setListShown(true);
-	
+			
 			// Prepare the loader. Either re-connect with an existing one,
 			// or start a new one.
 			this.getLoaderManager().initLoader(0, null, this);
@@ -300,6 +300,10 @@ public class ResultDetailFragment extends Fragment {
 					sample.add(mCurrentDic);
 				}
 			}
+			
+			//Cancel default divider
+			ListView mListView = this.getListView();
+			mListView.setDivider(null);
 			
 		    mAdapter.setData(sample);
 	
@@ -504,7 +508,6 @@ public class ResultDetailFragment extends Fragment {
 					}
 					case 1:
 					{
-						TextLine.setText(item.getSample_sentence_ch());
 						speakIcon.setVisibility(View.VISIBLE);
 						speakIcon.setOnClickListener(new View.OnClickListener() {
 							@Override
@@ -513,6 +516,7 @@ public class ResultDetailFragment extends Fragment {
 								Log.d(TAG, "[onClick], speakIcon "+item.getSample_sentance_audio());
 							}
 						});
+						TextLine.setText(item.getSample_sentence_ch());
 						break;
 					}
 					case 2:

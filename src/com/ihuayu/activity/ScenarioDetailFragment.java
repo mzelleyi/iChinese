@@ -4,7 +4,6 @@ package com.ihuayu.activity;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
 
 import com.ihuayu.R;
 import com.ihuayu.activity.db.entity.Dialog;
@@ -182,6 +181,10 @@ public class ScenarioDetailFragment extends Fragment {
 			Log.d(TAG, "[ScenarioDialogFragment][onLoadFinished] + Begin");
 			// Set the new data in the adapter.
 			mAdapter.setData(data);
+			
+			//Cancel default divider
+			ListView mListView = this.getListView();
+			mListView.setDivider(null);
 	
 			// The list should now be shown.
 			if (this.isResumed()) {

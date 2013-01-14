@@ -15,25 +15,18 @@
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/result_listitem_height"
-    android:gravity="center_vertical"
-    android:layout_margin="@dimen/margin_h3"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/margin_h3"
     android:background="@drawable/bg_detail_tab" >
     <TextView
         android:id="@+id/result_detail_listitem_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_marginLeft="@dimen/margin_h3"
-        android:layout_marginTop="@dimen/margin_h2"
-        android:layout_marginRight="@dimen/margin_h6"
-        android:layout_marginBottom="@dimen/margin_h2"
         android:layout_alignParentLeft="true"
-        android:ellipsize="marquee"
+        android:layout_centerVertical="true"
+        android:layout_margin="@dimen/margin_h1"
         android:gravity="left"
         android:hint="@string/dummy_text"
-        android:marqueeRepeatLimit="1"
-        android:maxLines="2"
         android:textColor="@color/black_normal"
         android:textSize="@dimen/listview_primary_text_size" />
     <ImageView
@@ -42,7 +35,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:src="@drawable/btn_speaker_sb"
         android:layout_margin="@dimen/margin_h2"
+        android:src="@drawable/btn_speaker_sb"
+        android:visibility="gone"
         android:contentDescription="@string/dummy_img_des" />
 </RelativeLayout>

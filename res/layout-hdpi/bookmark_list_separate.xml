@@ -23,10 +23,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginLeft="@dimen/margin_h4"
-        android:ellipsize="marquee"
         android:gravity="left"
-        android:marqueeRepeatLimit="1"
         android:singleLine="true"
+        android:textColor="@color/white_normal"
         android:hint="@string/dummy_text"
         android:textSize="@dimen/listview_primary_text_size" />
 </LinearLayout>

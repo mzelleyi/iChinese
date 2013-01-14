@@ -136,7 +136,9 @@ public class ResultDetailFragment extends Fragment {
 					showDialog(mDialogType);
 				} else {
 					favoriteImg.setImageResource(R.drawable.btn_mark_off_2x);
-					Toast.makeText(parentActivity, "Cancel", Toast.LENGTH_SHORT).show();
+					
+					MainActivity.dbManagerment.removeFromFavorites(mCurrentDic.getId());
+					
 					mDialogType = -1;
 					mBeFavorited = false;
 				}
@@ -176,6 +178,9 @@ public class ResultDetailFragment extends Fragment {
         // Do stuff here.
         Log.i(TAG, "Positive click!");
         if (mDialogType == MyDialogFragment.ADD_TO_BOOKMARK) {
+        	
+        	MainActivity.dbManagerment.addBookmark(mCurrentDic.getId());
+        	
         	ImageView favoriteImg = (ImageView)parentActivity.findViewById(R.id.result_detail_des_favorite_img);
         	favoriteImg.setImageResource(R.drawable.btn_mark_on_2x);
         	mDialogType = MyDialogFragment.ADD_SUCCESS;

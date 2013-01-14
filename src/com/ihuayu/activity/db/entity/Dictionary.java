@@ -21,6 +21,8 @@ public class Dictionary {
 	private String sample_sentence_ch;
 	private String sample_sentance_py;
 	private String sample_sentance_audio;
+	private boolean misDivider = false;
+	private boolean mNeedDelete = false;
 	
 //	public String getId() {
 //		return id;
@@ -106,5 +108,19 @@ public class Dictionary {
 	}
 	public void setSample_sentance_audio(String sample_sentance_audio) {
 		this.sample_sentance_audio = sample_sentance_audio;
+	}
+	public boolean getIsDivider() {
+		return misDivider;
+	}
+	public void setIsDivider(boolean misDivider) {
+		this.misDivider = misDivider;
+	}
+	public boolean getNeedDelete()
+	{
+		return mNeedDelete;
+	}
+	public void setNeedDelete(boolean mNeedDelete)
+	{
+		this.mNeedDelete = mNeedDelete;
 	}
 }

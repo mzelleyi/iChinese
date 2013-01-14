@@ -3,7 +3,6 @@
  */
 package com.ihuayu.activity;
 
-import java.io.File;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,13 +10,11 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.ihuayu.R;
+import com.ihuayu.activity.db.entity.Dictionary;
 
 import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.PixelFormat;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -132,7 +129,7 @@ public class BookmarkFragment extends Fragment {
 	}
 	
 	public static class BookmarkListFragment extends ListFragment implements 
-		LoaderManager.LoaderCallbacks<List<BookmarkEntry>> {
+		LoaderManager.LoaderCallbacks<List<Dictionary>> {
 		
 		// This is the Adapter being used to display the list's data.
 		BookmarkListAdapter mAdapter;
@@ -140,7 +137,7 @@ public class BookmarkFragment extends Fragment {
 		//Handle indicate case.
 		ListView mListView = null;
 	    private RemoveWindow mRemoveWindow = new RemoveWindow();
-	    Handler mHandler = new Handler();
+	    private Handler mHandler = new Handler();
 	    private WindowManager mWindowManager;
 	    private TextView mDialogText;
 	    private boolean mShowing;
@@ -149,13 +146,13 @@ public class BookmarkFragment extends Fragment {
 	    //List<Character> sDividerCharList = new ArrayList<Character>();
 		
 		//The origin data that get from DB.
-		List<BookmarkEntry> mOriginBookmarkList = null;
+		List<Dictionary> mOriginBookmarkList = null;
 		//The data that fill with divider elements.
-		List<BookmarkEntry> mWithDividerList = new ArrayList<BookmarkEntry>();
+		List<Dictionary> mWithDividerList = new ArrayList<Dictionary>();
 		//The list used to keep need remove list normal item.
-		List<BookmarkEntry> mRemoveBookmarkList = new ArrayList<BookmarkEntry>();
+		List<Dictionary> mRemoveBookmarkList = new ArrayList<Dictionary>();
 		//The list used to keep need remove list divider item.
-		List<BookmarkEntry> mRemoveDividerList = new ArrayList<BookmarkEntry>();
+		List<Dictionary> mRemoveDividerList = new ArrayList<Dictionary>();
 		
 		@Override
 		public void onActivityCreated(Bundle savedInstanceState) {
@@ -177,7 +174,7 @@ public class BookmarkFragment extends Fragment {
 			this.setListAdapter(mAdapter);
 	
 			// Start out with a progress indicator.
-			this.setListShown(false);
+			this.setListShown(true);
 	
 			// Prepare the loader. Either re-connect with an existing one,
 			// or start a new one.
@@ -222,7 +219,7 @@ public class BookmarkFragment extends Fragment {
 		}
 	
 		@Override
-		public Loader<List<BookmarkEntry>> onCreateLoader(int id, Bundle args) {
+		public Loader<List<Dictionary>> onCreateLoader(int id, Bundle args) {
 			Log.d(TAG, "[BookmarkListFragment][onCreateLoader] + Begin");
 			// This is called when a new Loader needs to be created. This
 			// sample only has one Loader with no arguments, so it is simple.
@@ -230,7 +227,7 @@ public class BookmarkFragment extends Fragment {
 		}
 	
 		@Override
-		public void onLoadFinished(Loader<List<BookmarkEntry>> loader, List<BookmarkEntry> data) {
+		public void onLoadFinished(Loader<List<Dictionary>> loader, List<Dictionary> data) {
 			Log.d(TAG, "[BookmarkListFragment][onLoadFinished] + Begin");
 			// Set the new data in the adapter.
 			Log.d(TAG, "[BookmarkListFragment] mOriginBookmarkList Size = "+ data.size());
@@ -238,51 +235,58 @@ public class BookmarkFragment extends Fragment {
 			//Save origin get data list
 			mOriginBookmarkList = data;
 			
-//			mOriginBookmarkList = new ArrayList<BookmarkEntry>(data.size());
+//			mOriginBookmarkList = new ArrayList<Dictionary>(data.size());
 //	        for (int i=0; i<data.size(); i++) {
 //	            mOriginBookmarkList.add(data.get(i));
 //	        }
-//			mWithDividerList = new ArrayList<BookmarkEntry>(data.size());
+//			mWithDividerList = new ArrayList<Dictionary>(data.size());
 //			for (int i = 0; i < data.size(); i++) {
 //				mWithDividerList.add(data.get(i));
 //			}
 	        
-        	BookmarkEntry firstEntry = data.get(0);
-        	String temp = String.valueOf(firstEntry.getLabel().charAt(0));
-        	
-        	//New First Entry As Divider
-        	BookmarkEntry firstAddEntry = new BookmarkEntry(data.get(0).getApplicationInfo());
-        	firstAddEntry.loadLabel(this.getActivity());
-        	firstAddEntry.misDivider = true;
-        	mWithDividerList.add(firstAddEntry);
-        	//Add to dividers list
-        	//sDividerCharList.add(firstAddEntry.getLabel().charAt(0));
-        	Log.d(TAG, "add isDivider = "+firstAddEntry.misDivider+"; entry = "+firstAddEntry.getLabel());
-            for (int i = 0; i < data.size() ; i++) {
-            	Log.d(TAG, " i = "+i);
-            	//Add char flag for divider
-            	BookmarkEntry entry = data.get(i);
-            	Character thisChar = entry.getLabel().charAt(0);
-            	if(String.valueOf(thisChar).equalsIgnoreCase(temp)) {
-    	        	Log.d(TAG, "add isDivider = "+entry.misDivider+	"; entry = "+entry.getLabel());
-    	        	mWithDividerList.add(entry);
-    	        	//sDividerChars[i] = thisChar;
-            	} else {
-            		temp = String.valueOf(thisChar);
-            		
-            		//New duplicate fist char entry as list item
-            		BookmarkEntry addEntry = new BookmarkEntry(data.get(i).getApplicationInfo());
-    	        	addEntry.loadLabel(this.getActivity());
-    	        	addEntry.misDivider = true;
-    	        	Log.d(TAG, "add isDivider = "+addEntry.misDivider+"; entry = "+addEntry.getLabel());
-    	        	//sDividerCharList.add(addEntry.getLabel().charAt(0));
-    	        	mWithDividerList.add(addEntry);
-	            	
-                	//Add Normal Item
-    	        	Log.d(TAG, "add isDivider = "+entry.misDivider+"; entry = "+entry.getLabel());
-    	        	mWithDividerList.add(entry);
-            	}
-            }
+			if (data.size() > 0) {
+				Dictionary firstEntry = data.get(0);
+	        	String temp = String.valueOf(firstEntry.getKeyword().charAt(0));
+	        	
+	        	//New First Entry As Divider
+	        	Dictionary firstAddEntry = new Dictionary();
+	        	firstAddEntry.setKeyword(data.get(0).getKeyword());
+	        	firstAddEntry.setId(data.get(0).getId());
+	        	firstAddEntry.setIsDivider(true);
+	        	mWithDividerList.add(firstAddEntry);
+	        	
+	        	//Add to dividers list
+	        	//sDividerCharList.add(firstAddEntry.getLabel().charAt(0));
+	        	Log.d(TAG, "add isDivider = "+firstAddEntry.getIsDivider()+"; entry = "+firstAddEntry.getKeyword());
+	            for (int i = 0; i < data.size() ; i++) {
+	            	Log.d(TAG, " i = "+i);
+	            	//Add char flag for divider
+	            	Dictionary entry = data.get(i);
+	            	Character thisChar = entry.getKeyword().charAt(0);
+	            	if(String.valueOf(thisChar).equalsIgnoreCase(temp)) {
+	    	        	Log.d(TAG, "add isDivider = "+entry.getIsDivider()+	"; entry = "+entry.getKeyword());
+	    	        	mWithDividerList.add(entry);
+	    	        	//sDividerChars[i] = thisChar;
+	            	} else {
+	            		temp = String.valueOf(thisChar);
+	            		
+	            		//New duplicate fist char entry as list item
+	            		//Dictionary addEntry = new Dictionary(data.get(i).getApplicationInfo());
+	                   	Dictionary addEntry = new Dictionary();
+	                   	addEntry.setKeyword(data.get(i).getKeyword());
+	                   	addEntry.setId(data.get(i).getId());
+	                   	addEntry.setIsDivider(true);
+	    	        	Log.d(TAG, "add isDivider = "+addEntry.getIsDivider()+"; entry = "+addEntry.getKeyword());
+	    	        	//sDividerCharList.add(addEntry.getLabel().charAt(0));
+	    	        	mWithDividerList.add(addEntry);
+		            	
+	                	//Add Normal Item
+	    	        	Log.d(TAG, "add isDivider = "+entry.getIsDivider()+"; entry = "+entry.getKeyword());
+	    	        	mWithDividerList.add(entry);
+	            	}
+	            }
+			}
+
             Log.d(TAG, "[BookmarkListFragment] mWithDividerList Size = "+ mWithDividerList.size());
 			mAdapter.setData(mWithDividerList);
 			//Log.d(TAG, "[BookmarkListFragment] sDividerChars length = "+ sDividerCharList.size());
@@ -330,16 +334,18 @@ public class BookmarkFragment extends Fragment {
 						Log.d(TAG, "[onScroll] + firstVisibleItem = "+firstVisibleItem
 								+",visibleItemCount = "+visibleItemCount+",totalItemCount = "+totalItemCount);
 				        if (mReady) {
-				            char firstLetter = mWithDividerList.get(firstVisibleItem).getLabel().charAt(0);
-				            
-				            if (!mShowing && firstLetter != mPrevLetter) {
-				                mShowing = true;
-				                mDialogText.setVisibility(View.VISIBLE);
-				            }
-				            mDialogText.setText(((Character)firstLetter).toString());
-				            mHandler.removeCallbacks(mRemoveWindow);
-				            mHandler.postDelayed(mRemoveWindow, 2000);
-				            mPrevLetter = firstLetter;
+				        	if (mWithDividerList.size() > 0) {
+				        		char firstLetter = mWithDividerList.get(firstVisibleItem).getKeyword().charAt(0);
+					            
+					            if (!mShowing && firstLetter != mPrevLetter) {
+					                mShowing = true;
+					                mDialogText.setVisibility(View.VISIBLE);
+					            }
+					            mDialogText.setText(((Character)firstLetter).toString());
+					            mHandler.removeCallbacks(mRemoveWindow);
+					            mHandler.postDelayed(mRemoveWindow, 2000);
+					            mPrevLetter = firstLetter;
+				        	}
 				        }
 					}
 				});
@@ -347,7 +353,7 @@ public class BookmarkFragment extends Fragment {
 		}
 	
 		@Override
-		public void onLoaderReset(Loader<List<BookmarkEntry>> loader) {
+		public void onLoaderReset(Loader<List<Dictionary>> loader) {
 			Log.d(TAG, "[BookmarkListFragment][onLoaderReset] + Begin");
 			// Clear the data in the adapter.
 			mAdapter.setData(null);
@@ -377,7 +383,7 @@ public class BookmarkFragment extends Fragment {
 			Log.d(TAG, "[BookmarkListFragment] mWithDividerList size = "+mWithDividerList.size());
 //			for (int i = 0 ; i < mAdapter.getCount(); i++) {
 //				Log.d(TAG, "[BookmarkListFragment] i = "+i);
-//				BookmarkEntry entry = mAdapter.getItem(i);
+//				Dictionary entry = mAdapter.getItem(i);
 //				if (entry.mNeedDelete) {
 //					Log.d(TAG, "[BookmarkListFragment] remove item i ="+i);
 //					mAdapter.remove(entry);
@@ -388,9 +394,9 @@ public class BookmarkFragment extends Fragment {
 //			Log.d(TAG, "[BookmarkListFragment] Adapter.getCount = "+mAdapter.getCount());
 //			for (int i = 0 ; i < mAdapter.getCount(); i++) {
 //				Log.d(TAG, "[BookmarkListFragment] i = "+i);
-//				BookmarkEntry entry = mAdapter.getItem(i);
+//				Dictionary entry = mAdapter.getItem(i);
 //				if (entry.misDivider) {
-//		        	BookmarkEntry nextEntry = mAdapter.getItem(i+1);
+//		        	Dictionary nextEntry = mAdapter.getItem(i+1);
 //		        	if (nextEntry.misDivider) {
 //		        		Log.d(TAG, "[BookmarkListAdapter] remove divider i = "+i);
 //			        	mAdapter.remove(entry);
@@ -400,8 +406,8 @@ public class BookmarkFragment extends Fragment {
 //			}
 			for (int i = 0 ; i < mWithDividerList.size(); i++) {
 				Log.d(TAG, " i = "+i);
-				BookmarkEntry entry = mWithDividerList.get(i);
-				if (entry.mNeedDelete) {
+				Dictionary entry = mWithDividerList.get(i);
+				if (entry.getNeedDelete()) {
 					Log.d(TAG, "remove item i ="+i);
 					mRemoveBookmarkList.add(entry);
 					//mWithDividerList.remove(entry);
@@ -409,7 +415,7 @@ public class BookmarkFragment extends Fragment {
 					//Log.d(TAG, "now count ="+mWithDividerList.size());
 				}
 			}
-            for (BookmarkEntry entry : mRemoveBookmarkList) {
+            for (Dictionary entry : mRemoveBookmarkList) {
             	mWithDividerList.remove(entry);
             }
             Log.d(TAG, "[BookmarkListFragment] After Remove Delete Item, The Size ="+mWithDividerList.size());
@@ -419,12 +425,12 @@ public class BookmarkFragment extends Fragment {
 			Log.d(TAG, "[BookmarkListFragment] mWithDividerList size = "+mWithDividerList.size());
 			for (int i = 0 ; i < mWithDividerList.size(); i++) {
 				Log.d(TAG, " i = "+i);
-				BookmarkEntry entry = mWithDividerList.get(i);
-				if (entry.misDivider) {
+				Dictionary entry = mWithDividerList.get(i);
+				if (entry.getIsDivider()) {
 					int nextPos = i + 1;
 					if (nextPos < mWithDividerList.size()) {
-						BookmarkEntry nextEntry = mWithDividerList.get(nextPos);
-						if (nextEntry.misDivider) {
+						Dictionary nextEntry = mWithDividerList.get(nextPos);
+						if (nextEntry.getIsDivider()) {
 			        		Log.d(TAG, " remove divider i = "+i);
 			        		mRemoveDividerList.add(entry);
 			        		//mWithDividerList.remove(entry);
@@ -438,7 +444,7 @@ public class BookmarkFragment extends Fragment {
 					}
 				}
 			}
-            for (BookmarkEntry entry : mRemoveDividerList) {
+            for (Dictionary entry : mRemoveDividerList) {
             	mWithDividerList.remove(entry);
             	//sDividerCharList.remove(entry.getLabel().charAt(0));
             }
@@ -447,6 +453,15 @@ public class BookmarkFragment extends Fragment {
 			
 			mAdapter.setData(mWithDividerList);
 			mAdapter.notifyDataSetChanged();
+			
+			//Remove From DB
+			int size = mRemoveBookmarkList.size();
+			int[] removeId = new int[size];
+            for (int i = 0; i < size; i++) {
+            	removeId[i] = mRemoveBookmarkList.get(i).getId();
+            }
+			MainActivity.dbManagerment.removeFromFavorites(removeId);
+			
 			Log.d(TAG, "[BookmarkListFragment][leaveEditMode] + End");
 		}
 	
@@ -458,89 +473,89 @@ public class BookmarkFragment extends Fragment {
 	    }
 	}
 	
-	/**
-	 * This class holds the per-item data in our Loader.
-	 */
-	public static class BookmarkEntry {
-	    public BookmarkEntry(BookmarkListLoader loader, ApplicationInfo info) {
-	        mLoader = loader;
-	        mInfo = info;
-	        mApkFile = new File(info.sourceDir);
-	    }
-	    
-	    public BookmarkEntry(ApplicationInfo info) {
-	    	mLoader = null;
-	        mInfo = info;
-	        mApkFile = new File(info.sourceDir);
-	    }
-
-	    public ApplicationInfo getApplicationInfo() {
-	        return mInfo;
-	    }
-
-	    public String getLabel() {
-	        return mLabel;
-	    }
-	    
-	    public Drawable getIcon() {
-	        if (mIcon == null) {
-	            if (mApkFile.exists()) {
-	                mIcon = mInfo.loadIcon(mLoader.mPm);
-	                return mIcon;
-	            } else {
-	                mMounted = false;
-	            }
-	        } else if (!mMounted) {
-	            // If the Bookmark wasn't mounted but is now mounted, reload
-	            // its icon.
-	            if (mApkFile.exists()) {
-	                mMounted = true;
-	                mIcon = mInfo.loadIcon(mLoader.mPm);
-	                return mIcon;
-	            }
-	        } else {
-	            return mIcon;
-	        }
-
-	        return mLoader.getContext().getResources().getDrawable(
-	                android.R.drawable.sym_def_app_icon);
-	    }
-
-	    @Override 
-	    public String toString() {
-	        return mLabel;
-	    }
-
-	    void loadLabel(Context context) {
-	        if (mLabel == null || !mMounted) {
-	            if (!mApkFile.exists()) {
-	                mMounted = false;
-	                mLabel = mInfo.packageName;
-	            } else {
-	                mMounted = true;
-	                CharSequence label = mInfo.loadLabel(context.getPackageManager());
-	                mLabel = label != null ? label.toString() : mInfo.packageName;
-	            }
-	        }
-	    }
-
-	    private final BookmarkListLoader mLoader;
-	    private final ApplicationInfo mInfo;
-	    private final File mApkFile;
-	    private String mLabel;
-	    private boolean misDivider = false;
-	    private boolean mNeedDelete = false;
-	    private Drawable mIcon;
-	    private boolean mMounted;
-	}
+//	/**
+//	 * This class holds the per-item data in our Loader.
+//	 */
+//	public static class Dictionary {
+//	    public Dictionary(BookmarkListLoader loader, ApplicationInfo info) {
+//	        mLoader = loader;
+//	        mInfo = info;
+//	        mApkFile = new File(info.sourceDir);
+//	    }
+//	    
+//	    public Dictionary(ApplicationInfo info) {
+//	    	mLoader = null;
+//	        mInfo = info;
+//	        mApkFile = new File(info.sourceDir);
+//	    }
+//
+//	    public ApplicationInfo getApplicationInfo() {
+//	        return mInfo;
+//	    }
+//
+//	    public String getLabel() {
+//	        return mLabel;
+//	    }
+//	    
+//	    public Drawable getIcon() {
+//	        if (mIcon == null) {
+//	            if (mApkFile.exists()) {
+//	                mIcon = mInfo.loadIcon(mLoader.mPm);
+//	                return mIcon;
+//	            } else {
+//	                mMounted = false;
+//	            }
+//	        } else if (!mMounted) {
+//	            // If the Bookmark wasn't mounted but is now mounted, reload
+//	            // its icon.
+//	            if (mApkFile.exists()) {
+//	                mMounted = true;
+//	                mIcon = mInfo.loadIcon(mLoader.mPm);
+//	                return mIcon;
+//	            }
+//	        } else {
+//	            return mIcon;
+//	        }
+//
+//	        return mLoader.getContext().getResources().getDrawable(
+//	                android.R.drawable.sym_def_app_icon);
+//	    }
+//
+//	    @Override 
+//	    public String toString() {
+//	        return mLabel;
+//	    }
+//
+//	    void loadLabel(Context context) {
+//	        if (mLabel == null || !mMounted) {
+//	            if (!mApkFile.exists()) {
+//	                mMounted = false;
+//	                mLabel = mInfo.packageName;
+//	            } else {
+//	                mMounted = true;
+//	                CharSequence label = mInfo.loadLabel(context.getPackageManager());
+//	                mLabel = label != null ? label.toString() : mInfo.packageName;
+//	            }
+//	        }
+//	    }
+//
+//	    private final BookmarkListLoader mLoader;
+//	    private final ApplicationInfo mInfo;
+//	    private final File mApkFile;
+//	    private String mLabel;
+//	    private boolean misDivider = false;
+//	    private boolean mNeedDelete = false;
+//	    private Drawable mIcon;
+//	    private boolean mMounted;
+//	}
 	
 	/**
 	 * A custom Loader that loads all of the installed applications.
 	 */
-	public static class BookmarkListLoader extends AsyncTaskLoader<List<BookmarkEntry>> {
-	    final PackageManager mPm;
+	public static class BookmarkListLoader extends AsyncTaskLoader<List<Dictionary>> {
+	    //final PackageManager mPm;
 
-	    List<BookmarkEntry> mBookmarkList;
+	    List<Dictionary> mBookmarkList;
 
 	    public BookmarkListLoader(Context context) {
 	        super(context);
@@ -548,7 +563,7 @@ public class BookmarkFragment extends Fragment {
 	        // Retrieve the package manager for later use; note we don't
 	        // use 'context' directly but instead the save global application
 	        // context returned by getContext().
-	        mPm = getContext().getPackageManager();
+	        //mPm = getContext().getPackageManager();
 	    }
 
 	    /**
@@ -557,33 +572,34 @@ public class BookmarkFragment extends Fragment {
 	     * data to be published by the loader.
 	     */
 	    @Override 
-	    public List<BookmarkEntry> loadInBackground() {
+	    public List<Dictionary> loadInBackground() {
 	    	Log.d(TAG, "[BookmarkListLoader][loadInBackground] + Begin");
 	        // Retrieve all known applications.
-	        List<ApplicationInfo> apps = mPm.getInstalledApplications(
-	                PackageManager.GET_UNINSTALLED_PACKAGES |
-	                PackageManager.GET_DISABLED_COMPONENTS);
-	        if (apps == null) {
-	            apps = new ArrayList<ApplicationInfo>();
-	        }
+//	        List<ApplicationInfo> apps = mPm.getInstalledApplications(
+//	                PackageManager.GET_UNINSTALLED_PACKAGES |
+//	                PackageManager.GET_DISABLED_COMPONENTS);
+//	        if (apps == null) {
+//	            apps = new ArrayList<ApplicationInfo>();
+//	        }
+//	        final Context context = getContext();
+	    	
+	    	List<Dictionary> mList = MainActivity.dbManagerment.getAllBookMarks();
 
-	        final Context context = getContext();
-
-	        // Create corresponding array of entries and load their labels.
-	        List<BookmarkEntry> entries = new ArrayList<BookmarkEntry>(apps.size());
-	        for (int i=0; i<apps.size(); i++) {
-	        	BookmarkEntry entry = new BookmarkEntry(this, apps.get(i));
-	            entry.loadLabel(context);
-	            entries.add(entry);
-	        }
+//	        // Create corresponding array of entries and load their labels.
+//	        List<Dictionary> entries = new ArrayList<Dictionary>(apps.size());
+//	        for (int i=0; i<apps.size(); i++) {
+//	        	Dictionary entry = new Dictionary(this, apps.get(i));
+//	            entry.loadLabel(context);
+//	            entries.add(entry);
+//	        }
 
 	        // Sort the list.
-	        Collections.sort(entries, ALPHA_COMPARATOR);
+	        Collections.sort(mList, ALPHA_COMPARATOR);
 	        
-	        Log.d(TAG, "[BookmarkListLoader][loadInBackground] List Size ="+entries.size());
+	        Log.d(TAG, "[BookmarkListLoader][loadInBackground] List Size ="+mList.size());
 	        Log.d(TAG, "[BookmarkListLoader][loadInBackground] + End");
 	        // Done!
-	        return entries;
+	        return mList;
 	    }
 
 	    /**
@@ -592,7 +608,7 @@ public class BookmarkFragment extends Fragment {
 	     * here just adds a little more logic.
 	     */
 	    @Override 
-	    public void deliverResult(List<BookmarkEntry> BookmarkList) {
+	    public void deliverResult(List<Dictionary> BookmarkList) {
 	    	Log.d(TAG, "[BookmarkListLoader][deliverResult] + Begin");
 	        if (this.isReset()) {
 	            // An async query came in while the loader is stopped.  We
@@ -601,7 +617,7 @@ public class BookmarkFragment extends Fragment {
 	                this.onReleaseResources(BookmarkList);
 	            }
 	        }
-	        List<BookmarkEntry> oldBookmarkList = BookmarkList;
+	        List<Dictionary> oldBookmarkList = BookmarkList;
 	        mBookmarkList = BookmarkList;
 
 	        if (this.isStarted()) {
@@ -653,7 +669,7 @@ public class BookmarkFragment extends Fragment {
 	     * Handles a request to cancel a load.
 	     */
 	    @Override 
-	    public void onCanceled(List<BookmarkEntry> BookmarkList) {
+	    public void onCanceled(List<Dictionary> BookmarkList) {
 	    	Log.d(TAG, "[BookmarkListLoader][onCanceled] + Begin");
 	        super.onCanceled(BookmarkList);
 
@@ -683,13 +699,13 @@ public class BookmarkFragment extends Fragment {
 	     * Helper function to take care of releasing resources associated
 	     * with an actively loaded data set.
 	     */
-	    protected void onReleaseResources(List<BookmarkEntry> BookmarkList) {
+	    protected void onReleaseResources(List<Dictionary> BookmarkList) {
 	        // For a simple List<> there is nothing to do.  For something
 	        // like a Cursor, we would close it here.
 	    }
 	}
 
-	public static class BookmarkListAdapter extends ArrayAdapter<BookmarkEntry> {
+	public static class BookmarkListAdapter extends ArrayAdapter<Dictionary> {
 	    
 	    private boolean bEditMode = false;
 	    
@@ -700,12 +716,12 @@ public class BookmarkFragment extends Fragment {
 	        //mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	    }
 
-	    public void setData(List<BookmarkEntry> data) {
+	    public void setData(List<Dictionary> data) {
 	    	Log.d(TAG, "[BookmarkListAdapter][setData] + Begin");
 	        this.clear();
 	        if (data != null) {
 	        	Log.d(TAG, "[BookmarkListAdapter][setData] Size = "+data.size());
-	            for (BookmarkEntry entry : data) {
+	            for (Dictionary entry : data) {
 	                this.add(entry);
 	            }
 	        }
@@ -716,8 +732,8 @@ public class BookmarkFragment extends Fragment {
 		public int getItemViewType(int position)
 		{
 			// TODO Auto-generated method stub
-	    	BookmarkEntry item = this.getItem(position);
-	    	if (item.misDivider) {
+	    	Dictionary item = this.getItem(position);
+	    	if (item.getIsDivider()) {
 	    		return VIEW_TYPE_DIVIDER;
 	    	} else {
 	    		return VIEW_TYPE_NORMAL;
@@ -757,8 +773,8 @@ public class BookmarkFragment extends Fragment {
 //			TextView	listTextView2	= null;
 //			TextView	listTextView3	= null;
 //			TextView    listTextType    = null;
-			final BookmarkEntry item = this.getItem(position);
-			Log.d(TAG, "isDivider = "+item.misDivider+"; label = "+item.getLabel());
+			final Dictionary item = this.getItem(position);
+			Log.d(TAG, "isDivider = "+item.getIsDivider()+"; label = "+item.getKeyword());
 			if (item != null) {				
 				if (convertView == null) {
 					if (this.getItemViewType(position) == VIEW_TYPE_DIVIDER) {
@@ -812,11 +828,10 @@ public class BookmarkFragment extends Fragment {
 					if (this.getItemViewType(position) == 1) {
 						if (separatorText != null) {
 							Log.d(TAG, "set Separator Text");
-							separatorText.setText(String.valueOf(item.getLabel().charAt(0)));
+							separatorText.setText(String.valueOf(item.getKeyword().charAt(0)));
 						}
 					} else {
 						Log.d(TAG, "set ListItem Data");
-						
 						
 						final ImageView deleteImg = holder.listImageDelete;
 						if (bEditMode) {
@@ -827,7 +842,7 @@ public class BookmarkFragment extends Fragment {
 //							}
 							
 							deleteImg.setVisibility(View.VISIBLE);
-							if (item.mNeedDelete) {
+							if (item.getNeedDelete()) {
 								deleteImg.setImageResource(R.drawable.btn_clear_on);
 							} else {
 								deleteImg.setImageResource(R.drawable.btn_clear_rest);
@@ -838,12 +853,12 @@ public class BookmarkFragment extends Fragment {
 								public void onClick(View arg0)
 								{
 									// TODO Auto-generated method stub
-									if (item.mNeedDelete) {
+									if (item.getNeedDelete()) {
 										deleteImg.setImageResource(R.drawable.btn_clear_rest);
-										item.mNeedDelete = false;
+										item.setNeedDelete(false);
 									} else {
 										deleteImg.setImageResource(R.drawable.btn_clear_on);
-										item.mNeedDelete = true;
+										item.setNeedDelete(true);
 									}
 								}
 							});
@@ -852,31 +867,36 @@ public class BookmarkFragment extends Fragment {
 //							if (stub != null) {
 //								stub.setVisibility(View.GONE);
 								holder.listImageDelete.setVisibility(View.GONE);
-								item.mNeedDelete = false;
+								item.setNeedDelete(false);
 //							}
 						}
 	
 						if (holder.listImageSpearker != null) {
-							holder.listImageSpearker.setImageDrawable(item.getIcon());
-							holder.listImageSpearker.setOnClickListener(new View.OnClickListener()	{
-								@Override
-								public void onClick(View v)
-								{
-									// TODO Auto-generated method stub
-								}
-							});
+							if (bEditMode) {
+								holder.listImageSpearker.setImageResource(R.drawable.btn_speaker_sb);
+								holder.listImageSpearker.setClickable(false);
+							} else {
+								holder.listImageSpearker.setImageResource(R.drawable.btn_speaker);
+								holder.listImageSpearker.setOnClickListener(new View.OnClickListener()	{
+									@Override
+									public void onClick(View v)
+									{
+										// TODO Auto-generated method stub
+									}
+								});
+							}
 						}
 						if (holder.listTextView1 != null) {
-							holder.listTextView1.setText(item.getLabel());
+							holder.listTextView1.setText(item.getKeyword());
 						}
 						if (holder.listTextView2 != null) {
-							holder.listTextView2.setText(item.getLabel());
+							holder.listTextView2.setText(item.getDestiontion());
 						}
 						if (holder.listTextView3 != null) {
-							holder.listTextView3.setText(item.getLabel());
+							holder.listTextView3.setText(item.getChineser_tone_py());
 						}
 						if (holder.listTextCategory != null) {
-							holder.listTextCategory.setText("Category");
+							holder.listTextCategory.setText(item.getDic_catagory());
 						}
 					}
 				}
@@ -888,10 +908,10 @@ public class BookmarkFragment extends Fragment {
 	/**
 	 * Perform alphabetical comparison of application entry objects.
 	 */
-	public static final Comparator<BookmarkEntry> ALPHA_COMPARATOR = new Comparator<BookmarkEntry>() {
+	public static final Comparator<Dictionary> ALPHA_COMPARATOR = new Comparator<Dictionary>() {
 	    private final Collator sCollator = Collator.getInstance();
-	    public int compare(BookmarkEntry object1, BookmarkEntry object2) {
-	        return sCollator.compare(object1.getLabel(), object2.getLabel());
+	    public int compare(Dictionary object1, Dictionary object2) {
+	        return sCollator.compare(object1.getKeyword(), object2.getKeyword());
 	    }
 	};
 }

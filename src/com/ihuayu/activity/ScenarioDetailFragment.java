@@ -391,12 +391,12 @@ public class ScenarioDetailFragment extends Fragment {
 
 
 			if (dialogItem != null) {
-				ImageView sexIcon = (ImageView)view.findViewById(R.id.scenario_dialog_img_icon);
-				if (dialogGender.equalsIgnoreCase("f")) {
-					sexIcon.setImageResource(R.drawable.icn_female);
-				} else {
-					sexIcon.setImageResource(R.drawable.icn_male);
-				}
+//				ImageView sexIcon = (ImageView)view.findViewById(R.id.scenario_dialog_img_icon);
+//				if (dialogGender.equalsIgnoreCase("f")) {
+//					sexIcon.setImageResource(R.drawable.icn_female);
+//				} else {
+//					sexIcon.setImageResource(R.drawable.icn_male);
+//				}
 				
 				TextView firstLine = (TextView)view.findViewById(R.id.scenario_dialog_text_first_line);
 				TextView secondLine = (TextView)view.findViewById(R.id.scenario_dialog_text_second_line);

@@ -42,34 +42,26 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:paddingRight="@dimen/margin_h2" >
-
             <EditText
                 android:id="@+id/search_bar_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_alignParentLeft="true"
-                android:layout_gravity="center"
-                android:layout_marginBottom="@dimen/margin_h2"
-                android:layout_marginLeft="@dimen/margin_h2"
-                android:layout_marginRight="@dimen/margin_h2"
-                android:layout_marginTop="@dimen/margin_h2"
-                android:focusable="true" 
+                android:layout_centerVertical="true"
+                android:layout_margin="@dimen/margin_h2"
                 android:singleLine="true"
-				android:focusableInTouchMode="true"
-                android:duplicateParentState="false"
                 android:hint="@string/searchbox_hint"
                 android:imeOptions="actionSearch"
                 android:inputType="textAutoCorrect" />
-
             <ImageView
 		        android:id="@+id/search_bar_edit_clear"
-		        android:contentDescription="@string/dummy_img_des"
 		        android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
-	            android:layout_centerVertical="true"
+	            android:layout_marginRight="@dimen/margin_h2"
 	            android:layout_alignParentRight="true"
-	            android:padding="@dimen/margin_h2"
+	            android:layout_centerVertical="true"
 	            android:visibility="gone"
+	            android:contentDescription="@string/dummy_img_des"
 		        android:src="@drawable/btn_clear_rest" >
              </ImageView>
         </RelativeLayout>

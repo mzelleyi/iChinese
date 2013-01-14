@@ -16,32 +16,32 @@
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="wrap_content" >
 
     <RelativeLayout
         android:id="@+id/scenario_dialog_title"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/scenario_dialog_title_bar_height"
-        android:layout_margin="@dimen/margin_h3"
+        android:layout_height="wrap_content"
         android:layout_alignParentTop="true">
         <ImageView 
 	        android:id="@+id/scenario_dialog_img_icon"
-	        android:layout_width="@dimen/scenario_dialog_item_image_icon_width"
-	        android:layout_height="match_parent"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
 	        android:layout_alignParentLeft="true"
+	        android:layout_centerVertical="true"
+	        android:layout_margin="@dimen/margin_h3"
+	        android:background="@drawable/icn_female"
 	        android:contentDescription="@string/dummy_img_des" />
     	<TextView
 	        android:id="@+id/scenario_dialog_textview_name"
 	        android:layout_width="match_parent"
-	        android:layout_height="match_parent"
-	        android:layout_centerInParent="true"
+	        android:layout_height="wrap_content"
+	        android:layout_centerVertical="true"
 	        android:layout_toRightOf="@id/scenario_dialog_img_icon"
-	        android:ellipsize="marquee"
 	        android:gravity="left"
-	        android:textColor="#000000"
-	        android:marqueeRepeatLimit="1"
-	        android:padding="@dimen/margin_h3"
+	        android:textColor="@color/black_normal"
 	        android:singleLine="true"
+	        android:ellipsize="end"
 	        android:textSize="@dimen/scenario_dialog_text_size" />
     </RelativeLayout>
     
@@ -49,49 +49,47 @@
         android:id="@+id/text_content_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_h2"
         android:layout_below="@id/scenario_dialog_title"
         android:background="@drawable/bg_bubble_red" >
     	<RelativeLayout
     	    android:id="@+id/scenario_dialog_first_line_layout"
     	    android:layout_width="match_parent"
     	    android:layout_height="wrap_content"
-    	    android:layout_margin="@dimen/margin_h3"
-    	    android:layout_marginTop="@dimen/scenario_dialog_text_margin_top" >
-    	    <TextView android:id="@+id/scenario_dialog_text_first_line"
-		        android:layout_gravity="center_vertical"
+    	    android:layout_marginLeft="@dimen/margin_h2"
+    	    android:layout_marginTop="@dimen/scenario_dialog_text_margin_top"
+    	    android:layout_marginRight="@dimen/margin_h2" >
+    	    <TextView 
+    	        android:id="@+id/scenario_dialog_text_first_line"
 		        android:layout_width="wrap_content"
 		        android:layout_height="wrap_content"
-		        android:layout_marginTop="@dimen/margin_h2"
+		        android:layout_centerVertical="true"
 		        android:textSize="@dimen/scenario_dialog_text_size"
-		        android:textColor="#000000"
-		        android:singleLine="true"
-		        android:hint="@string/dummy_text"
-			    android:ellipsize="marquee"
-			    android:marqueeRepeatLimit="1"
+		        android:textColor="@color/black_normal"
+			    android:ellipsize="end"
+			    android:hint="@string/dummy_text"
 		        android:gravity="left" />
-        	<ImageView 
+    	    <ImageView 
 		        android:id="@+id/scenario_dialog_img_speaker"
-		        android:layout_width="@dimen/scenario_listitem_icon_right_width"
-		        android:layout_height="@dimen/scenario_listitem_icon_right_height"
-		        android:layout_toRightOf="@id/scenario_dialog_text_first_line"
-		        android:layout_marginLeft="@dimen/margin_h3"
-		        android:layout_gravity="center_vertical"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_centerVertical="true"
+		        android:layout_alignParentRight="true"
+		        android:layout_marginLeft="@dimen/margin_h2"
 		        android:contentDescription="@string/dummy_img_des" />
     	</RelativeLayout>
-        <TextView android:id="@+id/scenario_dialog_text_second_line"
-	        android:layout_gravity="center_vertical"
+        <TextView 
+            android:id="@+id/scenario_dialog_text_second_line"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
 	        android:layout_below="@id/scenario_dialog_first_line_layout"
-	        android:layout_margin="@dimen/margin_h3"
-	        android:layout_marginTop="@dimen/margin_h2"
+	        android:layout_centerVertical="true"
+	        android:layout_marginLeft="@dimen/margin_h2"
+	        android:layout_marginRight="@dimen/margin_h2"
+	        android:layout_marginBottom="@dimen/margin_h2"
 	        android:textSize="@dimen/scenario_dialog_text_size"
-	        android:textColor="#000000"
+	        android:textColor="@color/black_normal"
 	        android:hint="@string/dummy_text"
-	        android:singleLine="true"
-		    android:ellipsize="marquee"
-		    android:marqueeRepeatLimit="1"
+		    android:ellipsize="end"
 	        android:gravity="left" />
     </RelativeLayout>
 </RelativeLayout>

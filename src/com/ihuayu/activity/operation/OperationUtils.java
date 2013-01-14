@@ -108,6 +108,8 @@ public class OperationUtils {
 				dialog.setSrc_keyword(cursor.getString(cursor.getColumnIndex(name)));
 			}else if("Dest_Keyword".equalsIgnoreCase(name)) {
 				dialog.setDest_keyword(cursor.getString(cursor.getColumnIndex(name)));
+			} else if("Keyword_PY".equalsIgnoreCase(name)) {
+				dialog.setKeyword_py(cursor.getString(cursor.getColumnIndex(name)));
 			}
 		}
 		return dialog;

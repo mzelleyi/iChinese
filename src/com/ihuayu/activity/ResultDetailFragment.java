@@ -166,10 +166,10 @@ public class ResultDetailFragment extends Fragment {
 	
     public static void showDialog(int dialogType) {
     	if (dialogType == MyDialogFragment.ADD_TO_BOOKMARK) {
-    		DialogFragment newFragment = MyDialogFragment.newInstance(parentActivity, MyDialogFragment.ADD_TO_BOOKMARK);
+    		DialogFragment newFragment = MyDialogFragment.newInstance(parentActivity, MyDialogFragment.ADD_TO_BOOKMARK, null);
             newFragment.show(parentActivity.getSupportFragmentManager(), "dialog_add");
     	} else {
-    		DialogFragment newFragment = MyDialogFragment.newInstance(parentActivity, MyDialogFragment.ADD_SUCCESS);
+    		DialogFragment newFragment = MyDialogFragment.newInstance(parentActivity, MyDialogFragment.ADD_SUCCESS, null);
             newFragment.show(parentActivity.getSupportFragmentManager(), "dialog_success");
     	}
     }

@@ -15,12 +15,11 @@
 -->
 
 <!-- Top-level content view for the simple fragment sample. -->
-
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content" 
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:padding="@dimen/margin_h5"
-    android:background="@drawable/bg_wordmap">
+    android:background="@drawable/bg_wordmap"
+    android:padding="@dimen/margin_h5" >
     
     <LinearLayout 
         android:id="@+id/dialog_text_panel"
@@ -30,7 +29,7 @@
         android:layout_alignParentTop="true" >
         <TextView
             android:id="@+id/dialog_text_firstline"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/dummy_text"
             android:layout_gravity="center_vertical|center_horizontal"
@@ -38,7 +37,7 @@
             android:gravity="top|center_horizontal" />
         <TextView
             android:id="@+id/dialog_text_secondline"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/dummy_text"
             android:layout_gravity="center_vertical|center_horizontal"
@@ -46,33 +45,29 @@
             android:gravity="top|center_horizontal" />
         <TextView
             android:id="@+id/dialog_text_thridline"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/dummy_text"
             android:layout_gravity="center_vertical|center_horizontal"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:gravity="top|center_horizontal" />
-    </LinearLayout>
-
-    <LinearLayout 
-        android:id="@+id/dialog_words_panel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/dialog_text_panel"
-        android:orientation="vertical" >
         <TextView
             android:id="@+id/dialog_words_define_hint"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_h5"
+            android:layout_marginBottom="@dimen/margin_h3"
+            android:hint="@string/dialog_words_define_hint"
             android:layout_gravity="center_vertical|center_horizontal"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:gravity="top|center_horizontal" />
-        <LinearLayout 
-	        android:id="@+id/dialog_words_define_panel"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:orientation="horizontal" >
-	    </LinearLayout>
+    </LinearLayout>
+    <LinearLayout 
+        android:id="@+id/dialog_words_define_panel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/dialog_text_panel" >
     </LinearLayout>
     <Button 
         android:id="@+id/scenario_fragment_dialog_btn"
@@ -81,10 +76,11 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:paddingLeft="@dimen/margin_h6"
-        android:paddingTop="@dimen/margin_h3"
+        android:paddingTop="@dimen/margin_h4"
         android:paddingRight="@dimen/margin_h6"
-        android:paddingBottom="@dimen/margin_h3"
-        android:text="@string/dialog_btn_ok" >
+        android:paddingBottom="@dimen/margin_h4"
+        android:text="@string/dialog_btn_ok"
+        android:textSize="@dimen/btn_dialog_text_size" >
         <requestFocus />
     </Button>
 </RelativeLayout>

@@ -251,6 +251,7 @@ public class SearchFragment extends Fragment {
 			switch (msg.what) {
 			case SearchFragment.MSG_REFRESH_SUGGEST_LISTVIEW: {
 				Log.d(TAG, "[mUiHandler][MSG_REFRESH_SUGGEST_LISTVIEW]");
+				@SuppressWarnings("unchecked")
 				List<Dictionary> dicList = (List<Dictionary>) msg.obj;
 				mDicList = dicList;
 
@@ -289,7 +290,7 @@ public class SearchFragment extends Fragment {
 			case SearchFragment.MSG_DO_ALL_SEARCH: {
 				Log.d(TAG, "[mUiHandler][MSG_DO_ALL_SEARCH]");
 				searchDialog = MyDialogFragment.newInstance(parentActivity,
-						MyDialogFragment.DO_SEARCH_DB);
+						MyDialogFragment.DO_SEARCH_DB, null);
 				searchDialog.show(parentActivity.getSupportFragmentManager(),
 						"dialog_search_db");
 

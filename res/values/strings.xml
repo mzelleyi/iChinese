@@ -36,5 +36,6 @@
     <string name="dialog_msg_add_to_bookmark">Add To Bookmark?</string>
     <string name="dialog_msg_add_success">Successful</string>
     <string name="dialog_btn_ok">OK</string>
+    <string name="dialog_words_define_hint">Words definition</string>
 
 </resources>

@@ -9,9 +9,12 @@ import com.ihuayu.R;
 import com.ihuayu.activity.db.entity.Dialog;
 import com.ihuayu.activity.db.entity.DialogKeywords;
 import com.ihuayu.activity.db.entity.Scenario;
+import com.ihuayu.view.MyDialogFragment;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -20,6 +23,9 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -40,7 +46,9 @@ public class ScenarioDetailFragment extends Fragment {
 
 	private static final String TAG = "iHuayu:ScenarioDetailFragment";
 	private static FragmentActivity parentActivity = null;
+	private static LayoutInflater mInflater = null;
 	private static Scenario mScenario = null;
+
 
     /**
      * Create a new instance of ScenarioFragment
@@ -66,7 +74,8 @@ public class ScenarioDetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
     	Log.d(TAG, "[onCreateView] + Begin");
-        View v = inflater.inflate(R.layout.scenario_detail_fragment, container, false);
+    	mInflater = inflater;
+        View v = mInflater.inflate(R.layout.scenario_detail_fragment, container, false);
         return v;
     }
 
@@ -125,6 +134,11 @@ public class ScenarioDetailFragment extends Fragment {
         }
 	}
 	
+	public static void doPositiveClick() {
+		// TODO Auto-generated method stub
+		Log.d(TAG, "[doPositiveClick] + Begin");
+	}
+	
 	public static class ScenarioDialogFragment extends ListFragment implements 
 		LoaderManager.LoaderCallbacks<List<HashMap<Dialog, List<DialogKeywords>>>> {
 		
@@ -166,7 +180,11 @@ public class ScenarioDetailFragment extends Fragment {
 		public void onListItemClick(ListView l, View v, int position, long id) {
 			// Insert desired behavior here.
 			Log.i(TAG, "[ScenarioDialogFragment][onListItemClick] Item clicked: " + id);
-			
+			HashMap<Dialog, List<DialogKeywords>> mapItem = mAdapter.getItem(position);
+	        
+			DialogFragment newFragment = MyDialogFragment.newInstance(parentActivity, 
+					MyDialogFragment.SCENARIO_DIALOG, mapItem);
+            newFragment.show(parentActivity.getSupportFragmentManager(), "scenario_dialog");
 		}
 	
 		public Loader<List<HashMap<Dialog, List<DialogKeywords>>>> onCreateLoader(int id, Bundle args) {
@@ -335,12 +353,13 @@ public class ScenarioDetailFragment extends Fragment {
 	}
 	
 	public static class ScenarioDialogAdapter extends ArrayAdapter<HashMap<Dialog, List<DialogKeywords>>> {
-	    private final LayoutInflater mInflater;
+        private Dialog dialogItem = null;
+        private List<DialogKeywords> keyWordList = null;
 
 	    public ScenarioDialogAdapter(Context context) {
 	        //super(context, android.R.layout.simple_list_item_2);
 	    	super(context, R.layout.scenario_detail_listitem_female);
-	        mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+	        //mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	    }
 
 	    public void setData(List<HashMap<Dialog, List<DialogKeywords>>> data) {
@@ -364,21 +383,21 @@ public class ScenarioDetailFragment extends Fragment {
 	    	Log.d(TAG, "[ScenarioDetailAdapter][getView] + pos="+position);
 	        View view;
 	        
-	        String dialogGender = null;
+	        //String dialogGender = null;
 	        //String dialogAudio = null;
-	        Dialog dialogItem = null;
+	        
+	        SpannableString spanStr = null;
 			
 	        final HashMap<Dialog, List<DialogKeywords>> mapItem = this.getItem(position);
 	        
 	        Iterator<Dialog> iterator = mapItem.keySet().iterator();
 	        while(iterator.hasNext()) {
 	        	dialogItem = (Dialog) iterator.next();
-	        	dialogGender = dialogItem.getGender();
-	        	//dialogAudio = dialogItem.getAudio();
 	        }
+	        keyWordList = mapItem.get(dialogItem);
 
 	        if (convertView == null) {
-	        	if (dialogGender.equalsIgnoreCase("f")) {
+	        	if (dialogItem.getGender().equalsIgnoreCase("f")) {
 	        		Log.d(TAG, "[ScenarioDialogAdapter][getView] new female item");
 	        		view = mInflater.inflate(R.layout.scenario_detail_listitem_female, parent, false);
 	        	} else {
@@ -391,29 +410,36 @@ public class ScenarioDetailFragment extends Fragment {
 
 
 			if (dialogItem != null) {
-//				ImageView sexIcon = (ImageView)view.findViewById(R.id.scenario_dialog_img_icon);
-//				if (dialogGender.equalsIgnoreCase("f")) {
-//					sexIcon.setImageResource(R.drawable.icn_female);
-//				} else {
-//					sexIcon.setImageResource(R.drawable.icn_male);
-//				}
-				
 				TextView firstLine = (TextView)view.findViewById(R.id.scenario_dialog_text_first_line);
 				TextView secondLine = (TextView)view.findViewById(R.id.scenario_dialog_text_second_line);
 				TextView nameLine = (TextView)view.findViewById(R.id.scenario_dialog_textview_name);
 				nameLine.setText(dialogItem.getNarrator());
-				firstLine.setText(dialogItem.getSentence());
 				secondLine.setText(dialogItem.getSentence_py());
+				
+				String sectenceStr = dialogItem.getSentence();
+				spanStr = new SpannableString(sectenceStr);
+				Log.d(TAG, "[getView] sectenceStr = "+sectenceStr);
+				
+	            for (int i = 0; i < keyWordList.size(); i++ ) {
+	            	DialogKeywords keyItem = keyWordList.get(i);
+	            	String keyStr = keyItem.getDest_keyword();
+	            	Log.d(TAG, "[getView] keyStr = "+keyStr);
+	            	int firstIndex = sectenceStr.indexOf(keyStr);
+	            	int lastIndex = firstIndex + keyStr.length();
+	            	Log.d(TAG, "[getView] firstIndex = "+firstIndex+",lastIndex = "+lastIndex);
+	            	spanStr.setSpan(new ForegroundColorSpan(Color.RED), firstIndex, lastIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+	            }
+				firstLine.setText(spanStr);
 				
 				ImageView speakIcon = (ImageView)view.findViewById(R.id.scenario_dialog_img_speaker);
 				speakIcon.setImageResource(R.drawable.btn_speaker_s);
-				
 				speakIcon.setOnClickListener(new View.OnClickListener()	{
 					@Override
 					public void onClick(View v)
 					{
 						// TODO Auto-generated method stub
-						//Log.d(TAG, "[ScenarioDialogAdapter][onClick] URL = "+dialogAudio);
+						//Log.d(TAG, "[ScenarioDialogAdapter][onClick] URL = "+dialogItem.getAudio());
+						Log.d(TAG, "[ScenarioDialogAdapter][onClick] URL = ");
 					}
 				});
 			}

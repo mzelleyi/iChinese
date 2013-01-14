@@ -21,31 +21,31 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="@dimen/margin_h2"
+        android:padding="@dimen/margin_h1"
         android:background="@drawable/bg_wordmap_tab" >
         <TextView
-            android:id="@+id/dialog_text_firstline"
+            android:id="@+id/dialog_text_word_en"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:hint="@string/dummy_text"
-            android:layout_gravity="center_vertical|center_horizontal"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:gravity="top|center_horizontal" />
+            android:gravity="center" />
         <TextView
-            android:id="@+id/dialog_text_secondline"
+            android:id="@+id/dialog_text_word_py"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:hint="@string/dummy_text"
-            android:layout_gravity="center_vertical|center_horizontal"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:gravity="top|center_horizontal" />
+            android:gravity="center" />
         <TextView
-            android:id="@+id/dialog_text_thridline"
+            android:id="@+id/dialog_text_word_cn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:hint="@string/dummy_text"
-            android:layout_gravity="center_vertical|center_horizontal"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:gravity="top|center_horizontal" />
+            android:gravity="center" />
 </LinearLayout>
 

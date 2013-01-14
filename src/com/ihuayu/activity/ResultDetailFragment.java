@@ -20,6 +20,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,6 +42,7 @@ public class ResultDetailFragment extends Fragment {
 	private static final String TAG = "iHuayu:ResultDetailFragment";
 	private static FragmentActivity parentActivity = null;
 	private static List<Dictionary> mResultList = new ArrayList<Dictionary>();
+	private static Dictionary mCurrentDic = null;
 	private static int mCurrentPos = -1;
 	private static int mDialogType = -1;
 	private static boolean mBeFavorited = false;
@@ -52,7 +54,10 @@ public class ResultDetailFragment extends Fragment {
     	Log.d(TAG, "[newInstance] + Begin");
     	ResultDetailFragment fragment = new ResultDetailFragment();
     	mResultList = list;
+    	mCurrentDic = mResultList.get(position);
     	mCurrentPos = position;
+    	Log.d(TAG, "[newInstance] List Size = "+mResultList.size());
+    	Log.d(TAG, "[newInstance] mCurrentPos = "+mCurrentPos);
         return fragment;
     }
     
@@ -86,8 +91,18 @@ public class ResultDetailFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				mCurrentPos--;
-				updateDataFragment();
+				Log.d(TAG, "[onClick] btnPrev + mCurrentPos = "+mCurrentPos);
+				mCurrentPos = mCurrentPos - 1;
+				Log.d(TAG, "[onClick] btnPrev + mCurrentPos = "+mCurrentPos);
+				if (mCurrentPos > -1 && mCurrentPos < mResultList.size()) {
+					mCurrentDic = mResultList.get(mCurrentPos);
+					updateDataFragment();
+				} else {
+					mCurrentPos = mCurrentPos + 1;
+					Toast toast = Toast.makeText(parentActivity, "The First One!", Toast.LENGTH_SHORT);
+					toast.setGravity(Gravity.CENTER, 0, 0);
+					toast.show();
+				}
 			}
 		});
 		
@@ -96,8 +111,18 @@ public class ResultDetailFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				mCurrentPos++;
-				updateDataFragment();
+				Log.d(TAG, "[onClick] btnNext + mCurrentPos = "+mCurrentPos);
+				mCurrentPos = mCurrentPos + 1;
+				Log.d(TAG, "[onClick] btnNext + mCurrentPos = "+mCurrentPos);
+				if (mCurrentPos > -1 && mCurrentPos < mResultList.size()) {
+					mCurrentDic = mResultList.get(mCurrentPos);
+					updateDataFragment();
+				} else {
+					mCurrentPos = mCurrentPos - 1;
+					Toast toast = Toast.makeText(parentActivity, "The Last One!", Toast.LENGTH_SHORT);
+					toast.setGravity(Gravity.CENTER, 0, 0);
+					toast.show();
+				}
 			}
 		});
 		
@@ -207,7 +232,7 @@ public class ResultDetailFragment extends Fragment {
 	
 			// Give some text to display if there is no data. In a real
 			// application this would come from a resource.
-			this.setEmptyText("No Scenarios");
+			this.setEmptyText("No Result");
 	
 			// We have a menu item to show in action bar.
 			this.setHasOptionsMenu(false);
@@ -217,7 +242,7 @@ public class ResultDetailFragment extends Fragment {
 			this.setListAdapter(mAdapter);
 	
 			// Start out with a progress indicator.
-			this.setListShown(false);
+			this.setListShown(true);
 	
 			// Prepare the loader. Either re-connect with an existing one,
 			// or start a new one.
@@ -248,25 +273,34 @@ public class ResultDetailFragment extends Fragment {
 		public void onLoadFinished(Loader<List<Dictionary>> loader, List<Dictionary> data) {
 			Log.d(TAG, "[ResultDemoFragment][onLoadFinished] + Begin");
 			// Set the new data in the adapter.
-			Dictionary currentDic = null;
-			if (mCurrentPos > -1 && mCurrentPos <= mResultList.size()) {
-				currentDic = mResultList.get(mCurrentPos);
+			List<Dictionary> sample = new ArrayList<Dictionary>();
+			
+			if (mCurrentDic != null) {
 				TextView TextView1 = (TextView) parentActivity.findViewById(R.id.result_detail_des_first_line);
-				TextView1.setText(currentDic.getKeyword());
+				TextView1.setText(mCurrentDic.getKeyword());
 				TextView TextView2 = (TextView) parentActivity.findViewById(R.id.result_detail_des_second_line_text);
-				TextView2.setText(currentDic.getDestiontion());
+				TextView2.setText(mCurrentDic.getDestiontion());
 				TextView TextView3 = (TextView) parentActivity.findViewById(R.id.result_detail_des_third_line);
-				TextView3.setText(currentDic.getChineser_tone_py());
+				TextView3.setText(mCurrentDic.getChineser_tone_py());
 				TextView TextViewSourceLabel = (TextView) parentActivity.findViewById(R.id.result_detail_des_source_text);
 				TextViewSourceLabel.setText(R.string.dic_detail_source_text);
 				TextView TextView1SourceInfo = (TextView) parentActivity.findViewById(R.id.result_detail_des_source_info);
-				TextView1SourceInfo.setText(currentDic.getDic_catagory());
+				TextView1SourceInfo.setText(mCurrentDic.getDic_catagory());
+				
+				String strEn = mCurrentDic.getSample_sentance_en();
+				String strCN = mCurrentDic.getSample_sentence_ch();
+				String strPY = mCurrentDic.getSample_sentance_py();
+				if (strEn != null && !strEn.equalsIgnoreCase(" ")) {
+					sample.add(mCurrentDic);
+				}
+				if (strCN != null && !strCN.equalsIgnoreCase(" ")) {
+					sample.add(mCurrentDic);
+				}
+				if (strPY != null && !strPY.equalsIgnoreCase(" ")) {
+					sample.add(mCurrentDic);
+				}
 			}
 			
-			List<Dictionary> sample = new ArrayList<Dictionary>(3);
-			for (int i = 0; i < 3; i++) {
-				sample.add(currentDic);
-			}
 		    mAdapter.setData(sample);
 	
 			// The list should now be shown.
@@ -307,7 +341,7 @@ public class ResultDetailFragment extends Fragment {
 	    	int size = mResultList.size();
 	    	List<Dictionary> entries = new ArrayList<Dictionary>(size);
 	    	for (int i=0; i<size; i++) {
-	            entries.add(mResultList.get(mCurrentPos));
+	            entries.add(mResultList.get(i));
 	        }
 	        Log.d(TAG, "[ResultDemoLoader][loadInBackground] + End");
 	        // Done!
@@ -331,7 +365,7 @@ public class ResultDetailFragment extends Fragment {
 	        }
 	        Log.d(TAG, "[ResultDemoLoader][deliverResult] List Size="+dicList.size());
 	        List<Dictionary> oldDicList = dicList;
-	        mResultList = dicList;
+	        mDicList = dicList;
 
 	        if (this.isStarted()) {
 	            // If the Loader is currently started, we can immediately
@@ -354,14 +388,14 @@ public class ResultDetailFragment extends Fragment {
 	    @Override 
 	    protected void onStartLoading() {
 	    	Log.d(TAG, "[ScenarioListLoader][onStartLoading] + Begin");
-	        if (mResultList != null) {
+	        if (mDicList != null) {
 	            // If we currently have a result available, deliver it
 	            // immediately.
-	            this.deliverResult(mResultList);
+	            this.deliverResult(mDicList);
 	        }
 
 
-	        if (takeContentChanged() || mResultList == null) {
+	        if (takeContentChanged() || mDicList == null) {
 	            // If the data has changed since the last time it was loaded
 	            // or is not currently available, start a load.
 	            this.forceLoad();
@@ -403,9 +437,9 @@ public class ResultDetailFragment extends Fragment {
 	        this.onStopLoading();
 
 	        // At this point we can release the resources associated with 'scenarioList' if needed.
-	        if (mResultList != null) {
-	            this.onReleaseResources(mResultList);
-	            mResultList = null;
+	        if (mDicList != null) {
+	            this.onReleaseResources(mDicList);
+	            mDicList = null;
 	        }
 	    }
 
@@ -432,7 +466,7 @@ public class ResultDetailFragment extends Fragment {
 	    	Log.d(TAG, "[ResultDemoAdapter][setData] + Begin");
 	        this.clear();
 	        if (data != null) {
-	        	Log.d(TAG, "[ResultDemoAdapter][setData] Size"+data.size());
+	        	Log.d(TAG, "[ResultDemoAdapter][setData] Size = "+data.size());
 	            for (Dictionary dicEntry : data) {
 	                this.add(dicEntry);
 	            }
@@ -465,12 +499,12 @@ public class ResultDetailFragment extends Fragment {
 					case 0:
 					{
 						TextLine.setText(item.getSample_sentance_en());
+						speakIcon.setVisibility(View.GONE);
 						break;
 					}
 					case 1:
 					{
 						TextLine.setText(item.getSample_sentence_ch());
-						speakIcon.setImageResource(R.drawable.btn_speaker);
 						speakIcon.setVisibility(View.VISIBLE);
 						speakIcon.setOnClickListener(new View.OnClickListener() {
 							@Override
@@ -484,6 +518,7 @@ public class ResultDetailFragment extends Fragment {
 					case 2:
 					{
 						TextLine.setText(item.getSample_sentance_py());
+						speakIcon.setVisibility(View.GONE);
 						break;
 					}
 				}

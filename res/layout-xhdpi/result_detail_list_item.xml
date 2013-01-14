@@ -21,10 +21,13 @@
     android:background="@drawable/bg_detail_tab" >
     <TextView
         android:id="@+id/result_detail_listitem_text"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_margin="@dimen/margin_h3"
+        android:layout_marginLeft="@dimen/margin_h3"
+        android:layout_marginTop="@dimen/margin_h2"
+        android:layout_marginRight="@dimen/margin_h6"
+        android:layout_marginBottom="@dimen/margin_h2"
         android:layout_alignParentLeft="true"
         android:ellipsize="marquee"
         android:gravity="left"
@@ -33,15 +36,13 @@
         android:maxLines="2"
         android:textColor="@color/black_normal"
         android:textSize="@dimen/listview_primary_text_size" />
-
     <ImageView
         android:id="@+id/result_detail_listitem_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_toRightOf="@id/result_detail_listitem_text"
         android:layout_centerVertical="true"
-        android:layout_margin="@dimen/margin_h3"
-        android:contentDescription="@string/dummy_img_des"
-        android:visibility="gone" />
+        android:src="@drawable/btn_speaker_sb"
+        android:layout_margin="@dimen/margin_h2"
+        android:contentDescription="@string/dummy_img_des" />
 </RelativeLayout>

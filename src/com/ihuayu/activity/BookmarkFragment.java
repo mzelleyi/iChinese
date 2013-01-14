@@ -338,7 +338,7 @@ public class BookmarkFragment extends Fragment {
 				            }
 				            mDialogText.setText(((Character)firstLetter).toString());
 				            mHandler.removeCallbacks(mRemoveWindow);
-				            mHandler.postDelayed(mRemoveWindow, 3000);
+				            mHandler.postDelayed(mRemoveWindow, 2000);
 				            mPrevLetter = firstLetter;
 				        }
 					}

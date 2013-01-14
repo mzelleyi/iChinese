@@ -67,7 +67,7 @@ public class OperationUtils {
 		Dictionary dictionary = new Dictionary();
 		for(String name : cursor.getColumnNames()) {
 			if("id".equalsIgnoreCase(name)) {
-				dictionary.setId(cursor.getString(cursor.getColumnIndex(name)));
+				dictionary.setId(Integer.parseInt(cursor.getString(cursor.getColumnIndex(name))));
 			}else if("language_dir".equalsIgnoreCase(name)) {
 				dictionary.setLanguage_dir(cursor.getString(cursor.getColumnIndex(name)));
 			}else if("keyword".equalsIgnoreCase(name)) {

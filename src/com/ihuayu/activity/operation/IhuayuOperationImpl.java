@@ -84,6 +84,21 @@ public class IhuayuOperationImpl {
 		}
 	}
 	
+	public List<Dictionary> getAllBookmarks() {
+		try {
+			//TODO. maybe have performance issue.
+			Cursor result = this.db.rawQuery("select * from dictionary where id in (select Dictionary_ID from Favorites)", null);
+			return OperationUtils.cursorToDictionary(result);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	
+	public int removeFromFavorites(int dictionaryId) {
+		int result = this.db.delete("Favorites", "Dictionary_ID = ?", new String[]{dictionaryId + ""});
+		return result;
+	}
+	
 	@SuppressLint("SimpleDateFormat")
 	private String getStandardTimeStr() throws ParseException {
 		DateFormat  format2 = new SimpleDateFormat("yyyyMMddHHmmss");

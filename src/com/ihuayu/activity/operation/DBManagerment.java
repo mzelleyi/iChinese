@@ -47,12 +47,43 @@ public class DBManagerment {
 			dialogKeyword.put(dialog, keywards);
 			dialogKeywordList.add(dialogKeyword);
 		}
-		
 		return dialogKeywordList;
 	}
 	
-	public void addBookmark(String dictionaryID) {
-		operation.insertToBookmark(dictionaryID);
+	public void addBookmark(int dictionaryID) {
+		operation.insertToBookmark(dictionaryID + "");
 	}
-
+	
+	public List<Dictionary> getAllBookMarks() {
+		return operation.getAllBookmarks();
+	}
+	
+	public int removeFromFavorites(int dictionaryId) {
+		return operation.removeFromFavorites(dictionaryId);
+	}
+	
+	public void removeFromFavorites(int[] dictionaryId) {
+		for(int i = 0; i < dictionaryId.length; i ++) {
+			operation.removeFromFavorites(dictionaryId[i]);
+		}
+	}
+	public Dictionary getDictinary(int dicId){
+		//Should return only one record.
+		List<Dictionary> dictionaryList = operation.queryDictionary("select * from dictionary where id = ? ", new String[]{dicId+""});
+		if(dictionaryList == null || dictionaryList.size() == 0) return null;
+		return dictionaryList.get(0);
+	}
+	
+	public Dictionary getNextDictionary(int currentDictionaryId) {
+		List<Dictionary> dictionaryList = operation.queryDictionary("select * from dictionary where id = ? ", new String[]{(currentDictionaryId + 1)+""});
+		if(dictionaryList == null || dictionaryList.size() == 0) return null;
+		return dictionaryList.get(0);
+	}
+	
+	public Dictionary getPreviousDictionary(int currentDictionaryId) {
+		List<Dictionary> dictionaryList = operation.queryDictionary("select * from dictionary where id = ? ", new String[]{(currentDictionaryId - 1 )+""});
+		if(dictionaryList == null || dictionaryList.size() == 0) return null;
+		return dictionaryList.get(0);
+	}
+	
 }

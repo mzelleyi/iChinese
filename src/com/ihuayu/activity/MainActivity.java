@@ -1,20 +1,18 @@
 package com.ihuayu.activity;
 
 
-import com.ihuayu.R;
-import com.ihuayu.activity.operation.DBManagerment;
-
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
-//import android.view.Menu;
-//import android.view.MenuItem;
-//import android.support.v4.app.NavUtils;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
+
+import com.ihuayu.R;
+import com.ihuayu.activity.operation.DBManagerment;
+import com.ihuayu.activity.rest.AudioPlayer;
 
 /**
  * 
@@ -119,6 +117,15 @@ public class MainActivity extends FragmentActivity implements
 
 	public void onTabChanged(String tabTag) {
 		Log.d(TAG, "[onTabChanged] + Begin,tabTag:" + tabTag);
+		
+		AudioPlayer test = new AudioPlayer();
+		try {
+			test.playAudio(this, "audio/c3419fab-9810-4fd3-8c8b-5ff67196e94e.mp3");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+//		test.downFile("http://ihuayu.gistxl.com/smc/audio/c3419fab-9810-4fd3-8c8b-5ff67196e94e.mp3", "/audio/", "c3419fab-9810-4fd3-8c8b-5ff67196e94e.mp3");
 		// TODO Auto-generated method stub
 		if (TAB_SEARCH.equals(tabTag)) {
 			updateTab(tabTag, R.id.tab_content_search);

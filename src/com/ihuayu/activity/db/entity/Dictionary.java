@@ -8,7 +8,7 @@ package com.ihuayu.activity.db.entity;
  *
  */
 public class Dictionary {
-	private String id;
+	private int id;
 	private String language_dir;
 	private String keyword;
 	private String keyword_len;
@@ -22,14 +22,21 @@ public class Dictionary {
 	private String sample_sentance_py;
 	private String sample_sentance_audio;
 	
-	public String getId() {
-		return id;
-	}
-	public void setId(String id) {
-		this.id = id;
-	}
+//	public String getId() {
+//		return id;
+//	}
+//	public void setId(String id) {
+//		this.id = id;
+//	}
+	
 	public String getLanguage_dir() {
 		return language_dir;
+	}
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
 	}
 	public void setLanguage_dir(String language_dir) {
 		this.language_dir = language_dir;

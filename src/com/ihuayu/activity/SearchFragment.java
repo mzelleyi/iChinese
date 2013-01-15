@@ -21,7 +21,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -58,6 +57,7 @@ public class SearchFragment extends Fragment {
 	private static LayoutInflater mInflater;
 	private static DialogFragment searchDialog;
 	private static QueryType mSearchKeyType = null;
+	private static EditText mEditText = null;
 	
 	private static List<Dictionary> mDicList = new ArrayList<Dictionary>();
 	
@@ -132,7 +132,7 @@ public class SearchFragment extends Fragment {
 		
 		final ImageView mPromptImg = (ImageView)parentActivity.findViewById(R.id.search_fragment_prompt_image);
 		final ImageView mClearImg = (ImageView)parentActivity.findViewById(R.id.search_bar_edit_clear);
-	    final EditText mEditText = (EditText)parentActivity.findViewById(R.id.search_bar_edit_text);
+	    mEditText = (EditText)parentActivity.findViewById(R.id.search_bar_edit_text);
 		
 	    mAdapter = new SearchListAdapter(parentActivity);
 		mListView = (ListView)parentActivity.findViewById(R.id.search_result_list);
@@ -200,16 +200,13 @@ public class SearchFragment extends Fragment {
 				// TODO Auto-generated method stub
 				Log.d(TAG, "[onEditorAction] + Begin ,actionId = "+actionId);
 				boolean handled = false;
-		        if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+		        if (actionId == EditorInfo.IME_ACTION_SEARCH || 
+		        		actionId == EditorInfo.IME_ACTION_DONE ||
+		        		actionId == EditorInfo.IME_ACTION_GO) {
 		        	Log.d(TAG, "[onEditorAction] -> IME_ACTION_SEARCH ");
 		        	String searchKey = mEditText.getText().toString();
 		            sendAllSearchMsg(searchKey,0);
 		            handled = true;
-		        } else if (actionId == EditorInfo.IME_ACTION_DONE){
-		        	Log.d(TAG, "[onEditorAction] -> IME_ACTION_SEARCH ");
-		        	//String searchKey = mEditText.getText().toString();
-		            //sendSearchMsg(searchKey,0);
-		        	handled = true;
 		        }
 		        return handled;
 			}
@@ -255,11 +252,7 @@ public class SearchFragment extends Fragment {
 				List<Dictionary> dicList = (List<Dictionary>) msg.obj;
 				mDicList = dicList;
 
-				// mCurFilter = !TextUtils.isEmpty(resultStr) ? resultStr :
-				// null;
-				// mAdapter.getFilter().filter(mCurFilter);
-				mAdapter.setData(dicList);
-				// mListView.setAdapter(mAdapter);
+				mAdapter.setData(dicList,false);
 				mAdapter.notifyDataSetChanged();
 				break;
 			}
@@ -267,12 +260,13 @@ public class SearchFragment extends Fragment {
 				Log.d(TAG, "[mUiHandler][MSG_REFRESH_SEARCH_RESULT]");
 				searchDialog.dismiss();
 
-				String searchResultStr = (String) msg.obj;
+				List<Dictionary> dicList = (List<Dictionary>) msg.obj;
+				mDicList =  dicList;
 
-				mCurFilter = !TextUtils.isEmpty(searchResultStr) ? searchResultStr : null;
-				mAdapter.getFilter().filter(mCurFilter);
-				int resultCount = mAdapter.getCount();
-				Log.d(TAG, "[mUiHandler] Result Count = " + resultCount);
+				//mCurFilter = !TextUtils.isEmpty(searchResultStr) ? searchResultStr : null;
+				//mAdapter.getFilter().filter(mCurFilter);
+				mAdapter.setData(dicList,true);
+				mAdapter.notifyDataSetChanged();
 				break;
 			}
 			case SearchFragment.MSG_DO_SUGGEST_SEARCH: {
@@ -281,14 +275,15 @@ public class SearchFragment extends Fragment {
 				
 				List<Dictionary> dicList = MainActivity.dbManagerment.searchDictionary(mSearchKeyType, searchStr);
 
-				Message msg1 = mUiHandler
-						.obtainMessage(MSG_REFRESH_SUGGEST_LISTVIEW);
+				Message msg1 = mUiHandler.obtainMessage(MSG_REFRESH_SUGGEST_LISTVIEW);
 				msg1.obj = dicList;
 				this.sendMessage(msg1);
 				break;
 			}
 			case SearchFragment.MSG_DO_ALL_SEARCH: {
 				Log.d(TAG, "[mUiHandler][MSG_DO_ALL_SEARCH]");
+				inputMethodManager.hideSoftInputFromWindow(mEditText.getWindowToken(),0);
+				
 				searchDialog = MyDialogFragment.newInstance(parentActivity,
 						MyDialogFragment.DO_SEARCH_DB, null);
 				searchDialog.show(parentActivity.getSupportFragmentManager(),
@@ -296,8 +291,7 @@ public class SearchFragment extends Fragment {
 
 				String doSearchStr = (String) msg.obj;
 				List<Dictionary> dicList = MainActivity.dbManagerment.searchDictionary(mSearchKeyType, doSearchStr);
-				Message msg2 = mUiHandler
-						.obtainMessage(MSG_REFRESH_SUGGEST_LISTVIEW);
+				Message msg2 = mUiHandler.obtainMessage(MSG_REFRESH_SEARCH_RESULT);
 				msg2.obj = dicList;
 				this.sendMessageDelayed(msg2, 1000);
 				break;
@@ -307,14 +301,20 @@ public class SearchFragment extends Fragment {
 	};
 	
     public static class SearchListAdapter extends ArrayAdapter<Dictionary> {
-
+    	private boolean bFuzzyMode = false;
+    	
         public SearchListAdapter(Context context) {
             super(context, android.R.layout.simple_list_item_2);
         }
 
-        public void setData(List<Dictionary> data) {
+        public void setData(List<Dictionary> data, boolean fuzzyMode) {
+        	bFuzzyMode = fuzzyMode;
             this.clear();
-            if (data != null) {
+            if (data != null && data.size() > 0) {
+            	//Dummy First Item For Divider
+            	if (bFuzzyMode) {
+            		this.add(data.get(0));
+            	}
                 for (Dictionary str : data) {
                     this.add(str);
                 }
@@ -324,17 +324,39 @@ public class SearchFragment extends Fragment {
         /**
          * Populate new items in the list.
          */
-        @Override public View getView(int position, View convertView, ViewGroup parent) {
+        @Override 
+        public View getView(int position, View convertView, ViewGroup parent) {
             View view;
 
             if (convertView == null) {
-                view = mInflater.inflate(R.layout.search_result_list_item, parent, false);
+            	if (bFuzzyMode) {
+            		if (position == 0) {
+            			view = mInflater.inflate(R.layout.bookmark_list_separate, parent, false);
+            		} else {
+            			view = mInflater.inflate(R.layout.bookmark_list_item, parent, false);
+            		}
+            	} else {
+            		view = mInflater.inflate(R.layout.search_suggest_item, parent, false);
+            	}
             } else {
                 view = convertView;
             }
 
             Dictionary item = getItem(position);
-            ((TextView)view.findViewById(R.id.search_result_listitem_text)).setText(item.getKeyword());
+            if (bFuzzyMode) {
+            	if (position == 0) {
+            		TextView dividerText = (TextView) view.findViewById(R.id.bookmark_listitem_separate_text);
+            		dividerText.setText("Dictionaries");
+            	} else {
+            		((ImageView)view.findViewById(R.id.bookmark_listitem_icon_speaker)).setImageResource(R.drawable.btn_speaker_sb);
+					((TextView)view.findViewById(R.id.bookmark_listitem_text_first_line)).setText(item.getKeyword());
+					((TextView)view.findViewById(R.id.bookmark_listitem_text_second_line)).setText(item.getDestiontion());
+					((TextView)view.findViewById(R.id.bookmark_listitem_text_third_line)).setText(item.getChineser_tone_py());
+					((TextView)view.findViewById(R.id.bookmark_listitem_text_type)).setText(item.getDic_catagory());
+            	}
+            } else {
+            	((TextView)view.findViewById(R.id.search_result_listitem_text)).setText(item.getKeyword());
+            }
 
             return view;
         }

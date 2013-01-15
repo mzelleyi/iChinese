@@ -8,6 +8,7 @@ import java.util.List;
 
 import com.ihuayu.R;
 import com.ihuayu.activity.db.entity.Dictionary;
+import com.ihuayu.activity.db.entity.FuzzyResult;
 import com.ihuayu.activity.db.entity.QueryType;
 import com.ihuayu.view.MyDialogFragment;
 
@@ -43,25 +44,29 @@ import android.widget.TextView;
  */
 public class SearchFragment extends Fragment {
 
-	private static final String TAG = "iHuayu:SearchFragment";
-	private static final int DELAY_REFRESH_LIST_VIEW = 300;
-	private static final int MSG_DO_SUGGEST_SEARCH = 1;
-	private static final int MSG_REFRESH_SUGGEST_LISTVIEW = 2;
-	private static final int MSG_DO_ALL_SEARCH = 3;
-	private static final int MSG_REFRESH_SEARCH_RESULT = 4;
-	
-	private static FragmentActivity parentActivity = null;
-	//private static String[] mStrings = Cheeses.sCheeseStrings;
-	private static SearchListAdapter mAdapter;
-	private static ListView mListView;
-	private static LayoutInflater mInflater;
-	private static DialogFragment searchDialog;
-	private static QueryType mSearchKeyType = null;
-	private static EditText mEditText = null;
-	
-	private static List<Dictionary> mDicList = new ArrayList<Dictionary>();
-	
-	InputMethodManager inputMethodManager = null;
+	private static final String			TAG								= "iHuayu:SearchFragment";
+	private static final int			DELAY_REFRESH_LIST_VIEW			= 300;
+	private static final int			MSG_DO_SUGGEST_SEARCH			= 1;
+	private static final int			MSG_REFRESH_SUGGEST_LISTVIEW	= 2;
+	private static final int			MSG_DO_FUZZY_SEARCH				= 3;
+	private static final int			MSG_REFRESH_FUZZY_RESULT		= 4;
+
+	private static final int			VIEW_TYPE_SUGGEST				= 0;
+	private static final int			VIEW_TYPE_FUZZY				= 1;
+
+	private static FragmentActivity		parentActivity					= null;
+	// private static String[] mStrings = Cheeses.sCheeseStrings;
+	private static SearchListAdapter	mAdapter;
+	private static ListView				mListView;
+	private static LayoutInflater		mInflater;
+	private static DialogFragment		searchDialog;
+	private static QueryType			mSearchKeyType					= null;
+	private static EditText				mEditText						= null;
+	private static TextView				mFuzzyHint						= null;
+	private static TextView				mDivider						= null;
+	private static List<Dictionary>		mDicList						= new ArrayList<Dictionary>();
+	private InputMethodManager			mInputMethodManager				= null;
+	private static boolean				bFuzzyMode						= false;
 	
  // If non-null, this is the current filter the user has provided.
     String mCurFilter;
@@ -108,7 +113,7 @@ public class SearchFragment extends Fragment {
 		
 		parentActivity = this.getActivity();
 		
-		inputMethodManager = (InputMethodManager)parentActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+		mInputMethodManager = (InputMethodManager)parentActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
 		
 		final Button btnLanguage = (Button)parentActivity.findViewById(R.id.search_bar_btn);
 		//Tag "EN" represent input type is English while "CN" represent Chinese.
@@ -132,6 +137,8 @@ public class SearchFragment extends Fragment {
 		
 		final ImageView mPromptImg = (ImageView)parentActivity.findViewById(R.id.search_fragment_prompt_image);
 		final ImageView mClearImg = (ImageView)parentActivity.findViewById(R.id.search_bar_edit_clear);
+		mFuzzyHint = (TextView)parentActivity.findViewById(R.id.search_fuzzy_hint_text);
+		mDivider = (TextView)parentActivity.findViewById(R.id.search_fuzzy_divider_text);
 	    mEditText = (EditText)parentActivity.findViewById(R.id.search_bar_edit_text);
 		
 	    mAdapter = new SearchListAdapter(parentActivity);
@@ -144,7 +151,7 @@ public class SearchFragment extends Fragment {
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3)
 			{
 				// TODO Auto-generated method stub
-				Log.d(TAG, "[onItemClick] + arg 1="+arg1+",arg 2="+arg2+",arg 3="+arg3);
+				Log.d(TAG, "[onItemClick] + arg 2="+arg2+",arg 3="+arg3);
 				FragmentManager fm = parentActivity.getSupportFragmentManager();
 				Fragment newFragment = ResultDetailFragment.newInstance(mDicList,arg2);
 				FragmentTransaction ft = fm.beginTransaction();
@@ -152,8 +159,7 @@ public class SearchFragment extends Fragment {
 				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 				ft.addToBackStack(null);
 				ft.commit();
-				
-				inputMethodManager.hideSoftInputFromWindow(mEditText.getWindowToken(),0);
+				mInputMethodManager.hideSoftInputFromWindow(mEditText.getWindowToken(),0);
 			}
 		});
 		
@@ -233,8 +239,8 @@ public class SearchFragment extends Fragment {
 	}
 	
 	private void sendAllSearchMsg(String key, long delayTime) {
-		mUiHandler.removeMessages(MSG_DO_ALL_SEARCH);
-		Message msg = mUiHandler.obtainMessage(MSG_DO_ALL_SEARCH);
+		mUiHandler.removeMessages(MSG_DO_FUZZY_SEARCH);
+		Message msg = mUiHandler.obtainMessage(MSG_DO_FUZZY_SEARCH);
 		msg.obj = key;
 		if (delayTime > 0)
 			mUiHandler.sendMessageDelayed(msg, delayTime);
@@ -250,22 +256,47 @@ public class SearchFragment extends Fragment {
 				Log.d(TAG, "[mUiHandler][MSG_REFRESH_SUGGEST_LISTVIEW]");
 				@SuppressWarnings("unchecked")
 				List<Dictionary> dicList = (List<Dictionary>) msg.obj;
-				mDicList = dicList;
-
-				mAdapter.setData(dicList,false);
+				
+				mDicList.clear();
+        		for(Dictionary object: dicList) {
+        			mDicList.add(object);
+        		}
+				
+				mFuzzyHint.setVisibility(View.GONE);
+				mDivider.setVisibility(View.GONE);
+				
+				bFuzzyMode = false;
+				mAdapter.setData(mDicList);
 				mAdapter.notifyDataSetChanged();
 				break;
 			}
-			case SearchFragment.MSG_REFRESH_SEARCH_RESULT: {
-				Log.d(TAG, "[mUiHandler][MSG_REFRESH_SEARCH_RESULT]");
+			case SearchFragment.MSG_REFRESH_FUZZY_RESULT: {
+				Log.d(TAG, "[mUiHandler][MSG_REFRESH_FUZZY_RESULT]");
 				searchDialog.dismiss();
 
-				List<Dictionary> dicList = (List<Dictionary>) msg.obj;
-				mDicList =  dicList;
+				FuzzyResult fuzzyResult = (FuzzyResult) msg.obj;
+				List<Dictionary> dicList =  fuzzyResult.getDictionaryList();
+				
+				mDicList.clear();
+        		for(Dictionary object: dicList) {
+        			mDicList.add(object);
+        		}
+        		
+        		mDivider.setVisibility(View.VISIBLE);
+				if (!fuzzyResult.isExactResult()) {
+					mFuzzyHint.setVisibility(View.VISIBLE);
+					//String hintStr = (String) mFuzzyHint.getText();
+					//SpannableString spanStr = new SpannableString(hintStr);
+					//spanStr.setSpan(new ForegroundColorSpan(Color.BLUE), firstIndex, lastIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+					//mFuzzyHint.setText(spanStr);
+				} else {
+					mFuzzyHint.setVisibility(View.GONE);
+				}				
 
 				//mCurFilter = !TextUtils.isEmpty(searchResultStr) ? searchResultStr : null;
 				//mAdapter.getFilter().filter(mCurFilter);
-				mAdapter.setData(dicList,true);
+				bFuzzyMode = true;
+				mAdapter.setData(mDicList);
 				mAdapter.notifyDataSetChanged();
 				break;
 			}
@@ -280,9 +311,9 @@ public class SearchFragment extends Fragment {
 				this.sendMessage(msg1);
 				break;
 			}
-			case SearchFragment.MSG_DO_ALL_SEARCH: {
-				Log.d(TAG, "[mUiHandler][MSG_DO_ALL_SEARCH]");
-				inputMethodManager.hideSoftInputFromWindow(mEditText.getWindowToken(),0);
+			case SearchFragment.MSG_DO_FUZZY_SEARCH: {
+				Log.d(TAG, "[mUiHandler][MSG_DO_FUZZY_SEARCH]");
+				mInputMethodManager.hideSoftInputFromWindow(mEditText.getWindowToken(),0);
 				
 				searchDialog = MyDialogFragment.newInstance(parentActivity,
 						MyDialogFragment.DO_SEARCH_DB, null);
@@ -290,9 +321,9 @@ public class SearchFragment extends Fragment {
 						"dialog_search_db");
 
 				String doSearchStr = (String) msg.obj;
-				List<Dictionary> dicList = MainActivity.dbManagerment.searchDictionary(mSearchKeyType, doSearchStr);
-				Message msg2 = mUiHandler.obtainMessage(MSG_REFRESH_SEARCH_RESULT);
-				msg2.obj = dicList;
+				FuzzyResult fuzzyResult = MainActivity.dbManagerment.fuzzySearchDictionary(mSearchKeyType, doSearchStr);
+				Message msg2 = mUiHandler.obtainMessage(MSG_REFRESH_FUZZY_RESULT);
+				msg2.obj = fuzzyResult;
 				this.sendMessageDelayed(msg2, 1000);
 				break;
 			}
@@ -301,40 +332,52 @@ public class SearchFragment extends Fragment {
 	};
 	
     public static class SearchListAdapter extends ArrayAdapter<Dictionary> {
-    	private boolean bFuzzyMode = false;
     	
         public SearchListAdapter(Context context) {
             super(context, android.R.layout.simple_list_item_2);
         }
 
-        public void setData(List<Dictionary> data, boolean fuzzyMode) {
-        	bFuzzyMode = fuzzyMode;
+        public void setData(List<Dictionary> data) {
             this.clear();
             if (data != null && data.size() > 0) {
             	//Dummy First Item For Divider
-            	if (bFuzzyMode) {
-            		this.add(data.get(0));
-            	}
                 for (Dictionary str : data) {
                     this.add(str);
                 }
             }
         }
+        
+        
 
-        /**
+	    @Override
+		public int getItemViewType(int position) {
+			// TODO Auto-generated method stub
+	    	if (bFuzzyMode) {
+	    		return VIEW_TYPE_FUZZY;
+	    	} else {
+	    		return VIEW_TYPE_SUGGEST;
+	    	}
+			//return super.getItemViewType(position);
+		}
+	    
+		@Override
+		public int getViewTypeCount()
+		{
+			// TODO Auto-generated method stub
+			return 2;
+			//return super.getViewTypeCount();
+		}
+
+		/**
          * Populate new items in the list.
          */
         @Override 
         public View getView(int position, View convertView, ViewGroup parent) {
             View view;
-
+            Log.d(TAG, "[getView] pos = "+position);
             if (convertView == null) {
-            	if (bFuzzyMode) {
-            		if (position == 0) {
-            			view = mInflater.inflate(R.layout.bookmark_list_separate, parent, false);
-            		} else {
-            			view = mInflater.inflate(R.layout.bookmark_list_item, parent, false);
-            		}
+            	if (getItemViewType(position) == VIEW_TYPE_FUZZY) {
+            		view = mInflater.inflate(R.layout.bookmark_list_item, parent, false);
             	} else {
             		view = mInflater.inflate(R.layout.search_suggest_item, parent, false);
             	}
@@ -343,10 +386,9 @@ public class SearchFragment extends Fragment {
             }
 
             Dictionary item = getItem(position);
-            if (bFuzzyMode) {
-            	if (position == 0) {
-            		TextView dividerText = (TextView) view.findViewById(R.id.bookmark_listitem_separate_text);
-            		dividerText.setText("Dictionaries");
+            if (null != view) {
+            	if (getItemViewType(position) == VIEW_TYPE_SUGGEST) {
+            		((TextView)view.findViewById(R.id.search_result_listitem_text)).setText(item.getKeyword());
             	} else {
             		((ImageView)view.findViewById(R.id.bookmark_listitem_icon_speaker)).setImageResource(R.drawable.btn_speaker_sb);
 					((TextView)view.findViewById(R.id.bookmark_listitem_text_first_line)).setText(item.getKeyword());
@@ -354,10 +396,7 @@ public class SearchFragment extends Fragment {
 					((TextView)view.findViewById(R.id.bookmark_listitem_text_third_line)).setText(item.getChineser_tone_py());
 					((TextView)view.findViewById(R.id.bookmark_listitem_text_type)).setText(item.getDic_catagory());
             	}
-            } else {
-            	((TextView)view.findViewById(R.id.search_result_listitem_text)).setText(item.getKeyword());
             }
-
             return view;
         }
     }

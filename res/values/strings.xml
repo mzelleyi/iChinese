@@ -13,6 +13,8 @@
     <string name="searchbox_hint">Search</string>
     <string name="search_no_result_hint_first_line">No Result Found!</string>
     <string name="search_no_result_hint_second_line">Suggest</string>
+    <string name="search_dictionariy_divider_hint">Dictionaries</string>
+    <string name="search_fuzzy_text_hint">No match found.Fuzzy search result.Suggest</string>
     
     <string name="tab_bar_search">SEARCH</string>
     <string name="tab_bar_scenario">SCENARIOS</string>

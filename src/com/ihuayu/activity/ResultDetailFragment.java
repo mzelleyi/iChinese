@@ -54,7 +54,9 @@ public class ResultDetailFragment extends Fragment {
     	Log.d(TAG, "[newInstance] + Begin");
     	ResultDetailFragment fragment = new ResultDetailFragment();
     	mResultList = list;
-    	mCurrentDic = mResultList.get(position);
+    	if (position < mResultList.size()) {
+    		mCurrentDic = mResultList.get(position);
+    	}
     	mCurrentPos = position;
     	Log.d(TAG, "[newInstance] List Size = "+mResultList.size());
     	Log.d(TAG, "[newInstance] mCurrentPos = "+mCurrentPos);

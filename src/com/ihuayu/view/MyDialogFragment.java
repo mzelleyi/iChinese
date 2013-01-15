@@ -46,23 +46,24 @@ public class MyDialogFragment extends DialogFragment {
     	parentActivity = (FragmentActivity) context;
     	mInflater = parentActivity.getLayoutInflater();
     	
-    	dialogKeyMap = (HashMap<com.ihuayu.activity.db.entity.Dialog, List<DialogKeywords>>) param;
-
-        Iterator<com.ihuayu.activity.db.entity.Dialog> iterator = dialogKeyMap.keySet().iterator();
-        while(iterator.hasNext()) {
-        	dialogItem = (com.ihuayu.activity.db.entity.Dialog) iterator.next();
-        }
-        keyWordList = dialogKeyMap.get(dialogItem);
-        Log.d(TAG, "[newInstance] keyWordList size = "+keyWordList.size());
-        for (int i = 0; i< keyWordList.size() ; i++) {
-        	DialogKeywords words = keyWordList.get(i);
-			String enStr = words.getSrc_keyword();
-			String pyStr = words.getKeyword_py();
-			String cnStr = words.getDest_keyword();
-			Log.d(TAG, "[newInstance] enStr = "+enStr);
-			Log.d(TAG, "[newInstance] pyStr = "+pyStr);
-			Log.d(TAG, "[newInstance] cnStr = "+cnStr);
-        }
+    	if (null != param) {
+    		dialogKeyMap = (HashMap<com.ihuayu.activity.db.entity.Dialog, List<DialogKeywords>>) param;
+    		Iterator<com.ihuayu.activity.db.entity.Dialog> iterator = dialogKeyMap.keySet().iterator();
+            while(iterator.hasNext()) {
+            	dialogItem = (com.ihuayu.activity.db.entity.Dialog) iterator.next();
+            }
+            keyWordList = dialogKeyMap.get(dialogItem);
+            Log.d(TAG, "[newInstance] keyWordList size = "+keyWordList.size());
+            for (int i = 0; i< keyWordList.size() ; i++) {
+            	DialogKeywords words = keyWordList.get(i);
+    			String enStr = words.getSrc_keyword();
+    			String pyStr = words.getKeyword_py();
+    			String cnStr = words.getDest_keyword();
+    			Log.d(TAG, "[newInstance] enStr = "+enStr);
+    			Log.d(TAG, "[newInstance] pyStr = "+pyStr);
+    			Log.d(TAG, "[newInstance] cnStr = "+cnStr);
+            }
+    	}
     	
         Bundle args = new Bundle();
         args.putInt("dialogType", dialogType);

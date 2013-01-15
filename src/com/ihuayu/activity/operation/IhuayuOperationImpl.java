@@ -15,6 +15,7 @@ import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.ihuayu.activity.db.DBSqlite;
 import com.ihuayu.activity.db.entity.Dialog;
@@ -28,6 +29,7 @@ import com.ihuayu.activity.db.entity.Scenario;
  *
  */
 public class IhuayuOperationImpl {
+	private static final String TAG = "iHuayu:IhuayuOperationImpl";
 	private SQLiteDatabase db = null;
 	DBSqlite manager;
 	
@@ -97,9 +99,12 @@ public class IhuayuOperationImpl {
 	
 	public int getBookmark(int dictionaryId) {
 		try {
+			Log.d(TAG, "[getBookmark] + Begin");
 			//TODO. maybe have performance issue.
-			Cursor result = this.db.rawQuery("select Dictionary_ID from Favorites where Dictionary_ID = ?)", new String[]{dictionaryId + ""});
-			return result.getInt(result.getColumnIndex("Dictionary_ID"));
+			Cursor result = this.db.rawQuery("select * from Favorites where Dictionary_ID = ?", new String[]{dictionaryId + ""});
+			//return result.getInt(result.getColumnIndex("Dictionary_ID"));
+			Log.d(TAG, "[getBookmark] Cursor Count = "+result.getCount());
+			return result.getCount();
 		} catch (Exception e) {
 			return -1;
 		}

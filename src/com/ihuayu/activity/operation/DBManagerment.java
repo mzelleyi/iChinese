@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.ihuayu.activity.db.DBSqlite;
 import com.ihuayu.activity.db.entity.Dialog;
@@ -22,7 +23,7 @@ import com.ihuayu.activity.db.entity.Scenario;
  *
  */
 public class DBManagerment {
-	
+	private static final String TAG = "iHuayu:DBManagerment";
 	private IhuayuOperationImpl operation = null;
 	
 	public DBManagerment(Context context) {
@@ -73,9 +74,18 @@ public class DBManagerment {
 		}
 	}
 	
-	public boolean hasbookmarked(int dictionaryID) {
-		if(operation.getBookmark(dictionaryID) != -1) return true;
-		return false;
+	public boolean hasbookmarked(int dictionaryID)
+	{
+		Log.d(TAG, "[hasbookmarked] dictionaryID = " + dictionaryID);
+		// if(operation.getBookmark(dictionaryID) != -1) return true;
+		if (operation.getBookmark(dictionaryID) > 0) {
+			Log.d(TAG, "[hasbookmarked] has been bookmarked,return true");
+			return true;
+		}
+		else {
+			Log.d(TAG, "[hasbookmarked] hasn't been bookmarked,return false");
+			return false;
+		}
 	}
 	
 	public Dictionary getDictinary(int dicId){

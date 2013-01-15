@@ -45,6 +45,7 @@ public class ResultDetailFragment extends Fragment {
 	private static Dictionary mCurrentDic = null;
 	private static int mCurrentPos = -1;
 	private static int mDialogType = -1;
+	private static ImageView mFavoriteImg = null;
 	private static boolean mBeFavorited = false;
 
     /**
@@ -98,6 +99,7 @@ public class ResultDetailFragment extends Fragment {
 				Log.d(TAG, "[onClick] btnPrev + mCurrentPos = "+mCurrentPos);
 				if (mCurrentPos > -1 && mCurrentPos < mResultList.size()) {
 					mCurrentDic = mResultList.get(mCurrentPos);
+					updateFavoriteImg();
 					updateDataFragment();
 				} else {
 					mCurrentPos = mCurrentPos + 1;
@@ -118,6 +120,7 @@ public class ResultDetailFragment extends Fragment {
 				Log.d(TAG, "[onClick] btnNext + mCurrentPos = "+mCurrentPos);
 				if (mCurrentPos > -1 && mCurrentPos < mResultList.size()) {
 					mCurrentDic = mResultList.get(mCurrentPos);
+					updateFavoriteImg();
 					updateDataFragment();
 				} else {
 					mCurrentPos = mCurrentPos - 1;
@@ -128,8 +131,8 @@ public class ResultDetailFragment extends Fragment {
 			}
 		});
 		
-		final ImageView favoriteImg = (ImageView)parentActivity.findViewById(R.id.result_detail_des_favorite_img);
-		favoriteImg.setOnClickListener(new View.OnClickListener() {
+		mFavoriteImg = (ImageView)parentActivity.findViewById(R.id.result_detail_des_favorite_img);
+		mFavoriteImg.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
@@ -137,7 +140,7 @@ public class ResultDetailFragment extends Fragment {
 					mDialogType = MyDialogFragment.ADD_TO_BOOKMARK;
 					showDialog(mDialogType);
 				} else {
-					favoriteImg.setImageResource(R.drawable.btn_mark_off_2x);
+					mFavoriteImg.setImageResource(R.drawable.btn_mark_off_2x);
 					
 					MainActivity.dbManagerment.removeFromFavorites(mCurrentDic.getId());
 					
@@ -162,8 +165,8 @@ public class ResultDetailFragment extends Fragment {
 //				ft.commit();
 			}
 		});
-		
-		this.updateDataFragment();
+		updateFavoriteImg();
+		updateDataFragment();
 	}
 	
     public static void showDialog(int dialogType) {
@@ -178,13 +181,12 @@ public class ResultDetailFragment extends Fragment {
     
     public static void doPositiveClick() {
         // Do stuff here.
-        Log.i(TAG, "Positive click!");
+        Log.i(TAG, "[doPositiveClick] + Begin");
         if (mDialogType == MyDialogFragment.ADD_TO_BOOKMARK) {
-        	
         	MainActivity.dbManagerment.addBookmark(mCurrentDic.getId());
         	
-        	ImageView favoriteImg = (ImageView)parentActivity.findViewById(R.id.result_detail_des_favorite_img);
-        	favoriteImg.setImageResource(R.drawable.btn_mark_on_2x);
+        	updateFavoriteImg();
+        	
         	mDialogType = MyDialogFragment.ADD_SUCCESS;
         	showDialog(MyDialogFragment.ADD_SUCCESS);
         } else if (mDialogType == MyDialogFragment.ADD_SUCCESS) {
@@ -203,7 +205,7 @@ public class ResultDetailFragment extends Fragment {
         mBeFavorited = false;
     }
 	
-	public void updateDataFragment() {
+	public static void updateDataFragment() {
 		//Add Detail Dialog Fragment
 		FragmentManager fm = parentActivity.getSupportFragmentManager();
 		FragmentTransaction ft = fm.beginTransaction();
@@ -224,6 +226,17 @@ public class ResultDetailFragment extends Fragment {
 			//ft.addToBackStack(null);
 			ft.commit();
         }
+	}
+	
+	public static void updateFavoriteImg() {
+		Log.d(TAG, "[updateFavoriteImg] mCurrent Dictionary ID = "+mCurrentDic.getId());
+		mBeFavorited = MainActivity.dbManagerment.hasbookmarked(mCurrentDic.getId());
+		Log.d(TAG, "[updateFavoriteImg] This item has been bookmarked = "+mBeFavorited);
+		if (mBeFavorited) {
+			mFavoriteImg.setImageResource(R.drawable.btn_mark_on_2x);
+		} else {
+			mFavoriteImg.setImageResource(R.drawable.btn_mark_off_2x);
+		}
 	}
 	
 	public static class ResultDemoFragment extends ListFragment implements 

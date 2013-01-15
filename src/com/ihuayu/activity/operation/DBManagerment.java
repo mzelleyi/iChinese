@@ -13,6 +13,7 @@ import com.ihuayu.activity.db.DBSqlite;
 import com.ihuayu.activity.db.entity.Dialog;
 import com.ihuayu.activity.db.entity.DialogKeywords;
 import com.ihuayu.activity.db.entity.Dictionary;
+import com.ihuayu.activity.db.entity.FuzzyResult;
 import com.ihuayu.activity.db.entity.QueryType;
 import com.ihuayu.activity.db.entity.Scenario;
 
@@ -34,7 +35,7 @@ public class DBManagerment {
 		return operation.searchDictionary(type.getName(), keyword);
 	}
 	
-	public List<Dictionary> fuzzySearchDictionary(QueryType type, String keyword) {
+	public FuzzyResult fuzzySearchDictionary(QueryType type, String keyword) {
 		return operation.fuzzySearch(type.getName(), keyword);
 	}
 	

@@ -20,6 +20,7 @@ import com.ihuayu.activity.db.DBSqlite;
 import com.ihuayu.activity.db.entity.Dialog;
 import com.ihuayu.activity.db.entity.DialogKeywords;
 import com.ihuayu.activity.db.entity.Dictionary;
+import com.ihuayu.activity.db.entity.FuzzyResult;
 import com.ihuayu.activity.db.entity.Scenario;
 
 /**
@@ -142,9 +143,19 @@ public class IhuayuOperationImpl {
 		return OperationUtils.cursorToDictionary(result);
 	}
 	
-	public List<Dictionary> fuzzySearch(String language_dir, String keyword) {
-		Fuzzy fuzzy = new Fuzzy();
-		return fuzzy.fuzzySearch(keyword, language_dir, this);
+	public FuzzyResult fuzzySearch(String language_dir, String keyword) {
+		FuzzyResult result = new FuzzyResult();
+		List<Dictionary> exactResult = queryDictionary("select * from dictionary where keyword = ? ", new String[]{keyword});
+		if(exactResult != null && exactResult.size() > 0) {
+			result.setDictionaryList(exactResult);
+			result.setExactResult(true);
+		}else {
+			Fuzzy fuzzy = new Fuzzy();
+			result.setDictionaryList(fuzzy.fuzzySearch(keyword, language_dir, this));
+			result.setExactResult(false);
+		}
+		
+		return result;
 	}
 	
 	public String getLastUpdateTime() {

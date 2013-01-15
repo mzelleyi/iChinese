@@ -94,6 +94,16 @@ public class IhuayuOperationImpl {
 		}
 	}
 	
+	public int getBookmark(int dictionaryId) {
+		try {
+			//TODO. maybe have performance issue.
+			Cursor result = this.db.rawQuery("select Dictionary_ID from Favorites where Dictionary_ID = ?)", new String[]{dictionaryId + ""});
+			return result.getInt(result.getColumnIndex("Dictionary_ID"));
+		} catch (Exception e) {
+			return -1;
+		}
+	}
+	
 	public int removeFromFavorites(int dictionaryId) {
 		int result = this.db.delete("Favorites", "Dictionary_ID = ?", new String[]{dictionaryId + ""});
 		return result;
@@ -130,6 +140,11 @@ public class IhuayuOperationImpl {
 		db.execSQL("create index IF NOT EXISTS dictinaryIndex ON dictionary (language_dir, keyword)");
 		Cursor result = db.rawQuery("select * from dictionary where language_dir = ? and keyword like ?", new String[]{language_dir,  keyword + "%"});
 		return OperationUtils.cursorToDictionary(result);
+	}
+	
+	public List<Dictionary> fuzzySearch(String language_dir, String keyword) {
+		Fuzzy fuzzy = new Fuzzy();
+		return fuzzy.fuzzySearch(keyword, language_dir, this);
 	}
 	
 	public String getLastUpdateTime() {

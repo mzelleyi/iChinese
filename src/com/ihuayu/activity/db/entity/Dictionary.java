@@ -24,6 +24,9 @@ public class Dictionary {
 	private boolean misDivider = false;
 	private boolean mNeedDelete = false;
 	
+	private int distance;
+	
+	
 //	public String getId() {
 //		return id;
 //	}
@@ -31,6 +34,12 @@ public class Dictionary {
 //		this.id = id;
 //	}
 	
+	public int getDistance() {
+		return distance;
+	}
+	public void setDistance(int distance) {
+		this.distance = distance;
+	}
 	public String getLanguage_dir() {
 		return language_dir;
 	}

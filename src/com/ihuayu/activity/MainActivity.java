@@ -1,6 +1,8 @@
 package com.ihuayu.activity;
 
 
+import java.util.List;
+
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -11,6 +13,8 @@ import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
 
 import com.ihuayu.R;
+import com.ihuayu.activity.db.entity.Dictionary;
+import com.ihuayu.activity.db.entity.QueryType;
 import com.ihuayu.activity.operation.DBManagerment;
 
 /**
@@ -116,7 +120,13 @@ public class MainActivity extends FragmentActivity implements
 
 	public void onTabChanged(String tabTag) {
 		Log.d(TAG, "[onTabChanged] + Begin,tabTag:" + tabTag);
-		
+//		DBManagerment db = new DBManagerment(this);
+//		List<Dictionary> results = db.fuzzySearchDictionary(QueryType.EN, "Name");
+//		
+//		for(Dictionary d : results) {
+//			System.out.println("==========" + d.getKeyword() + "====" + d.getDestiontion());
+//		}
+//		
 //		AudioPlayer test = new AudioPlayer();
 //		try {
 //			test.playAudio(this, "audio/c3419fab-9810-4fd3-8c8b-5ff67196e94e.mp3");

@@ -34,6 +34,10 @@ public class DBManagerment {
 		return operation.searchDictionary(type.getName(), keyword);
 	}
 	
+	public List<Dictionary> fuzzySearchDictionary(QueryType type, String keyword) {
+		return operation.fuzzySearch(type.getName(), keyword);
+	}
+	
 	public List<Scenario> getAllScenarios() {
 		return operation.queryScenario("select * from Scenario_Category", null);
 	}
@@ -67,6 +71,12 @@ public class DBManagerment {
 			operation.removeFromFavorites(dictionaryId[i]);
 		}
 	}
+	
+	public boolean hasbookmarked(int dictionaryID) {
+		if(operation.getBookmark(dictionaryID) != -1) return true;
+		return false;
+	}
+	
 	public Dictionary getDictinary(int dicId){
 		//Should return only one record.
 		List<Dictionary> dictionaryList = operation.queryDictionary("select * from dictionary where id = ? ", new String[]{dicId+""});

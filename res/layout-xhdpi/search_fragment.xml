@@ -73,7 +73,7 @@
         android:layout_height="match_parent"
         android:contentDescription="@string/dummy_img_des"
         android:scaleType="fitXY"
-        android:src="@drawable/prompt" />
+        android:src="@drawable/app_intro" />
     <TextView
 	    android:id="@+id/search_fuzzy_hint_text"
 	    android:layout_width="match_parent"

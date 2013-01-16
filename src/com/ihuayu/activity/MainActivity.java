@@ -1,7 +1,6 @@
 package com.ihuayu.activity;
 
 
-import java.util.List;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,8 +12,6 @@ import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
 
 import com.ihuayu.R;
-import com.ihuayu.activity.db.entity.Dictionary;
-import com.ihuayu.activity.db.entity.QueryType;
 import com.ihuayu.activity.operation.DBManagerment;
 
 /**
@@ -43,16 +40,16 @@ public class MainActivity extends FragmentActivity implements
 		mTabHost = (TabHost) findViewById(android.R.id.tabhost);
 		mTabHost.setup();
 		mTabHost.addTab(mTabHost.newTabSpec(TAB_SEARCH)
-				.setIndicator("Search", this.getResources().getDrawable(R.drawable.tabbar_search))
+				.setIndicator("Search", this.getResources().getDrawable(R.drawable.tab_search))
 				.setContent(R.id.tab_content_search));
 		mTabHost.addTab(mTabHost.newTabSpec(TAB_SCENARIO)
-				.setIndicator("Scenario", this.getResources().getDrawable(R.drawable.tabbar_scenario))
+				.setIndicator("Scenario", this.getResources().getDrawable(R.drawable.tab_scenarios))
 				.setContent(R.id.tab_content_scenario));
 		mTabHost.addTab(mTabHost.newTabSpec(TAB_BOOKMARK)
-				.setIndicator("Bookmark", this.getResources().getDrawable(R.drawable.tabbar_bookmarks))
+				.setIndicator("Bookmark", this.getResources().getDrawable(R.drawable.tab_bookmark))
 				.setContent(R.id.tab_content_bookmark));
 		mTabHost.addTab(mTabHost.newTabSpec(TAB_INFO)
-				.setIndicator("Info", this.getResources().getDrawable(R.drawable.tabbar_info))
+				.setIndicator("Info", this.getResources().getDrawable(R.drawable.tab_help))
 				.setContent(R.id.tab_content_info));
 		
 		mTabHost.setCurrentTabByTag(TAB_SEARCH);

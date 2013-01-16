@@ -33,7 +33,7 @@
             android:textColor="#ffffff"
             android:textStyle="bold"
             android:textSize="@dimen/title_bar_side_text_size"
-            android:background="#00F5FF" />
+            android:background="@drawable/btn_help_background" />
     </RelativeLayout>
 
     <WebView

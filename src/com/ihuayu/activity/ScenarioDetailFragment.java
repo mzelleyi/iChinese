@@ -432,7 +432,6 @@ public class ScenarioDetailFragment extends Fragment {
 				firstLine.setText(spanStr);
 				
 				ImageView speakIcon = (ImageView)view.findViewById(R.id.scenario_dialog_img_speaker);
-				speakIcon.setImageResource(R.drawable.btn_speaker_s);
 				speakIcon.setOnClickListener(new View.OnClickListener()	{
 					@Override
 					public void onClick(View v)

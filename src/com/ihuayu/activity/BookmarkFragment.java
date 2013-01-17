@@ -17,6 +17,9 @@ import android.content.res.Resources;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -26,6 +29,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -39,6 +43,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * @author Kesen
@@ -46,13 +51,21 @@ import android.widget.TextView;
  */
 public class BookmarkFragment extends Fragment {
 
-	private static final String			TAG						= "iHuayu:BookmarkFragment";
-	private static final int			VIEW_TYPE_NORMAL		= 0;
-	private static final int			VIEW_TYPE_DIVIDER		= 1;
-	private static FragmentActivity		mParentActivity			= null;
-	private static LayoutInflater	    mInflater				= null;
-	private static Resources			mRes					= null;
-	private BookmarkListFragment		mBookmarkListFragment	= null;
+	private static final String		TAG						= "iHuayu:BookmarkFragment";
+	private static final int		VIEW_TYPE_NORMAL		= 0;
+	private static final int		VIEW_TYPE_DIVIDER		= 1;
+	private static FragmentActivity	mParentActivity			= null;
+	private static LayoutInflater	mInflater				= null;
+	private static Resources		mRes					= null;
+	private BookmarkListFragment	mBookmarkListFragment	= null;
+
+	// Message Code
+	private static final int		REMOVE_FROM_BOOKMARK	= 1;
+	//private static final int PLAY_AUDIO = 2;
+	private static final int		REMOVE_SUCCESS			= 3;
+	private static final int		REMOVE_FAILED			= 4;
+	private static final int        INDICATE_SHOW           = 5;
+	private static final int        INDICATE_HIDE           = 6;
 
     /**
      * Create a new instance of SearchFragment
@@ -63,13 +76,6 @@ public class BookmarkFragment extends Fragment {
         return fragment;
     }
     
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		Log.d(TAG, "[onCreate] + Begin");
-		// TODO Auto-generated method stub
-		super.onCreate(savedInstanceState);
-	}
-	
     /**
      * When creating, retrieve this parameter from its arguments.
      */
@@ -128,22 +134,30 @@ public class BookmarkFragment extends Fragment {
         }
 	}
 	
+	
 	public static class BookmarkListFragment extends ListFragment implements 
 		LoaderManager.LoaderCallbacks<List<Dictionary>> {
 		
 		// This is the Adapter being used to display the list's data.
-		BookmarkListAdapter mAdapter;
-		
-		//Handle indicate case.
-		ListView mListView = null;
-	    private RemoveWindow mRemoveWindow = new RemoveWindow();
-	    private Handler mHandler = new Handler();
-	    private WindowManager mWindowManager;
-	    private TextView mDialogText;
-	    private boolean mShowing;
-	    private boolean mReady;
-	    private char mPrevLetter = Character.MIN_VALUE;
-	    //List<Character> sDividerCharList = new ArrayList<Character>();
+		BookmarkListAdapter			mAdapter;
+
+		// Handle indicate case.
+		private ListView			mListView			= null;
+		//private RemoveWindow		mRemoveWindow		= new RemoveWindow();
+		//private Handler				mHandler			= new Handler();
+		private WindowManager		mWindowManager;
+		private TextView			mDialogText;
+		private boolean				mShowing;
+		private boolean				mReady;
+		private char				mPrevLetter			= Character.MIN_VALUE;
+		// List<Character> sDividerCharList = new ArrayList<Character>();
+
+		// Define Thread Name
+		private static final String	THREAD_NAME			= "BookmarkFragmentThread";
+		// The DB Handler Thread
+		private HandlerThread		mHandlerThread		= null;
+		// The DB Operation Thread
+		private NonUiHandler		mNonUiHandler		= null;
 		
 		//The origin data that get from DB.
 		List<Dictionary> mOriginBookmarkList = null;
@@ -154,6 +168,108 @@ public class BookmarkFragment extends Fragment {
 		//The list used to keep need remove list divider item.
 		List<Dictionary> mRemoveDividerList = new ArrayList<Dictionary>();
 		
+		private final Handler mUiHandler = new Handler()
+		{
+			@Override
+			public void handleMessage(Message msg)
+			{
+				switch (msg.what)
+				{
+					case REMOVE_FAILED:	{
+						Log.d(TAG, "[mUihandler handleMessage] REMOVE_FAILED");
+						Toast toast = Toast.makeText(mParentActivity, "Remove Failed", Toast.LENGTH_SHORT);
+						toast.setGravity(Gravity.CENTER, 0, 0);
+						toast.show();
+						break;
+					}
+					case REMOVE_SUCCESS: {
+						Log.d(TAG, "[mUihandler handleMessage] REMOVE_SUCCESS");
+						Toast toast = Toast.makeText(mParentActivity, "Remove Successed", Toast.LENGTH_SHORT);
+						toast.setGravity(Gravity.CENTER, 0, 0);
+						toast.show();
+						break;
+					}
+					case INDICATE_HIDE: {
+						Log.d(TAG, "[mUihandler handleMessage] INDICATE_HIDE");
+						hideIndicateWindow();
+						break;
+					}
+					case INDICATE_SHOW: {
+						Log.d(TAG, "[mUihandler handleMessage] INDICATE_SHOW");
+						showIndicateWindow();
+						break;
+					}
+					default:{
+						Log.e(TAG, "[mUihandler handleMessage] Something wrong!!!");
+						break;
+					}
+				}
+			}
+		};
+		
+		/**
+		 * The NonUiHandler to do DB action
+		 * @author kesen
+		 *
+		 */
+		private final class NonUiHandler extends Handler
+		{
+			public NonUiHandler(Looper looper)
+			{
+				super(looper);
+				Log.d(TAG, "[NonUihandler] Constructor");
+			}
+
+			@Override
+			public void handleMessage(Message msg)
+			{
+				switch (msg.what)
+				{
+					case REMOVE_FROM_BOOKMARK:
+						Log.d(TAG, "[NonUihandler][handleMessage] - REMOVE_FROM_BOOKMARK");
+						doRemoveAction((int[]) msg.obj);
+						break;
+					default:
+						Log.d(TAG, "Something wrong in handleMessage()");
+						break;
+				}
+			}
+				
+			private void doRemoveAction(int[] removeId)
+			{
+				Log.d(TAG, "[NonUihandler][doRemoveAction] + Begin");
+				for (int i = 0; i < removeId.length; i++ ) {
+					Log.d(TAG, "[NonUihandler] remove id = "+removeId[i]);
+				}
+				
+//				try
+//				{
+					MainActivity.dbManagerment.removeFromFavorites(removeId);
+//				}
+//				catch (Exception e)
+//				{
+//					e.printStackTrace();
+//					if (mUiHandler != null)
+//					{
+//						if (mUiHandler.hasMessages(REMOVE_FAILED)) {
+//		    				NonUiHandler.removeMessages(REMOVE_FAILED);
+//		    			}
+//						Log.d(TAG, "[NonUiHandler] Send REMOVE_FAILED Msg");
+//						mUiHandler.sendEmptyMessageDelayed(REMOVE_FAILED, 100);
+//					}
+//				}
+				if (mUiHandler != null)
+				{
+					if (mUiHandler.hasMessages(REMOVE_SUCCESS)) {
+	    				mNonUiHandler.removeMessages(REMOVE_SUCCESS);
+	    			}
+					Log.d(TAG, "[NonUihandler] Send REMOVE_FAILED msg");
+					mUiHandler.sendEmptyMessageDelayed(REMOVE_SUCCESS, 100);
+				}
+				Log.d(TAG, "[NonUihandler][doRemoveAction] + End");
+			}
+		}
+		
 		@Override
 		public void onActivityCreated(Bundle savedInstanceState) {
 			Log.d(TAG, "[BookmarkListFragment][onActivityCreated] + Begin");
@@ -162,7 +278,13 @@ public class BookmarkFragment extends Fragment {
 			mInflater = (LayoutInflater)mParentActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	        mWindowManager = (WindowManager)mParentActivity.getSystemService(Context.WINDOW_SERVICE);
 	        
-			// Give some text to display if there is no data. In a real
+			//Init Thread
+			mHandlerThread = new HandlerThread(THREAD_NAME);
+			mHandlerThread.setPriority(Thread.NORM_PRIORITY);
+			mHandlerThread.start();
+			mNonUiHandler = new NonUiHandler(mHandlerThread.getLooper());
+	        
+	        // Give some text to display if there is no data. In a real
 			// application this would come from a resource.
 			this.setEmptyText("No Bookmarks");
 	
@@ -182,17 +304,18 @@ public class BookmarkFragment extends Fragment {
 			Log.d(TAG, "[BookmarkListFragment][onActivityCreated] + End");
 		}
 		
+
+		
 	    @Override
 		public void onResume() {
 	        super.onResume();
 	        mReady = true;
 	    }
 
-	    
-	    @Override
+		@Override
 	    public void onPause() {
 	        super.onPause();
-	        removeWindow();
+	        hideIndicateWindow();
 	        mReady = false;
 	    }
 
@@ -302,17 +425,11 @@ public class BookmarkFragment extends Fragment {
 			// Set Indicate For ListView
 	        mDialogText = (TextView) mInflater.inflate(R.layout.list_position_indicate, null);
 	        mDialogText.setVisibility(View.INVISIBLE);
-	        mHandler.post(new Runnable() {
-	            public void run() {
-	                mReady = true;
-	                WindowManager.LayoutParams lp = new WindowManager.LayoutParams(
-	                        LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT,
-	                        WindowManager.LayoutParams.TYPE_APPLICATION,
-	                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-	                                | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-	                        PixelFormat.TRANSLUCENT);
-	                mWindowManager.addView(mDialogText, lp);
-	            }});
+			if (mNonUiHandler.hasMessages(INDICATE_SHOW)) {
+				mNonUiHandler.removeMessages(INDICATE_SHOW);
+			}
+			Log.d(TAG, "Send INDICATE_SHOW Msg delay 100");
+	        mUiHandler.sendEmptyMessageDelayed(INDICATE_SHOW, 100);
 			
 			mListView = this.getListView();
 			if (null != mListView) {
@@ -342,8 +459,11 @@ public class BookmarkFragment extends Fragment {
 					                mDialogText.setVisibility(View.VISIBLE);
 					            }
 					            mDialogText.setText(((Character)firstLetter).toString());
-					            mHandler.removeCallbacks(mRemoveWindow);
-					            mHandler.postDelayed(mRemoveWindow, 2000);
+				    			if (mNonUiHandler.hasMessages(INDICATE_HIDE)) {
+				    				mNonUiHandler.removeMessages(INDICATE_HIDE);
+				    			}
+				    			Log.d(TAG, "[onScroll] Send INDICATE_HIDE Msg delay 1500");
+					            mUiHandler.sendEmptyMessageDelayed(INDICATE_HIDE, 1500);
 					            mPrevLetter = firstLetter;
 				        	}
 				        }
@@ -359,11 +479,22 @@ public class BookmarkFragment extends Fragment {
 			mAdapter.setData(null);
 		}
 		
-	    private void removeWindow() {
+	    private void hideIndicateWindow() {
 	        if (mShowing) {
 	            mShowing = false;
 	            mDialogText.setVisibility(View.INVISIBLE);
 	        }
+	    }
+	    
+	    private void showIndicateWindow() {
+	    	mReady = true;
+            WindowManager.LayoutParams lp = new WindowManager.LayoutParams(
+                    LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT,
+                    WindowManager.LayoutParams.TYPE_APPLICATION,
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+                            | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                    PixelFormat.TRANSLUCENT);
+            mWindowManager.addView(mDialogText, lp);
 	    }
 	    
 	    private void enterEditMode() {
@@ -381,29 +512,7 @@ public class BookmarkFragment extends Fragment {
 			
 			Log.d(TAG, "[BookmarkListFragment] === Remove Delete Item ===");
 			Log.d(TAG, "[BookmarkListFragment] mWithDividerList size = "+mWithDividerList.size());
-//			for (int i = 0 ; i < mAdapter.getCount(); i++) {
-//				Log.d(TAG, "[BookmarkListFragment] i = "+i);
-//				Dictionary entry = mAdapter.getItem(i);
-//				if (entry.mNeedDelete) {
-//					Log.d(TAG, "[BookmarkListFragment] remove item i ="+i);
-//					mAdapter.remove(entry);
-//					Log.d(TAG, "[BookmarkListFragment] now count ="+mAdapter.getCount());
-//				}
-//			}
-//			Log.d(TAG, "[BookmarkListFragment] === Remove Unused Divider ===");
-//			Log.d(TAG, "[BookmarkListFragment] Adapter.getCount = "+mAdapter.getCount());
-//			for (int i = 0 ; i < mAdapter.getCount(); i++) {
-//				Log.d(TAG, "[BookmarkListFragment] i = "+i);
-//				Dictionary entry = mAdapter.getItem(i);
-//				if (entry.misDivider) {
-//		        	Dictionary nextEntry = mAdapter.getItem(i+1);
-//		        	if (nextEntry.misDivider) {
-//		        		Log.d(TAG, "[BookmarkListAdapter] remove divider i = "+i);
-//			        	mAdapter.remove(entry);
-//			        	Log.d(TAG, "[BookmarkListFragment] now count ="+mAdapter.getCount());
-//		        	}
-//				}
-//			}
+			
 			for (int i = 0 ; i < mWithDividerList.size(); i++) {
 				Log.d(TAG, " i = "+i);
 				Dictionary entry = mWithDividerList.get(i);
@@ -460,110 +569,38 @@ public class BookmarkFragment extends Fragment {
             for (int i = 0; i < size; i++) {
             	removeId[i] = mRemoveBookmarkList.get(i).getId();
             }
-			MainActivity.dbManagerment.removeFromFavorites(removeId);
-			
+            
+    		if (mNonUiHandler != null)
+    		{
+    			if (mNonUiHandler.hasMessages(REMOVE_FROM_BOOKMARK)) {
+    				mNonUiHandler.removeMessages(REMOVE_FROM_BOOKMARK);
+    			}
+    			Log.d(TAG, "[BookmarkListFragment] Send REMOVE_FROM_BOOKMARK Msg");
+    			Message msg = Message.obtain(mNonUiHandler, REMOVE_FROM_BOOKMARK, removeId);
+    			mNonUiHandler.sendMessageDelayed(msg, 50);
+    		}
+           	//MainActivity.dbManagerment.removeFromFavorites(removeId);
 			Log.d(TAG, "[BookmarkListFragment][leaveEditMode] + End");
 		}
 	
-		//The class used to show indicate for list view 
-	    private final class RemoveWindow implements Runnable {
-	        public void run() {
-	            removeWindow();
-	        }
-	    }
+//		//The class used to show indicate for list view 
+//	    private final class RemoveWindow implements Runnable {
+//	        public void run() {
+//	            removeWindow();
+//	        }
+//	    }
+		
 	}
 	
-//	/**
-//	 * This class holds the per-item data in our Loader.
-//	 */
-//	public static class Dictionary {
-//	    public Dictionary(BookmarkListLoader loader, ApplicationInfo info) {
-//	        mLoader = loader;
-//	        mInfo = info;
-//	        mApkFile = new File(info.sourceDir);
-//	    }
-//	    
-//	    public Dictionary(ApplicationInfo info) {
-//	    	mLoader = null;
-//	        mInfo = info;
-//	        mApkFile = new File(info.sourceDir);
-//	    }
-//
-//	    public ApplicationInfo getApplicationInfo() {
-//	        return mInfo;
-//	    }
-//
-//	    public String getLabel() {
-//	        return mLabel;
-//	    }
-//	    
-//	    public Drawable getIcon() {
-//	        if (mIcon == null) {
-//	            if (mApkFile.exists()) {
-//	                mIcon = mInfo.loadIcon(mLoader.mPm);
-//	                return mIcon;
-//	            } else {
-//	                mMounted = false;
-//	            }
-//	        } else if (!mMounted) {
-//	            // If the Bookmark wasn't mounted but is now mounted, reload
-//	            // its icon.
-//	            if (mApkFile.exists()) {
-//	                mMounted = true;
-//	                mIcon = mInfo.loadIcon(mLoader.mPm);
-//	                return mIcon;
-//	            }
-//	        } else {
-//	            return mIcon;
-//	        }
-//
-//	        return mLoader.getContext().getResources().getDrawable(
-//	                android.R.drawable.sym_def_app_icon);
-//	    }
-//
-//	    @Override 
-//	    public String toString() {
-//	        return mLabel;
-//	    }
-//
-//	    void loadLabel(Context context) {
-//	        if (mLabel == null || !mMounted) {
-//	            if (!mApkFile.exists()) {
-//	                mMounted = false;
-//	                mLabel = mInfo.packageName;
-//	            } else {
-//	                mMounted = true;
-//	                CharSequence label = mInfo.loadLabel(context.getPackageManager());
-//	                mLabel = label != null ? label.toString() : mInfo.packageName;
-//	            }
-//	        }
-//	    }
-//
-//	    private final BookmarkListLoader mLoader;
-//	    private final ApplicationInfo mInfo;
-//	    private final File mApkFile;
-//	    private String mLabel;
-//	    private boolean misDivider = false;
-//	    private boolean mNeedDelete = false;
-//	    private Drawable mIcon;
-//	    private boolean mMounted;
-//	}
 	
 	/**
 	 * A custom Loader that loads all of the installed applications.
 	 */
 	public static class BookmarkListLoader extends AsyncTaskLoader<List<Dictionary>> {
-	    //final PackageManager mPm;
-
 	    List<Dictionary> mBookmarkList;
 
 	    public BookmarkListLoader(Context context) {
 	        super(context);
-
-	        // Retrieve the package manager for later use; note we don't
-	        // use 'context' directly but instead the save global application
-	        // context returned by getContext().
-	        //mPm = getContext().getPackageManager();
 	    }
 
 	    /**
@@ -574,14 +611,6 @@ public class BookmarkFragment extends Fragment {
 	    @Override 
 	    public List<Dictionary> loadInBackground() {
 	    	Log.d(TAG, "[BookmarkListLoader][loadInBackground] + Begin");
-	        // Retrieve all known applications.
-//	        List<ApplicationInfo> apps = mPm.getInstalledApplications(
-//	                PackageManager.GET_UNINSTALLED_PACKAGES |
-//	                PackageManager.GET_DISABLED_COMPONENTS);
-//	        if (apps == null) {
-//	            apps = new ArrayList<ApplicationInfo>();
-//	        }
-//	        final Context context = getContext();
 	    	
 	    	List<Dictionary> mList = MainActivity.dbManagerment.getAllBookMarks();
 
@@ -711,7 +740,6 @@ public class BookmarkFragment extends Fragment {
 	    
 	    public BookmarkListAdapter(Context context) {
 	        //super(context, android.R.layout.simple_list_item_2);
-	        //super(context, R.layout.Bookmark_list_item);
 	    	super(context, R.layout.bookmark_list_item);
 	        //mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	    }
@@ -768,11 +796,7 @@ public class BookmarkFragment extends Fragment {
 	        //View view = null;
 			ViewHolder holder = null;
 			TextView 	separatorText = null;
-//			ImageView	listImageIcon	= null;
-//			TextView	listTextView1	= null;
-//			TextView	listTextView2	= null;
-//			TextView	listTextView3	= null;
-//			TextView    listTextType    = null;
+			
 			final Dictionary item = this.getItem(position);
 			Log.d(TAG, "isDivider = "+item.getIsDivider()+"; label = "+item.getKeyword());
 			if (item != null) {				
@@ -785,19 +809,6 @@ public class BookmarkFragment extends Fragment {
 						Log.d(TAG, "convertView == null, inflate -> find bookmark_list_item");
 						holder = new ViewHolder();
 						convertView = mInflater.inflate(R.layout.bookmark_list_item, parent, false);
-//						if (bEditMode) {
-//							
-////							ViewStub stub = (ViewStub) convertView.findViewById(R.id.bookmark_listitem_left_viewStub);
-////							View inflated = stub.inflate();
-//						    holder.listImageDelete  = (ImageView) convertView.findViewById(R.id.bookmark_listview_viewstub_img);
-//						} else {
-////							ViewStub stub = (ViewStub) convertView.findViewById(R.id.bookmark_listitem_left_viewStub);
-////							if (stub != null) {
-////								stub.setVisibility(View.GONE);
-////								holder.listImageDelete = null;
-////							}
-//							holder.listImageDelete  = (ImageView) convertView.findViewById(R.id.bookmark_listview_viewstub_img);
-//						}
 						
 						holder.listImageDelete  = (ImageView) convertView.findViewById(R.id.bookmark_listview_viewstub_img);
 						holder.listImageSpearker = (ImageView) convertView.findViewById(R.id.bookmark_listitem_icon_speaker);
@@ -814,12 +825,6 @@ public class BookmarkFragment extends Fragment {
 						separatorText = (TextView) convertView.findViewById(R.id.bookmark_listitem_separate_text);
 					} else {
 						Log.d(TAG, "convertView != null, find bookmark_list_item");
-						//convertView = mInflater.inflate(R.layout.bookmark_list_item, parent, false);
-//						listImageIcon = (ImageView) convertView.findViewById(R.id.bookmark_listitem_icon_speaker);
-//						listTextView1 = (TextView) convertView.findViewById(R.id.bookmark_listitem_text_first_line);
-//						listTextView2 = (TextView) convertView.findViewById(R.id.bookmark_listitem_text_second_line);
-//						listTextView3 = (TextView) convertView.findViewById(R.id.bookmark_listitem_text_third_line);
-//						listTextType = (TextView) convertView.findViewById(R.id.bookmark_listitem_text_type);
 						holder = (ViewHolder) convertView.getTag();
 					}
 				}
@@ -835,12 +840,6 @@ public class BookmarkFragment extends Fragment {
 						
 						final ImageView deleteImg = holder.listImageDelete;
 						if (bEditMode) {
-//							ViewStub stub = (ViewStub) convertView.findViewById(R.id.bookmark_listitem_left_viewStub);
-//							if (holder.listImageDelete == null) {
-//								View inflated = stub.inflate();
-//								holder.listImageDelete = (ImageView) inflated.findViewById(R.id.bookmark_listview_viewstub_img);
-//							}
-							
 							deleteImg.setVisibility(View.VISIBLE);
 							if (item.getNeedDelete()) {
 								deleteImg.setImageResource(R.drawable.btn_clear_on);
@@ -863,12 +862,8 @@ public class BookmarkFragment extends Fragment {
 								}
 							});
 						} else {
-//							ViewStub stub = (ViewStub) convertView.findViewById(R.id.bookmark_listitem_left_viewStub);
-//							if (stub != null) {
-//								stub.setVisibility(View.GONE);
-								holder.listImageDelete.setVisibility(View.GONE);
-								item.setNeedDelete(false);
-//							}
+							holder.listImageDelete.setVisibility(View.GONE);
+							item.setNeedDelete(false);
 						}
 	
 						if (holder.listImageSpearker != null) {

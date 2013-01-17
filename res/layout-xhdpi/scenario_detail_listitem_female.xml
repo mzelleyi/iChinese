@@ -74,7 +74,8 @@
 		        android:layout_height="wrap_content"
 		        android:layout_centerVertical="true"
 		        android:layout_alignParentRight="true"
-		        android:layout_marginLeft="@dimen/margin_h2"
+		        android:src="@drawable/btn_speaker_s"
+		        android:layout_marginLeft="@dimen/margin_h1"
 		        android:contentDescription="@string/dummy_img_des" />
     	</RelativeLayout>
         <TextView 

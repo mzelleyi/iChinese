@@ -10,6 +10,10 @@ import com.ihuayu.view.MyDialogFragment;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -39,14 +43,33 @@ import android.widget.Toast;
  */
 public class ResultDetailFragment extends Fragment {
 
-	private static final String TAG = "iHuayu:ResultDetailFragment";
-	private static FragmentActivity parentActivity = null;
-	private static List<Dictionary> mResultList = new ArrayList<Dictionary>();
-	private static Dictionary mCurrentDic = null;
-	private static int mCurrentPos = -1;
-	private static int mDialogType = -1;
-	private static ImageView mFavoriteImg = null;
-	private static boolean mBeFavorited = false;
+	private static final String		TAG				= "iHuayu:ResultDetailFragment";
+	private static FragmentActivity	parentActivity	= null;
+	private static List<Dictionary>	mResultList		= new ArrayList<Dictionary>();
+	private static Dictionary		mCurrentDic		= null;
+	private static int				mCurrentPos		= -1;
+	private static int				mDialogType		= -1;
+	private static ImageView		mFavoriteImg	= null;
+	private static boolean			mBeFavorited	= false;
+
+	// Message Code
+	private static final int		CHECK_FAV_STATUS		= 1;
+	private static final int		UPDATE_FAV_IMAGE		= 2;
+	
+	private static final int		ADD_TO_BOOKMARK	    	= 3;
+	private static final int        UPDATE_ADD_RESULT       = 4;
+	private static final int		REMOVE_FROM_BOOKMARK	= 5;
+	private static final int		UPDATE_REMOVE_RESULT	= 6;
+
+	
+	// Define Thread Name
+	private static final String		THREAD_NAME		= "ResultDetailFragmentThread";
+	// The DB Handler Thread
+	private HandlerThread			mHandlerThread	= null;
+	// The DB Operation Thread
+	private static NonUiHandler			mNonUiHandler	= null;
+	
+	
 
     /**
      * Create a new instance of ResultDetailFragment
@@ -64,13 +87,6 @@ public class ResultDetailFragment extends Fragment {
         return fragment;
     }
     
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		Log.d(TAG, "[onCreate] + Begin");
-		// TODO Auto-generated method stub
-		super.onCreate(savedInstanceState);
-	}
-	
     /**
      * When creating, retrieve this parameter from its arguments.
      */
@@ -89,6 +105,12 @@ public class ResultDetailFragment extends Fragment {
 		super.onViewCreated(view, savedInstanceState);
 		parentActivity = this.getActivity();
 		
+		//Init Thread
+		mHandlerThread = new HandlerThread(THREAD_NAME);
+		mHandlerThread.setPriority(Thread.NORM_PRIORITY);
+		mHandlerThread.start();
+		mNonUiHandler = new NonUiHandler(mHandlerThread.getLooper());
+		
 		Button btnPrev = (Button)parentActivity.findViewById(R.id.result_detail_footbar_btn_prev);
 		btnPrev.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -99,7 +121,7 @@ public class ResultDetailFragment extends Fragment {
 				Log.d(TAG, "[onClick] btnPrev + mCurrentPos = "+mCurrentPos);
 				if (mCurrentPos > -1 && mCurrentPos < mResultList.size()) {
 					mCurrentDic = mResultList.get(mCurrentPos);
-					updateFavoriteImg();
+					sendHandlerMsg(CHECK_FAV_STATUS);
 					updateDataFragment();
 				} else {
 					mCurrentPos = mCurrentPos + 1;
@@ -120,7 +142,7 @@ public class ResultDetailFragment extends Fragment {
 				Log.d(TAG, "[onClick] btnNext + mCurrentPos = "+mCurrentPos);
 				if (mCurrentPos > -1 && mCurrentPos < mResultList.size()) {
 					mCurrentDic = mResultList.get(mCurrentPos);
-					updateFavoriteImg();
+					sendHandlerMsg(CHECK_FAV_STATUS);
 					updateDataFragment();
 				} else {
 					mCurrentPos = mCurrentPos - 1;
@@ -140,12 +162,7 @@ public class ResultDetailFragment extends Fragment {
 					mDialogType = MyDialogFragment.ADD_TO_BOOKMARK;
 					showDialog(mDialogType);
 				} else {
-					mFavoriteImg.setImageResource(R.drawable.btn_mark_off);
-					
-					MainActivity.dbManagerment.removeFromFavorites(mCurrentDic.getId());
-					
-					mDialogType = -1;
-					mBeFavorited = false;
+					sendHandlerMsg(REMOVE_FROM_BOOKMARK);
 				}
 			}
 		});
@@ -165,8 +182,154 @@ public class ResultDetailFragment extends Fragment {
 //				ft.commit();
 			}
 		});
-		updateFavoriteImg();
+		
+		sendHandlerMsg(CHECK_FAV_STATUS);
+		//updateFavoriteImg();
 		updateDataFragment();
+	}
+	
+	private final Handler mUiHandler = new Handler()
+	{
+		@Override
+		public void handleMessage(Message msg)
+		{
+			switch (msg.what)
+			{
+				case UPDATE_FAV_IMAGE:	{
+					Log.d(TAG, "[mUihandler handleMessage] UPDATE_FAV_IMAGE");
+					updateFavoriteImg((Boolean) msg.obj);
+					break;
+				}
+				case UPDATE_ADD_RESULT: {
+					Log.d(TAG, "[mUihandler handleMessage] UPDATE_ADD_RESULT");
+					if (msg.arg1 > 0) {
+						mDialogType = MyDialogFragment.ADD_SUCCESS;
+						mBeFavorited = true;
+			        	showDialog(MyDialogFragment.ADD_SUCCESS);
+			        	updateFavoriteImg(true);
+					} else {
+						mDialogType = -1;
+						mBeFavorited = false;
+						Toast toast = Toast.makeText(parentActivity, "Add Failed", Toast.LENGTH_SHORT);
+						toast.setGravity(Gravity.CENTER, 0, 0);
+						toast.show();
+					}
+					break;
+				}
+				case UPDATE_REMOVE_RESULT: {
+					Log.d(TAG, "[mUihandler handleMessage] UPDATE_REMOVE_RESULT");
+					if (msg.arg1 > 0) {
+						updateFavoriteImg(false);
+						mDialogType = -1;
+						mBeFavorited = false;
+					} else {
+						mDialogType = -1;
+						mBeFavorited = true;
+						Toast toast = Toast.makeText(parentActivity, "Remove Failed", Toast.LENGTH_SHORT);
+						toast.setGravity(Gravity.CENTER, 0, 0);
+						toast.show();
+					}
+					break;
+				}
+				default:{
+					Log.e(TAG, "[mUihandler handleMessage] Something wrong!!!");
+					break;
+				}
+			}
+		}
+	};
+	
+	/**
+	 * The NonUiHandler to do DB action
+	 * @author kesen
+	 *
+	 */
+	private final class NonUiHandler extends Handler
+	{
+		public NonUiHandler(Looper looper)
+		{
+			super(looper);
+			Log.d(TAG, "[NonUihandler] Constructor");
+		}
+
+		@Override
+		public void handleMessage(Message msg)
+		{
+			switch (msg.what)
+			{
+				case CHECK_FAV_STATUS:
+					Log.d(TAG, "[NonUihandler][handleMessage] - CHECK_FAV_STATUS");
+					doCheckMarked();
+					break;
+				case ADD_TO_BOOKMARK:
+					Log.d(TAG, "[NonUihandler][handleMessage] - ADD_TO_BOOKMARK");
+					doAddToBookmark();
+					break;
+				case REMOVE_FROM_BOOKMARK:
+					Log.d(TAG, "[NonUihandler][handleMessage] - REMOVE_FROM_BOOKMARK");
+					doRemoveFromBookmark();
+					break;
+				default:
+					Log.d(TAG, "[NonUihandler][handleMessage] Something wrong in handleMessage()");
+					break;
+			}
+		}
+		
+		private void doAddToBookmark()
+		{
+			Log.d(TAG, "[NonUihandler][doAddToBookmark] + Begin");
+			Log.d(TAG, "[NonUihandler][doAddToBookmark] mCurrent Dictionary ID = "+mCurrentDic.getId());
+			int result = (int) MainActivity.dbManagerment.addBookmark(mCurrentDic.getId());
+			Log.d(TAG, "[NonUihandler][doRemoveFromBookmark] result = "+result);
+			if (mUiHandler != null)
+			{
+				if (mUiHandler.hasMessages(UPDATE_ADD_RESULT)) {
+					mUiHandler.removeMessages(UPDATE_ADD_RESULT);
+    			}
+				Log.d(TAG, "[mUiHandler] Send UPDATE_ADD_RESULT msg");
+				Message msg = Message.obtain(mUiHandler, UPDATE_ADD_RESULT);
+				msg.arg1 = result;
+				mUiHandler.sendMessageDelayed(msg, 100);
+			}
+			Log.d(TAG, "[NonUihandler][doAddToBookmark] + End");
+		}
+		
+		private void doRemoveFromBookmark()
+		{
+			Log.d(TAG, "[NonUihandler][doRemoveFromBookmark] + Begin");
+			Log.d(TAG, "[NonUihandler][doRemoveFromBookmark] mCurrent Dictionary ID = "+mCurrentDic.getId());
+			int result = MainActivity.dbManagerment.removeFromFavorites(mCurrentDic.getId());
+			Log.d(TAG, "[NonUihandler][doRemoveFromBookmark] result = "+result);
+			if (mUiHandler != null)
+			{
+				if (mUiHandler.hasMessages(UPDATE_REMOVE_RESULT)) {
+					mUiHandler.removeMessages(UPDATE_REMOVE_RESULT);
+    			}
+				Log.d(TAG, "[mUiHandler] Send UPDATE_REMOVE_RESULT msg");
+				Message msg = Message.obtain(mUiHandler, UPDATE_REMOVE_RESULT);
+				msg.arg1 = result;
+				mUiHandler.sendMessageDelayed(msg, 100);
+			}
+			Log.d(TAG, "[NonUihandler][doRemoveFromBookmark] + End");
+		}
+			
+		private void doCheckMarked()
+		{
+			Log.d(TAG, "[NonUihandler][doCheckMarked] + Begin");
+			Log.d(TAG, "[NonUihandler][doCheckMarked] mCurrent Dictionary ID = "+mCurrentDic.getId());
+			mBeFavorited = MainActivity.dbManagerment.hasbookmarked(mCurrentDic.getId());
+			Log.d(TAG, "[NonUihandler][doCheckMarked] hasbookmarked = "+mBeFavorited);
+			if (mUiHandler != null)
+			{
+				if (mUiHandler.hasMessages(UPDATE_FAV_IMAGE)) {
+					mUiHandler.removeMessages(UPDATE_FAV_IMAGE);
+    			}
+				Log.d(TAG, "[mUiHandler] Send UPDATE_FAV_IMAGE msg");
+				Message msg = Message.obtain(mUiHandler, UPDATE_FAV_IMAGE, mBeFavorited);
+				mUiHandler.sendMessageDelayed(msg, 100);
+			}
+			Log.d(TAG, "[NonUihandler][doCheckMarked] + End");
+		}
 	}
 	
     public static void showDialog(int dialogType) {
@@ -183,12 +346,7 @@ public class ResultDetailFragment extends Fragment {
         // Do stuff here.
         Log.i(TAG, "[doPositiveClick] + Begin");
         if (mDialogType == MyDialogFragment.ADD_TO_BOOKMARK) {
-        	MainActivity.dbManagerment.addBookmark(mCurrentDic.getId());
-        	
-        	updateFavoriteImg();
-        	
-        	mDialogType = MyDialogFragment.ADD_SUCCESS;
-        	showDialog(MyDialogFragment.ADD_SUCCESS);
+        	sendHandlerMsg(ADD_TO_BOOKMARK);
         } else if (mDialogType == MyDialogFragment.ADD_SUCCESS) {
         	mBeFavorited = true;
         	mDialogType = -1;
@@ -228,14 +386,22 @@ public class ResultDetailFragment extends Fragment {
         }
 	}
 	
-	public static void updateFavoriteImg() {
-		Log.d(TAG, "[updateFavoriteImg] mCurrent Dictionary ID = "+mCurrentDic.getId());
-		mBeFavorited = MainActivity.dbManagerment.hasbookmarked(mCurrentDic.getId());
-		Log.d(TAG, "[updateFavoriteImg] This item has been bookmarked = "+mBeFavorited);
-		if (mBeFavorited) {
+	public static void updateFavoriteImg(boolean mFavorited) {
+		Log.d(TAG, "[updateFavoriteImg] This item has been bookmarked = "+mFavorited);
+		if (mFavorited) {
 			mFavoriteImg.setImageResource(R.drawable.btn_mark_on);
 		} else {
 			mFavoriteImg.setImageResource(R.drawable.btn_mark_off);
+		}
+	}
+	
+	private static void sendHandlerMsg(int msgCode) {
+   		if (mNonUiHandler != null) {
+			if (mNonUiHandler.hasMessages(msgCode)) {
+				mNonUiHandler.removeMessages(msgCode);
+			}
+			Log.d(TAG, "Send msgCode ="+msgCode);
+			mNonUiHandler.sendEmptyMessage(msgCode);
 		}
 	}
 	

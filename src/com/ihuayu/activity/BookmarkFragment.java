@@ -261,9 +261,9 @@ public class BookmarkFragment extends Fragment {
 				if (mUiHandler != null)
 				{
 					if (mUiHandler.hasMessages(REMOVE_SUCCESS)) {
-	    				mNonUiHandler.removeMessages(REMOVE_SUCCESS);
+						mUiHandler.removeMessages(REMOVE_SUCCESS);
 	    			}
-					Log.d(TAG, "[NonUihandler] Send REMOVE_FAILED msg");
+					Log.d(TAG, "[NonUihandler] Send REMOVE_SUCCESS msg");
 					mUiHandler.sendEmptyMessageDelayed(REMOVE_SUCCESS, 100);
 				}
 				Log.d(TAG, "[NonUihandler][doRemoveAction] + End");
@@ -425,8 +425,8 @@ public class BookmarkFragment extends Fragment {
 			// Set Indicate For ListView
 	        mDialogText = (TextView) mInflater.inflate(R.layout.list_position_indicate, null);
 	        mDialogText.setVisibility(View.INVISIBLE);
-			if (mNonUiHandler.hasMessages(INDICATE_SHOW)) {
-				mNonUiHandler.removeMessages(INDICATE_SHOW);
+			if (mUiHandler.hasMessages(INDICATE_SHOW)) {
+				mUiHandler.removeMessages(INDICATE_SHOW);
 			}
 			Log.d(TAG, "Send INDICATE_SHOW Msg delay 100");
 	        mUiHandler.sendEmptyMessageDelayed(INDICATE_SHOW, 100);
@@ -459,8 +459,8 @@ public class BookmarkFragment extends Fragment {
 					                mDialogText.setVisibility(View.VISIBLE);
 					            }
 					            mDialogText.setText(((Character)firstLetter).toString());
-				    			if (mNonUiHandler.hasMessages(INDICATE_HIDE)) {
-				    				mNonUiHandler.removeMessages(INDICATE_HIDE);
+				    			if (mUiHandler.hasMessages(INDICATE_HIDE)) {
+				    				mUiHandler.removeMessages(INDICATE_HIDE);
 				    			}
 				    			Log.d(TAG, "[onScroll] Send INDICATE_HIDE Msg delay 1500");
 					            mUiHandler.sendEmptyMessageDelayed(INDICATE_HIDE, 1500);
@@ -577,7 +577,7 @@ public class BookmarkFragment extends Fragment {
     			}
     			Log.d(TAG, "[BookmarkListFragment] Send REMOVE_FROM_BOOKMARK Msg");
     			Message msg = Message.obtain(mNonUiHandler, REMOVE_FROM_BOOKMARK, removeId);
-    			mNonUiHandler.sendMessageDelayed(msg, 50);
+    			mNonUiHandler.sendMessageDelayed(msg, 100);
     		}
            	//MainActivity.dbManagerment.removeFromFavorites(removeId);
 			Log.d(TAG, "[BookmarkListFragment][leaveEditMode] + End");

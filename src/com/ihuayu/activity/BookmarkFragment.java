@@ -868,7 +868,7 @@ public class BookmarkFragment extends Fragment {
 	
 						if (holder.listImageSpearker != null) {
 							if (bEditMode) {
-								holder.listImageSpearker.setImageResource(R.drawable.btn_speaker_sb);
+								holder.listImageSpearker.setImageResource(R.drawable.btn_speaker);
 								holder.listImageSpearker.setClickable(false);
 							} else {
 								holder.listImageSpearker.setImageResource(R.drawable.btn_speaker);

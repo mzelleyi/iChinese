@@ -140,7 +140,7 @@ public class ResultDetailFragment extends Fragment {
 					mDialogType = MyDialogFragment.ADD_TO_BOOKMARK;
 					showDialog(mDialogType);
 				} else {
-					mFavoriteImg.setImageResource(R.drawable.btn_mark_off_2x);
+					mFavoriteImg.setImageResource(R.drawable.btn_mark_off);
 					
 					MainActivity.dbManagerment.removeFromFavorites(mCurrentDic.getId());
 					
@@ -233,9 +233,9 @@ public class ResultDetailFragment extends Fragment {
 		mBeFavorited = MainActivity.dbManagerment.hasbookmarked(mCurrentDic.getId());
 		Log.d(TAG, "[updateFavoriteImg] This item has been bookmarked = "+mBeFavorited);
 		if (mBeFavorited) {
-			mFavoriteImg.setImageResource(R.drawable.btn_mark_on_2x);
+			mFavoriteImg.setImageResource(R.drawable.btn_mark_on);
 		} else {
-			mFavoriteImg.setImageResource(R.drawable.btn_mark_off_2x);
+			mFavoriteImg.setImageResource(R.drawable.btn_mark_off);
 		}
 	}
 	

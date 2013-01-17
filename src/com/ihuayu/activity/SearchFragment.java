@@ -390,7 +390,7 @@ public class SearchFragment extends Fragment {
             	if (getItemViewType(position) == VIEW_TYPE_SUGGEST) {
             		((TextView)view.findViewById(R.id.search_result_listitem_text)).setText(item.getKeyword());
             	} else {
-            		((ImageView)view.findViewById(R.id.bookmark_listitem_icon_speaker)).setImageResource(R.drawable.btn_speaker_sb);
+            		((ImageView)view.findViewById(R.id.bookmark_listitem_icon_speaker)).setImageResource(R.drawable.btn_speaker_black);
 					((TextView)view.findViewById(R.id.bookmark_listitem_text_first_line)).setText(item.getKeyword());
 					((TextView)view.findViewById(R.id.bookmark_listitem_text_second_line)).setText(item.getDestiontion());
 					((TextView)view.findViewById(R.id.bookmark_listitem_text_third_line)).setText(item.getChineser_tone_py());

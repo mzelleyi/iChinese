@@ -32,7 +32,7 @@
             android:layout_gravity="center"
             android:layout_marginLeft="@dimen/margin_h3"
             android:layout_marginTop="@dimen/margin_h2"
-            android:layout_marginRight="@dimen/margin_h3"
+            android:layout_marginRight="@dimen/margin_h1"
             android:layout_marginBottom="@dimen/margin_h2"
             android:contentDescription="@string/dummy_img_des"
             android:background="@drawable/btn_english" >
@@ -40,8 +40,7 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingRight="@dimen/margin_h2" >
+            android:layout_height="match_parent" >
             <EditText
                 android:id="@+id/search_bar_edit_text"
                 android:layout_width="match_parent"
@@ -49,20 +48,23 @@
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
                 android:layout_margin="@dimen/margin_h2"
+                android:paddingLeft="@dimen/margin_h1"
                 android:singleLine="true"
                 android:hint="@string/searchbox_hint"
                 android:imeOptions="actionSearch"
-                android:inputType="textAutoCorrect" />
+                android:background="@drawable/search_bar_bg"
+                android:inputType="textAutoCorrect" >
+            </EditText>
             <ImageView
 		        android:id="@+id/search_bar_edit_clear"
 		        android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
-	            android:layout_marginRight="@dimen/margin_h2"
+	            android:layout_marginRight="@dimen/margin_h3"
 	            android:layout_alignParentRight="true"
 	            android:layout_centerVertical="true"
 	            android:visibility="gone"
 	            android:contentDescription="@string/dummy_img_des"
-		        android:src="@drawable/btn_clear_rest" >
+		        android:src="@drawable/search_bar_clear" >
              </ImageView>
         </RelativeLayout>
         

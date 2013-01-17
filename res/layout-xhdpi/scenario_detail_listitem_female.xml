@@ -30,7 +30,7 @@
 	        android:layout_alignParentLeft="true"
 	        android:layout_centerVertical="true"
 	        android:layout_margin="@dimen/margin_h3"
-	        android:background="@drawable/icn_female"
+	        android:background="@drawable/icn_female_l"
 	        android:contentDescription="@string/dummy_img_des" />
     	<TextView
 	        android:id="@+id/scenario_dialog_textview_name"
@@ -74,7 +74,7 @@
 		        android:layout_height="wrap_content"
 		        android:layout_centerVertical="true"
 		        android:layout_alignParentRight="true"
-		        android:src="@drawable/btn_speaker_s"
+		        android:src="@drawable/btn_speaker_white"
 		        android:layout_marginLeft="@dimen/margin_h1"
 		        android:contentDescription="@string/dummy_img_des" />
     	</RelativeLayout>

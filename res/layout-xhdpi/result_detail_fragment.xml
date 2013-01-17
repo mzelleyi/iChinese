@@ -74,7 +74,7 @@
         				android:layout_width="wrap_content"
        					android:layout_height="wrap_content"
 				        android:layout_centerVertical="true"
-				        android:src="@drawable/btn_speaker_sb"
+				        android:src="@drawable/btn_speaker_black"
 				        android:layout_margin="@dimen/margin_h1"
 				        android:layout_alignParentRight="true"
 				        android:contentDescription="@string/dummy_img_des" />
@@ -113,7 +113,7 @@
        				android:layout_width="wrap_content"
       				android:layout_height="wrap_content"
 			        android:layout_gravity="center_vertical"
-			        android:src="@drawable/btn_mark_off_2x"
+			        android:src="@drawable/btn_mark_off"
 			        android:layout_margin="@dimen/margin_h1"
 			        android:contentDescription="@string/dummy_img_des" />
 	        	<TextView android:id="@+id/result_detail_des_source_text"

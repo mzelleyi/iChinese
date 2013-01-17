@@ -33,11 +33,12 @@
 				android:layout_width="match_parent"
 				android:layout_height="match_parent" />
 	    </FrameLayout>
-        
-        <TabWidget
+	    <TabWidget
             android:id="@android:id/tabs"
             android:layout_width="match_parent"
             android:layout_height="@dimen/tab_bar_height"
-            android:layout_weight="0" />
+            android:layout_weight="0"
+            android:background="@drawable/navigationbar_bg_2x" >
+        </TabWidget>
     </LinearLayout>
 </TabHost>

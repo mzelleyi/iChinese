@@ -53,6 +53,16 @@ public class MainActivity extends FragmentActivity implements
 				.setContent(R.id.tab_content_info));
 		
 		mTabHost.setCurrentTabByTag(TAB_SEARCH);
+		
+//		int highlightColor = getResources().getColor(R.color.green_light);
+//		ColorFilter colorFilter = new LightingColorFilter(highlightColor);
+//		mTabHost.getBackground().setColorFilter(colorFilter);
+//		for (int i = 0; i < mTabHost.getTabWidget().getChildCount(); i++)
+//        {
+//            View view = mTabHost.getTabWidget().getChildAt(i);
+//            view.setBackgroundColor(getResources().getColor(R.color.tab_color));
+//        }
+		
 		this.updateTab(TAB_SEARCH, R.id.tab_content_search);
 		
 		dbManagerment = new DBManagerment(this);
@@ -115,6 +125,7 @@ public class MainActivity extends FragmentActivity implements
 		Log.d(TAG, "[onDestory] + End");
 	}
 
+	@Override
 	public void onTabChanged(String tabTag) {
 		Log.d(TAG, "[onTabChanged] + Begin,tabTag:" + tabTag);
 //		DBManagerment db = new DBManagerment(this);
@@ -153,6 +164,7 @@ public class MainActivity extends FragmentActivity implements
 
 	private void updateTab(String tabTag, int viewHolderId) {
 		Log.d(TAG,"[updateTab] + Begin, tabTag=" + tabTag + ",viewHolderId="	+ String.valueOf(viewHolderId));
+		
 		FragmentManager fm = this.getSupportFragmentManager();
 		FragmentTransaction ft = fm.beginTransaction();
 		Fragment newFragment = fm.findFragmentById(viewHolderId);

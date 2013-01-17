@@ -56,8 +56,8 @@ public class DBManagerment {
 		return dialogKeywordList;
 	}
 	
-	public void addBookmark(int dictionaryID) {
-		operation.insertToBookmark(dictionaryID + "");
+	public long addBookmark(int dictionaryID) {
+		return operation.insertToBookmark(dictionaryID + "");
 	}
 	
 	public List<Dictionary> getAllBookMarks() {

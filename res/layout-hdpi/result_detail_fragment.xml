@@ -54,6 +54,7 @@
 		    <LinearLayout
 		        android:layout_height="wrap_content"
 		        android:layout_width="@dimen/result_description_left_width"
+		        android:paddingRight="@dimen/margin_h2"
 		        android:orientation="vertical" >
 		        <TextView android:id="@+id/result_detail_des_first_line"
 			        android:layout_gravity="center_vertical"

@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.ihuayu.R;
 import com.ihuayu.activity.db.entity.Dictionary;
+import com.ihuayu.activity.rest.AudioPlayer;
 import com.ihuayu.view.MyDialogFragment;
 
 import android.content.Context;
@@ -55,11 +56,12 @@ public class ResultDetailFragment extends Fragment {
 	// Message Code
 	private static final int		CHECK_FAV_STATUS		= 1;
 	private static final int		UPDATE_FAV_IMAGE		= 2;
-	
 	private static final int		ADD_TO_BOOKMARK	    	= 3;
 	private static final int        UPDATE_ADD_RESULT       = 4;
 	private static final int		REMOVE_FROM_BOOKMARK	= 5;
 	private static final int		UPDATE_REMOVE_RESULT	= 6;
+	private static final int        PLAY_CHINESE_AUDIO      = 7;
+	private static final int        PLAY_SENTANCE_AUDIO   = 8;
 	
 	private static DialogFragment mCurrentDialog = null;
 
@@ -70,7 +72,6 @@ public class ResultDetailFragment extends Fragment {
 	private HandlerThread			mHandlerThread	= null;
 	// The DB Operation Thread
 	private static NonUiHandler	    mNonUiHandler	= null;
-	
 	
 
     /**
@@ -112,6 +113,16 @@ public class ResultDetailFragment extends Fragment {
 		mHandlerThread.setPriority(Thread.NORM_PRIORITY);
 		mHandlerThread.start();
 		mNonUiHandler = new NonUiHandler(mHandlerThread.getLooper());
+		
+		ImageView audioImg = (ImageView)parentActivity.findViewById(R.id.result_detail_des_second_line_icon);
+		audioImg.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Log.d(TAG, "[onClick] audioImg + Begin");
+				sendHandlerMsg(PLAY_CHINESE_AUDIO);
+			}
+		});
 		
 		Button btnPrev = (Button)parentActivity.findViewById(R.id.result_detail_footbar_btn_prev);
 		btnPrev.setOnClickListener(new View.OnClickListener() {
@@ -270,6 +281,14 @@ public class ResultDetailFragment extends Fragment {
 					Log.d(TAG, "[NonUihandler][handleMessage] - REMOVE_FROM_BOOKMARK");
 					doRemoveFromBookmark();
 					break;
+				case PLAY_CHINESE_AUDIO:
+					Log.d(TAG, "[NonUihandler][handleMessage] - PLAY_CHINESE_AUDIO");
+					doPlayAudio(null);
+					break;
+				case PLAY_SENTANCE_AUDIO:
+					Log.d(TAG, "[NonUihandler][handleMessage] - PLAY_SENTANCE_AUDIO");
+					doPlayAudio((String) msg.obj);
+					break;
 				default:
 					Log.d(TAG, "[NonUihandler][handleMessage] Something wrong in handleMessage()");
 					break;
@@ -287,7 +306,6 @@ public class ResultDetailFragment extends Fragment {
 				if (mUiHandler.hasMessages(UPDATE_ADD_RESULT)) {
 					mUiHandler.removeMessages(UPDATE_ADD_RESULT);
     			}
-				Log.d(TAG, "[mUiHandler] Send UPDATE_ADD_RESULT msg");
 				Message msg = Message.obtain(mUiHandler, UPDATE_ADD_RESULT);
 				msg.arg1 = result;
 				mUiHandler.sendMessageDelayed(msg, 100);
@@ -306,7 +324,6 @@ public class ResultDetailFragment extends Fragment {
 				if (mUiHandler.hasMessages(UPDATE_REMOVE_RESULT)) {
 					mUiHandler.removeMessages(UPDATE_REMOVE_RESULT);
     			}
-				Log.d(TAG, "[mUiHandler] Send UPDATE_REMOVE_RESULT msg");
 				Message msg = Message.obtain(mUiHandler, UPDATE_REMOVE_RESULT);
 				msg.arg1 = result;
 				mUiHandler.sendMessageDelayed(msg, 100);
@@ -317,19 +334,52 @@ public class ResultDetailFragment extends Fragment {
 		private void doCheckMarked()
 		{
 			Log.d(TAG, "[NonUihandler][doCheckMarked] + Begin");
-			Log.d(TAG, "[NonUihandler][doCheckMarked] mCurrent Dictionary ID = "+mCurrentDic.getId());
-			mBeFavorited = MainActivity.dbManagerment.hasbookmarked(mCurrentDic.getId());
+			int dictionaryId = -1;
+			if (null != mCurrentDic) {
+				dictionaryId = mCurrentDic.getId();
+			}
+			Log.d(TAG, "[NonUihandler][doCheckMarked] mCurrent Dictionary ID = "+dictionaryId);
+			if (dictionaryId != -1) {
+				mBeFavorited = MainActivity.dbManagerment.hasbookmarked(mCurrentDic.getId());
+			}
 			Log.d(TAG, "[NonUihandler][doCheckMarked] hasbookmarked = "+mBeFavorited);
 			if (mUiHandler != null)
 			{
 				if (mUiHandler.hasMessages(UPDATE_FAV_IMAGE)) {
 					mUiHandler.removeMessages(UPDATE_FAV_IMAGE);
     			}
-				Log.d(TAG, "[mUiHandler] Send UPDATE_FAV_IMAGE msg");
 				Message msg = Message.obtain(mUiHandler, UPDATE_FAV_IMAGE, mBeFavorited);
 				mUiHandler.sendMessageDelayed(msg, 100);
 			}
 			Log.d(TAG, "[NonUihandler][doCheckMarked] + End");
+		}
+		
+		private void doPlayAudio(String audio) {
+			Log.d(TAG, "[NonUihandler][doPlayAudio] + Begin");
+			String audioStr = null;
+			if (audio == null) {
+				audioStr = mCurrentDic.getChinese_audio();
+			} else {
+				audioStr = audio;
+			}
+			Log.d(TAG, "[NonUihandler][doPlayAudio] audioStr = "+audioStr);
+			
+			AudioPlayer mAudioPlayer = new AudioPlayer();
+			try {
+				mAudioPlayer.playAudio(parentActivity, audioStr);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+//			if (mUiHandler != null)
+//			{
+//				if (mUiHandler.hasMessages(UPDATE_FAV_IMAGE)) {
+//					mUiHandler.removeMessages(UPDATE_FAV_IMAGE);
+//    			}
+//				Message msg = Message.obtain(mUiHandler, UPDATE_FAV_IMAGE, mBeFavorited);
+//				mUiHandler.sendMessageDelayed(msg, 100);
+//			}
+			Log.d(TAG, "[NonUihandler][doPlayAudio] + End");
 		}
 	}
 	
@@ -726,7 +776,15 @@ public class ResultDetailFragment extends Fragment {
 							@Override
 							public void onClick(View v) {
 								// TODO Auto-generated method stub
-								Log.d(TAG, "[onClick], speakIcon "+item.getSample_sentance_audio());
+								String sentanceAudio = item.getSample_sentance_audio();
+								Log.d(TAG, "[onClick] sentanceAudio = "+sentanceAudio);
+						   		if (mNonUiHandler != null) {
+									if (mNonUiHandler.hasMessages(PLAY_SENTANCE_AUDIO)) {
+										mNonUiHandler.removeMessages(PLAY_SENTANCE_AUDIO);
+									}
+									Message msg = Message.obtain(mNonUiHandler, PLAY_SENTANCE_AUDIO,sentanceAudio);
+									mNonUiHandler.sendMessage(msg);
+								}
 							}
 						});
 						TextLine.setText(item.getSample_sentence_ch());

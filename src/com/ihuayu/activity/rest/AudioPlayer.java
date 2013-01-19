@@ -11,6 +11,7 @@ import java.net.URL;
 
 import android.content.Context;
 import android.media.MediaPlayer;
+import android.util.Log;
 
 /**
  * @author lixingwang
@@ -18,13 +19,17 @@ import android.media.MediaPlayer;
  */
 public class AudioPlayer {
 	
+	private static final String	TAG				= "iHuayu:AudioPlayer";
 	private static final String AUDIO_DOWNLOAD_URL = "http://ihuayu.gistxl.com/smc/";
 	
 	public void playAudio(Context context, String audioURL) throws Exception {
+		Log.d(TAG, "[playAudio] + Begin");
+		Log.d(TAG, "[playAudio] + audioURL = "+audioURL);
 		String audioName = audioURL.split("/")[1];
+		Log.d(TAG, "[playAudio] audioName = "+audioName);
 		//Check the internet first
 		int result = downFile(AUDIO_DOWNLOAD_URL + audioName, "/audio/", audioName);
-		if(result == -1) throw new Exception("Dowload audi failed");
+		if(result == -1) throw new Exception("Dowload audio failed");
 		play(context,"/audio/" +  audioName);
 	}
 	
@@ -36,37 +41,43 @@ public class AudioPlayer {
 		player.start();
 	}
 	
-	private int downFile(String urlStr, String path, String fileName) throws Exception{  
-	        InputStream inputStream = null;  
-	        try {  
-	            FileUtils fileUtils = new FileUtils();  
-	              
-	            if(fileUtils.isFileExist(path + fileName)){  
-	                return 1;  
-	            } else {  
-	                inputStream = getInputStreamFromURL(urlStr);  
-	                File resultFile = fileUtils.write2SDFromInput(path, fileName, inputStream);  
-	                if(resultFile == null){  
-	                    return -1;  
-	                }  
-	            }  
-	        }   
-	        catch (Exception e) {  
-	            throw new Exception(e); 
-	        }  
-	        finally{  
-	            try {  
-	            	if(inputStream != null) {
-	            		inputStream.close();  
-	            	}
-	            } catch (IOException e) {  
-	            	 throw new Exception(e); 
-	            }  
-	        }  
-	        return 0;  
-	    }  
+	private int downFile(String urlStr, String path, String fileName) throws Exception {
+		Log.d(TAG, "[downFile] + Begin");
+		Log.d(TAG, "[downFile] urlStr = "+ urlStr);
+		Log.d(TAG, "[downFile] path = "+ path);
+		Log.d(TAG, "[downFile] fileName = "+ fileName);
+		InputStream inputStream = null;
+		try {
+			FileUtils fileUtils = new FileUtils();
+
+			if (fileUtils.isFileExist(path + fileName)) {
+				Log.d(TAG, "[downFile] the audio file is exist");
+				return 1;
+			} else {
+				Log.d(TAG, "[downFile] the audio file isn't exist, do download");
+				inputStream = getInputStreamFromURL(urlStr);
+				File resultFile = fileUtils.write2SDFromInput(path, fileName,inputStream);
+				if (resultFile == null) {
+					Log.e(TAG, "[downFile] write to sdcard failed");
+					return -1;
+				}
+			}
+		} catch (Exception e) {
+			throw new Exception(e);
+		} finally {
+			try {
+				if (inputStream != null) {
+					inputStream.close();
+				}
+			} catch (IOException e) {
+				throw new Exception(e);
+			}
+		}
+		return 0;
+	}
 	
-	private InputStream getInputStreamFromURL(String urlStr) throws IOException {  
+	private InputStream getInputStreamFromURL(String urlStr) throws IOException {
+		Log.d(TAG, "[getInputStreamFromURL] urlStr = "+urlStr);
         HttpURLConnection urlConn = null;  
         InputStream inputStream = null;  
     	URL url  = new URL(urlStr);  

@@ -9,11 +9,16 @@ import com.ihuayu.R;
 import com.ihuayu.activity.db.entity.Dialog;
 import com.ihuayu.activity.db.entity.DialogKeywords;
 import com.ihuayu.activity.db.entity.Scenario;
+import com.ihuayu.activity.rest.AudioPlayer;
 import com.ihuayu.view.MyDialogFragment;
 
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -48,6 +53,15 @@ public class ScenarioDetailFragment extends Fragment {
 	private static FragmentActivity parentActivity = null;
 	private static LayoutInflater mInflater = null;
 	private static Scenario mScenario = null;
+	
+	private static final int        PLAY_DIALOG_AUDIO   = 8;
+	
+	// Define Thread Name
+	private static final String		THREAD_NAME		= "ScenarioDetailFragmentThread";
+	// The DB Handler Thread
+	private HandlerThread			mHandlerThread	= null;
+	// The DB Operation Thread
+	private static NonUiHandler	    mNonUiHandler	= null;
 
 
     /**
@@ -60,13 +74,6 @@ public class ScenarioDetailFragment extends Fragment {
         return fragment;
     }
     
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		Log.d(TAG, "[onCreate] + Begin");
-		// TODO Auto-generated method stub
-		super.onCreate(savedInstanceState);
-	}
-	
     /**
      * When creating, retrieve this parameter from its arguments.
      */
@@ -85,6 +92,12 @@ public class ScenarioDetailFragment extends Fragment {
 		// TODO Auto-generated method stub
 		super.onViewCreated(view, savedInstanceState);
 		parentActivity = this.getActivity();
+		
+		//Init Thread
+		mHandlerThread = new HandlerThread(THREAD_NAME);
+		mHandlerThread.setPriority(Thread.NORM_PRIORITY);
+		mHandlerThread.start();
+		mNonUiHandler = new NonUiHandler(mHandlerThread.getLooper());
 		
 		//Init Item Outline Info
 		ImageView leftImg = (ImageView)parentActivity.findViewById(R.id.scenario_detail_item_icon_left);
@@ -132,6 +145,82 @@ public class ScenarioDetailFragment extends Fragment {
 			//ft.addToBackStack(null);
 			ft.commit();
         }
+	}
+	
+	private final Handler mUiHandler = new Handler()
+	{
+		@Override
+		public void handleMessage(Message msg)
+		{
+			switch (msg.what)
+			{
+//				case UPDATE_FAV_IMAGE:	{
+//					Log.d(TAG, "[mUihandler handleMessage] UPDATE_FAV_IMAGE");
+//					updateFavoriteImg((Boolean) msg.obj);
+//					break;
+//				}
+				default:{
+					Log.e(TAG, "[mUihandler handleMessage] Something wrong!!!");
+					break;
+				}
+			}
+		}
+	};
+	
+	/**
+	 * The NonUiHandler to do DB action
+	 * @author kesen
+	 *
+	 */
+	private final class NonUiHandler extends Handler
+	{
+		public NonUiHandler(Looper looper)
+		{
+			super(looper);
+			Log.d(TAG, "[NonUihandler] Constructor");
+		}
+
+		
+		@Override
+		public void handleMessage(Message msg)
+		{
+			switch (msg.what)
+			{
+				case PLAY_DIALOG_AUDIO:
+					Log.d(TAG, "[NonUihandler][handleMessage] - PLAY_DIALOG_AUDIO");
+					doPlayAudio((String) msg.obj);
+					break;
+				default:
+					Log.d(TAG, "[NonUihandler][handleMessage] Something wrong in handleMessage()");
+					break;
+			}
+		}
+		
+		private void doPlayAudio(String audio) {
+			Log.d(TAG, "[NonUihandler][doPlayAudio] + Begin");
+			String audioStr = null;
+			if (audio != null) {
+				audioStr = audio;
+			}
+			Log.d(TAG, "[NonUihandler][doPlayAudio] audioStr = "+audioStr);
+			
+			AudioPlayer mAudioPlayer = new AudioPlayer();
+			try {
+				mAudioPlayer.playAudio(parentActivity, audioStr);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+//			if (mUiHandler != null)
+//			{
+//				if (mUiHandler.hasMessages(UPDATE_FAV_IMAGE)) {
+//					mUiHandler.removeMessages(UPDATE_FAV_IMAGE);
+//    			}
+//				Message msg = Message.obtain(mUiHandler, UPDATE_FAV_IMAGE, mBeFavorited);
+//				mUiHandler.sendMessageDelayed(msg, 100);
+//			}
+			Log.d(TAG, "[NonUihandler][doPlayAudio] + End");
+		}
 	}
 	
 	public static void doPositiveClick() {
@@ -437,8 +526,15 @@ public class ScenarioDetailFragment extends Fragment {
 					public void onClick(View v)
 					{
 						// TODO Auto-generated method stub
-						//Log.d(TAG, "[ScenarioDialogAdapter][onClick] URL = "+dialogItem.getAudio());
-						Log.d(TAG, "[ScenarioDialogAdapter][onClick] URL = ");
+						String strAudio = dialogItem.getAudio();
+						Log.d(TAG, "[onClick] dialogAudio = "+strAudio);
+				   		if (mNonUiHandler != null) {
+							if (mNonUiHandler.hasMessages(PLAY_DIALOG_AUDIO)) {
+								mNonUiHandler.removeMessages(PLAY_DIALOG_AUDIO);
+							}
+							Message msg = Message.obtain(mNonUiHandler, PLAY_DIALOG_AUDIO,strAudio);
+							mNonUiHandler.sendMessage(msg);
+						}
 					}
 				});
 			}

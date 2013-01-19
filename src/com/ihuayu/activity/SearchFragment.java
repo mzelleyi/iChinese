@@ -169,7 +169,7 @@ public class SearchFragment extends Fragment {
 				FragmentManager fm = parentActivity.getSupportFragmentManager();
 				Fragment newFragment = ResultDetailFragment.newInstance(mDicList,arg2);
 				FragmentTransaction ft = fm.beginTransaction();
-				ft.add(R.id.tab_content_search, newFragment);
+				ft.replace(R.id.tab_content_search, newFragment);
 				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 				ft.addToBackStack(null);
 				ft.commit();

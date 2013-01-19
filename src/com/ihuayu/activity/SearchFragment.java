@@ -15,6 +15,8 @@ import com.ihuayu.view.MyDialogFragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -52,7 +54,14 @@ public class SearchFragment extends Fragment {
 	private static final int			MSG_REFRESH_FUZZY_RESULT		= 4;
 
 	private static final int			VIEW_TYPE_SUGGEST				= 0;
-	private static final int			VIEW_TYPE_FUZZY				= 1;
+	private static final int			VIEW_TYPE_FUZZY				    = 1;
+	
+	// Define Thread Name
+	private static final String THREAD_NAME = "SearchFragmentThread";
+	// The DB Handler Thread
+	private HandlerThread mHandlerThread = null;
+	// The DB Operation Thread
+	private static NonUiHandler mNonUiHandler = null;
 
 	private static FragmentActivity		parentActivity					= null;
 	// private static String[] mStrings = Cheeses.sCheeseStrings;
@@ -112,8 +121,13 @@ public class SearchFragment extends Fragment {
 		super.onViewCreated(view, savedInstanceState);
 		
 		parentActivity = this.getActivity();
-		
 		mInputMethodManager = (InputMethodManager)parentActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+		
+		//Init Thread
+		mHandlerThread = new HandlerThread(THREAD_NAME);
+		mHandlerThread.setPriority(Thread.NORM_PRIORITY);
+		mHandlerThread.start();
+		mNonUiHandler = new NonUiHandler(mHandlerThread.getLooper());
 		
 		final Button btnLanguage = (Button)parentActivity.findViewById(R.id.search_bar_btn);
 		//Tag "EN" represent input type is English while "CN" represent Chinese.
@@ -211,7 +225,7 @@ public class SearchFragment extends Fragment {
 		        		actionId == EditorInfo.IME_ACTION_GO) {
 		        	Log.d(TAG, "[onEditorAction] -> IME_ACTION_SEARCH ");
 		        	String searchKey = mEditText.getText().toString();
-		            sendAllSearchMsg(searchKey,0);
+		        	sendFuzzySearchMsg(searchKey,0);
 		            handled = true;
 		        }
 		        return handled;
@@ -229,23 +243,29 @@ public class SearchFragment extends Fragment {
 	}
 	
 	private void sendSuggentSearchMsg(String key, long delayTime) {
-		mUiHandler.removeMessages(MSG_DO_SUGGEST_SEARCH);
-		Message msg = mUiHandler.obtainMessage(MSG_DO_SUGGEST_SEARCH);
+		if (mNonUiHandler.hasMessages(MSG_DO_SUGGEST_SEARCH)) {
+			mNonUiHandler.removeMessages(MSG_DO_SUGGEST_SEARCH);
+		}
+		Message msg = mNonUiHandler.obtainMessage(MSG_DO_SUGGEST_SEARCH);
 		msg.obj = key;
-		if (delayTime > 0)
-			mUiHandler.sendMessageDelayed(msg, delayTime);
-		else
-			mUiHandler.sendMessage(msg);
+		if (delayTime > 0) {
+			mNonUiHandler.sendMessageDelayed(msg, delayTime);
+		} else {
+			mNonUiHandler.sendMessage(msg);
+		}
 	}
 	
-	private void sendAllSearchMsg(String key, long delayTime) {
-		mUiHandler.removeMessages(MSG_DO_FUZZY_SEARCH);
-		Message msg = mUiHandler.obtainMessage(MSG_DO_FUZZY_SEARCH);
+	private void sendFuzzySearchMsg(String key, long delayTime) {
+		if (mNonUiHandler.hasMessages(MSG_DO_FUZZY_SEARCH)) {
+			mNonUiHandler.removeMessages(MSG_DO_FUZZY_SEARCH);
+		}
+		Message msg = mNonUiHandler.obtainMessage(MSG_DO_FUZZY_SEARCH);
 		msg.obj = key;
-		if (delayTime > 0)
-			mUiHandler.sendMessageDelayed(msg, delayTime);
-		else
-			mUiHandler.sendMessage(msg);
+		if (delayTime > 0) {
+			mNonUiHandler.sendMessageDelayed(msg, delayTime);
+		} else {
+			mNonUiHandler.sendMessage(msg);
+		}
 	}
 	
 	private Handler mUiHandler = new Handler() {
@@ -300,36 +320,88 @@ public class SearchFragment extends Fragment {
 				mAdapter.notifyDataSetChanged();
 				break;
 			}
-			case SearchFragment.MSG_DO_SUGGEST_SEARCH: {
-				Log.d(TAG, "[mUiHandler][MSG_DO_SUGGEST_SEARCH]");
-				String searchStr = (String) msg.obj;
-				
-				List<Dictionary> dicList = MainActivity.dbManagerment.searchDictionary(mSearchKeyType, searchStr);
+			}
+		}
+	};
+	
+	/**
+	 * The NonUiHandler to do DB action
+	 * @author kesen
+	 *
+	 */
+	private final class NonUiHandler extends Handler
+	{
+		public NonUiHandler(Looper looper)
+		{
+			super(looper);
+			Log.d(TAG, "[NonUihandler] Constructor");
+		}
 
-				Message msg1 = mUiHandler.obtainMessage(MSG_REFRESH_SUGGEST_LISTVIEW);
-				msg1.obj = dicList;
-				this.sendMessage(msg1);
+		@Override
+		public void handleMessage(Message msg)
+		{
+			switch (msg.what)
+			{
+			case SearchFragment.MSG_DO_SUGGEST_SEARCH: {
+				Log.d(TAG, "[NonUiHandler] handle msg [MSG_DO_SUGGEST_SEARCH]");
+				String searchStr = (String) msg.obj;
+				doSuggestSearch(searchStr);
 				break;
 			}
 			case SearchFragment.MSG_DO_FUZZY_SEARCH: {
-				Log.d(TAG, "[mUiHandler][MSG_DO_FUZZY_SEARCH]");
+				Log.d(TAG, "[NonUiHandler] handle msg [MSG_DO_FUZZY_SEARCH]");
 				mInputMethodManager.hideSoftInputFromWindow(mEditText.getWindowToken(),0);
-				
 				searchDialog = MyDialogFragment.newInstance(parentActivity,
 						MyDialogFragment.DO_SEARCH_DB, null);
 				searchDialog.show(parentActivity.getSupportFragmentManager(),
 						"dialog_search_db");
-
+				
 				String doSearchStr = (String) msg.obj;
-				FuzzyResult fuzzyResult = MainActivity.dbManagerment.fuzzySearchDictionary(mSearchKeyType, doSearchStr);
-				Message msg2 = mUiHandler.obtainMessage(MSG_REFRESH_FUZZY_RESULT);
-				msg2.obj = fuzzyResult;
-				this.sendMessageDelayed(msg2, 1000);
+				doFuzzySearch(doSearchStr);
 				break;
 			}
+			default:
+				Log.d(TAG, "[NonUihandler][handleMessage] Something wrong in handleMessage()");
+				break;
 			}
 		}
-	};
+		
+		private void doSuggestSearch(String searchStr)
+		{
+			Log.d(TAG, "[NonUihandler][doSuggestSearch] + Begin");
+			Log.d(TAG, "[NonUihandler][doSuggestSearch] keyStr = "+searchStr);
+			List<Dictionary> dicList = MainActivity.dbManagerment.searchDictionary(mSearchKeyType, searchStr);
+			Log.d(TAG, "[NonUihandler][doSuggestSearch] dicList.size = "+dicList.size());
+			if (mUiHandler != null)
+			{
+				if (mUiHandler.hasMessages(MSG_REFRESH_SUGGEST_LISTVIEW)) {
+					mUiHandler.removeMessages(MSG_REFRESH_SUGGEST_LISTVIEW);
+    			}
+				Message msg1 = mUiHandler.obtainMessage(MSG_REFRESH_SUGGEST_LISTVIEW);
+				msg1.obj = dicList;
+				mUiHandler.sendMessage(msg1);
+			}
+			Log.d(TAG, "[NonUihandler][doSuggestSearch] + End");
+		}
+		
+		private void doFuzzySearch(String searchStr)
+		{
+			Log.d(TAG, "[NonUihandler][doFuzzySearch] + Begin");
+			Log.d(TAG, "[NonUihandler][doFuzzySearch] searchStr = "+searchStr);
+			
+			FuzzyResult fuzzyResult = MainActivity.dbManagerment.fuzzySearchDictionary(mSearchKeyType, searchStr);
+			Log.d(TAG, "[NonUihandler][doFuzzySearch] result is extact result = "+fuzzyResult.isExactResult());
+			if (mUiHandler != null) {
+				if (mUiHandler.hasMessages(MSG_REFRESH_FUZZY_RESULT)) {
+					mUiHandler.removeMessages(MSG_REFRESH_FUZZY_RESULT);
+    			}
+				Message msg2 = mUiHandler.obtainMessage(MSG_REFRESH_FUZZY_RESULT);
+				msg2.obj = fuzzyResult;
+				mUiHandler.sendMessage(msg2);
+			}
+			Log.d(TAG, "[NonUihandler][doFuzzySearch] + End");
+		}
+	}
 	
     public static class SearchListAdapter extends ArrayAdapter<Dictionary> {
     	
@@ -346,8 +418,6 @@ public class SearchFragment extends Fragment {
                 }
             }
         }
-        
-        
 
 	    @Override
 		public int getItemViewType(int position) {

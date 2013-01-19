@@ -352,7 +352,7 @@ public class SearchFragment extends Fragment {
 				Log.d(TAG, "[NonUiHandler] handle msg [MSG_DO_FUZZY_SEARCH]");
 				mInputMethodManager.hideSoftInputFromWindow(mEditText.getWindowToken(),0);
 				searchDialog = MyDialogFragment.newInstance(parentActivity,
-						MyDialogFragment.DO_SEARCH_DB, null);
+						MyDialogFragment.DO_SEARCH_DB, false, null);
 				searchDialog.show(parentActivity.getSupportFragmentManager(),
 						"dialog_search_db");
 				

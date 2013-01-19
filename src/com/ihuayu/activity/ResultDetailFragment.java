@@ -48,7 +48,7 @@ public class ResultDetailFragment extends Fragment {
 	private static List<Dictionary>	mResultList		= new ArrayList<Dictionary>();
 	private static Dictionary		mCurrentDic		= null;
 	private static int				mCurrentPos		= -1;
-	private static int				mDialogType		= -1;
+	//private static int				mDialogType		= -1;
 	private static ImageView		mFavoriteImg	= null;
 	private static boolean			mBeFavorited	= false;
 
@@ -60,6 +60,8 @@ public class ResultDetailFragment extends Fragment {
 	private static final int        UPDATE_ADD_RESULT       = 4;
 	private static final int		REMOVE_FROM_BOOKMARK	= 5;
 	private static final int		UPDATE_REMOVE_RESULT	= 6;
+	
+	private static DialogFragment mCurrentDialog = null;
 
 	
 	// Define Thread Name
@@ -67,7 +69,7 @@ public class ResultDetailFragment extends Fragment {
 	// The DB Handler Thread
 	private HandlerThread			mHandlerThread	= null;
 	// The DB Operation Thread
-	private static NonUiHandler			mNonUiHandler	= null;
+	private static NonUiHandler	    mNonUiHandler	= null;
 	
 	
 
@@ -159,10 +161,10 @@ public class ResultDetailFragment extends Fragment {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				if (!mBeFavorited) {
-					mDialogType = MyDialogFragment.ADD_TO_BOOKMARK;
-					showDialog(mDialogType);
+					//mDialogType = MyDialogFragment.ADD_TO_BOOKMARK;
+					showDialog(MyDialogFragment.ADD_TO_BOOKMARK,false);
 				} else {
-					sendHandlerMsg(REMOVE_FROM_BOOKMARK);
+					showDialog(MyDialogFragment.REMOVE_FROM_BOOKMARK,false);
 				}
 			}
 		});
@@ -203,31 +205,30 @@ public class ResultDetailFragment extends Fragment {
 				case UPDATE_ADD_RESULT: {
 					Log.d(TAG, "[mUihandler handleMessage] UPDATE_ADD_RESULT");
 					if (msg.arg1 > 0) {
-						mDialogType = MyDialogFragment.ADD_SUCCESS;
+						//mDialogType = MyDialogFragment.ADD_RESULT;
 						mBeFavorited = true;
-			        	showDialog(MyDialogFragment.ADD_SUCCESS);
+			        	showDialog(MyDialogFragment.ADD_RESULT, true);
 			        	updateFavoriteImg(true);
 					} else {
-						mDialogType = -1;
+						//mDialogType = -1;
 						mBeFavorited = false;
-						Toast toast = Toast.makeText(parentActivity, "Add Failed", Toast.LENGTH_SHORT);
-						toast.setGravity(Gravity.CENTER, 0, 0);
-						toast.show();
+						showDialog(MyDialogFragment.ADD_RESULT, false);
+						updateFavoriteImg(false);
 					}
 					break;
 				}
 				case UPDATE_REMOVE_RESULT: {
 					Log.d(TAG, "[mUihandler handleMessage] UPDATE_REMOVE_RESULT");
 					if (msg.arg1 > 0) {
-						updateFavoriteImg(false);
-						mDialogType = -1;
+						//mDialogType = -1;
 						mBeFavorited = false;
+						showDialog(MyDialogFragment.REMOVE_RESULT, true);
+						updateFavoriteImg(false);
 					} else {
-						mDialogType = -1;
+						//mDialogType = -1;
 						mBeFavorited = true;
-						Toast toast = Toast.makeText(parentActivity, "Remove Failed", Toast.LENGTH_SHORT);
-						toast.setGravity(Gravity.CENTER, 0, 0);
-						toast.show();
+						showDialog(MyDialogFragment.REMOVE_RESULT, false);
+						updateFavoriteImg(true);
 					}
 					break;
 				}
@@ -332,35 +333,62 @@ public class ResultDetailFragment extends Fragment {
 		}
 	}
 	
-    public static void showDialog(int dialogType) {
-    	if (dialogType == MyDialogFragment.ADD_TO_BOOKMARK) {
-    		DialogFragment newFragment = MyDialogFragment.newInstance(parentActivity, MyDialogFragment.ADD_TO_BOOKMARK, null);
-            newFragment.show(parentActivity.getSupportFragmentManager(), "dialog_add");
-    	} else {
-    		DialogFragment newFragment = MyDialogFragment.newInstance(parentActivity, MyDialogFragment.ADD_SUCCESS, null);
-            newFragment.show(parentActivity.getSupportFragmentManager(), "dialog_success");
-    	}
+    public static void showDialog(int dialogType, boolean bSusscuss) {
+    	switch (dialogType)
+		{
+			case MyDialogFragment.ADD_TO_BOOKMARK:
+				Log.d(TAG, "[showDialog] - ADD_TO_BOOKMARK");
+				mCurrentDialog = MyDialogFragment.newInstance(parentActivity, MyDialogFragment.ADD_TO_BOOKMARK, false, null);
+				mCurrentDialog.show(parentActivity.getSupportFragmentManager(), "dialog_add");
+				break;
+			case MyDialogFragment.ADD_RESULT:
+				Log.d(TAG, "[showDialog] - ADD_RESULT");
+				mCurrentDialog = MyDialogFragment.newInstance(parentActivity, MyDialogFragment.ADD_RESULT, bSusscuss, null);
+				mCurrentDialog.show(parentActivity.getSupportFragmentManager(), "dialog_add_result");
+				break;
+			case MyDialogFragment.REMOVE_FROM_BOOKMARK:
+				Log.d(TAG, "[showDialog] - REMOVE_FROM_BOOKMARK");
+				mCurrentDialog = MyDialogFragment.newInstance(parentActivity, MyDialogFragment.REMOVE_FROM_BOOKMARK, false, null);
+				mCurrentDialog.show(parentActivity.getSupportFragmentManager(), "dialog_remove");
+				break;
+			case MyDialogFragment.REMOVE_RESULT:
+				Log.d(TAG, "[showDialog] - REMOVE_RESULT");
+				mCurrentDialog = MyDialogFragment.newInstance(parentActivity, MyDialogFragment.REMOVE_RESULT, bSusscuss, null);
+				mCurrentDialog.show(parentActivity.getSupportFragmentManager(), "dialog_remove_result");
+				break;
+			default:
+				Log.d(TAG, "[showDialog] Something wrong in handleMessage()");
+				break;
+		}
     }
     
-    public static void doPositiveClick() {
-        // Do stuff here.
-        Log.i(TAG, "[doPositiveClick] + Begin");
-        if (mDialogType == MyDialogFragment.ADD_TO_BOOKMARK) {
-        	sendHandlerMsg(ADD_TO_BOOKMARK);
-        } else if (mDialogType == MyDialogFragment.ADD_SUCCESS) {
-        	mBeFavorited = true;
-        	mDialogType = -1;
-        } else {
-        	mDialogType = -1;
-        	mBeFavorited = false;
-        }
+    public static void doPositiveClick(int dialogType) {
+    	switch (dialogType)
+		{
+			case MyDialogFragment.ADD_TO_BOOKMARK:
+				Log.d(TAG, "[doPositiveClick] - ADD_TO_BOOKMARK");
+				sendHandlerMsg(ADD_TO_BOOKMARK);
+				break;
+			case MyDialogFragment.REMOVE_FROM_BOOKMARK:
+				Log.d(TAG, "[doPositiveClick] - REMOVE_FROM_BOOKMARK");
+				sendHandlerMsg(REMOVE_FROM_BOOKMARK);
+				break;
+			case MyDialogFragment.REMOVE_RESULT:
+			case MyDialogFragment.ADD_RESULT:
+				Log.d(TAG, "[doPositiveClick] - REMOVE_RESULT or ADD_RESULT");
+				mCurrentDialog.dismiss();
+				break;
+			default:
+				Log.d(TAG, "[doPositiveClick] Something wrong in handleMessage()");
+				break;
+		}
     }
     
     public static void doNegativeClick() {
         // Do stuff here.
         Log.i(TAG, "Negative click!");
-        mDialogType = -1;
-        mBeFavorited = false;
+        //mDialogType = -1;
+        //mBeFavorited = false;
     }
 	
 	public static void updateDataFragment() {
@@ -400,7 +428,6 @@ public class ResultDetailFragment extends Fragment {
 			if (mNonUiHandler.hasMessages(msgCode)) {
 				mNonUiHandler.removeMessages(msgCode);
 			}
-			Log.d(TAG, "Send msgCode ="+msgCode);
 			mNonUiHandler.sendEmptyMessage(msgCode);
 		}
 	}

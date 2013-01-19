@@ -183,7 +183,7 @@ public class ScenarioDetailFragment extends Fragment {
 			HashMap<Dialog, List<DialogKeywords>> mapItem = mAdapter.getItem(position);
 	        
 			DialogFragment newFragment = MyDialogFragment.newInstance(parentActivity, 
-					MyDialogFragment.SCENARIO_DIALOG, mapItem);
+					MyDialogFragment.SCENARIO_DIALOG, false, mapItem);
             newFragment.show(parentActivity.getSupportFragmentManager(), "scenario_dialog");
 		}
 	

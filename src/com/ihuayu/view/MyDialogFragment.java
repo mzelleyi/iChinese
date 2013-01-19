@@ -27,9 +27,11 @@ import com.ihuayu.activity.db.entity.DialogKeywords;
 public class MyDialogFragment extends DialogFragment {
 
 	public static final int ADD_TO_BOOKMARK = 0;
-	public static final int ADD_SUCCESS = 1;
-	public static final int DO_SEARCH_DB = 2;
-	public static final int SCENARIO_DIALOG = 3;
+	public static final int ADD_RESULT = 1;
+	public static final int REMOVE_FROM_BOOKMARK = 2;
+	public static final int REMOVE_RESULT = 3;
+	public static final int DO_SEARCH_DB = 4;
+	public static final int SCENARIO_DIALOG = 5;
 	private static final String TAG = "iHuayu:MyDialogFragment";
 	
 	private static FragmentActivity parentActivity = null;
@@ -38,8 +40,16 @@ public class MyDialogFragment extends DialogFragment {
 	private static com.ihuayu.activity.db.entity.Dialog dialogItem = null;
 	private static List<DialogKeywords> keyWordList = null;
 	
-    @SuppressWarnings("unchecked")
-	public static MyDialogFragment newInstance(Context context, int dialogType, Object param) {
+	/**
+	 * 
+	 * @param context
+	 * @param dialogType
+	 * @param succuss : The flag to indicate add or remove action result
+	 * @param param : For Show Dialog Detail Page
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public static MyDialogFragment newInstance(Context context, int dialogType, boolean succuss, Object param) {
     	Log.d(TAG, "[newInstance] + Begin");
     	MyDialogFragment frag = new MyDialogFragment();
     	
@@ -67,6 +77,7 @@ public class MyDialogFragment extends DialogFragment {
     	
         Bundle args = new Bundle();
         args.putInt("dialogType", dialogType);
+        args.putBoolean("actionResult", succuss);
         frag.setArguments(args);
         Log.d(TAG, "[newInstance] + End");
         return frag;
@@ -75,6 +86,7 @@ public class MyDialogFragment extends DialogFragment {
 	@Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         int dialogType = getArguments().getInt("dialogType");
+        boolean actionResult = getArguments().getBoolean("actionResult",false);
         if (dialogType == ADD_TO_BOOKMARK) {
         	return new AlertDialog.Builder(parentActivity)
             .setIcon(android.R.drawable.ic_dialog_alert)
@@ -82,7 +94,7 @@ public class MyDialogFragment extends DialogFragment {
             .setPositiveButton(android.R.string.ok,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                    	ResultDetailFragment.doPositiveClick();
+                    	ResultDetailFragment.doPositiveClick(ADD_TO_BOOKMARK);
                     }
                 }
             )
@@ -94,18 +106,73 @@ public class MyDialogFragment extends DialogFragment {
                 }
             )
             .create();
-        } else if (dialogType == ADD_SUCCESS) {
+        } else if (dialogType == ADD_RESULT) {
+        	if (actionResult) {
+        		return new AlertDialog.Builder(parentActivity)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle(R.string.dialog_msg_success)
+                .setPositiveButton(android.R.string.ok,
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                        	ResultDetailFragment.doPositiveClick(ADD_RESULT);
+                        }
+                    }
+                ).create();
+        	} else {
+        		return new AlertDialog.Builder(parentActivity)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle(R.string.dialog_msg_failed)
+                .setPositiveButton(android.R.string.ok,
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                        	ResultDetailFragment.doPositiveClick(ADD_RESULT);
+                        }
+                    }
+                ).create();
+        	}
+        } else if (dialogType == REMOVE_FROM_BOOKMARK) {
         	return new AlertDialog.Builder(parentActivity)
             .setIcon(android.R.drawable.ic_dialog_alert)
-            .setTitle(R.string.dialog_msg_add_success)
+            .setTitle(R.string.dialog_msg_remove_from_bookmark)
             .setPositiveButton(android.R.string.ok,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                    	ResultDetailFragment.doPositiveClick();
+                    	ResultDetailFragment.doPositiveClick(REMOVE_FROM_BOOKMARK);
+                    }
+                }
+            )
+            .setNegativeButton(android.R.string.cancel,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                    	ResultDetailFragment.doNegativeClick();
                     }
                 }
             )
             .create();
+        } else if (dialogType == REMOVE_RESULT) {
+        	if (actionResult) {
+        		return new AlertDialog.Builder(parentActivity)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle(R.string.dialog_msg_success)
+                .setPositiveButton(android.R.string.ok,
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                        	ResultDetailFragment.doPositiveClick(REMOVE_RESULT);
+                        }
+                    }
+                ).create();
+        	} else {
+        		return new AlertDialog.Builder(parentActivity)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle(R.string.dialog_msg_failed)
+                .setPositiveButton(android.R.string.ok,
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                        	ResultDetailFragment.doPositiveClick(REMOVE_RESULT);
+                        }
+                    }
+                ).create();
+        	}
         } else if (dialogType == DO_SEARCH_DB) {
         	ProgressDialog dialog = new ProgressDialog(parentActivity);
             dialog.setMessage("Please wait while searching...");

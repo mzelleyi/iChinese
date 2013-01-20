@@ -20,7 +20,7 @@ import android.util.Log;
 public class AudioPlayer {
 	
 	private static final String	TAG				= "iHuayu:AudioPlayer";
-	private static final String AUDIO_DOWNLOAD_URL = "http://ihuayu.gistxl.com/smc/";
+	private static final String AUDIO_DOWNLOAD_URL = "http://ihuayu.gistxl.com/smc";
 	
 	public void playAudio(Context context, String audioURL) throws Exception {
 		Log.d(TAG, "[playAudio] + Begin");
@@ -28,7 +28,7 @@ public class AudioPlayer {
 		String audioName = audioURL.split("/")[1];
 		Log.d(TAG, "[playAudio] audioName = "+audioName);
 		//Check the internet first
-		int result = downFile(AUDIO_DOWNLOAD_URL + audioName, "/audio/", audioName);
+		int result = downFile("/audio/", audioName);
 		if(result == -1) throw new Exception("Dowload audio failed");
 		play(context,"/audio/" +  audioName);
 	}
@@ -41,9 +41,9 @@ public class AudioPlayer {
 		player.start();
 	}
 	
-	private int downFile(String urlStr, String path, String fileName) throws Exception {
+	private int downFile(String path, String fileName) throws Exception {
 		Log.d(TAG, "[downFile] + Begin");
-		Log.d(TAG, "[downFile] urlStr = "+ urlStr);
+//		Log.d(TAG, "[downFile] urlStr = "+ urlStr);
 		Log.d(TAG, "[downFile] path = "+ path);
 		Log.d(TAG, "[downFile] fileName = "+ fileName);
 		InputStream inputStream = null;
@@ -55,7 +55,8 @@ public class AudioPlayer {
 				return 1;
 			} else {
 				Log.d(TAG, "[downFile] the audio file isn't exist, do download");
-				inputStream = getInputStreamFromURL(urlStr);
+				Log.d(TAG, "[downFile] urlStr = "+ AUDIO_DOWNLOAD_URL + path + fileName);
+				inputStream = getInputStreamFromURL(AUDIO_DOWNLOAD_URL + path + fileName);
 				File resultFile = fileUtils.write2SDFromInput(path, fileName,inputStream);
 				if (resultFile == null) {
 					Log.e(TAG, "[downFile] write to sdcard failed");

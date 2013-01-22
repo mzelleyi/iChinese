@@ -2,14 +2,21 @@ package com.ihuayu.activity;
 
 
 
+import android.annotation.SuppressLint;
+import android.content.res.Resources;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
+import android.widget.TextView;
 
 import com.ihuayu.R;
 import com.ihuayu.activity.operation.DBManagerment;
@@ -36,32 +43,36 @@ public class MainActivity extends FragmentActivity implements
 		Log.d(TAG, "[onCreate] + Begin");
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+		Resources mRes = this.getResources();
 
 		mTabHost = (TabHost) findViewById(android.R.id.tabhost);
 		mTabHost.setup();
+		mTabHost.getTabWidget().setDividerDrawable(null);
 		mTabHost.addTab(mTabHost.newTabSpec(TAB_SEARCH)
-				.setIndicator("Search", this.getResources().getDrawable(R.drawable.tab_search))
+				.setIndicator(mRes.getString(R.string.tab_bar_search), this.getResources().getDrawable(R.drawable.tab_search_selector))
 				.setContent(R.id.tab_content_search));
 		mTabHost.addTab(mTabHost.newTabSpec(TAB_SCENARIO)
-				.setIndicator("Scenario", this.getResources().getDrawable(R.drawable.tab_scenarios))
+				.setIndicator(mRes.getString(R.string.tab_bar_scenario), this.getResources().getDrawable(R.drawable.tab_scenarios_selector))
 				.setContent(R.id.tab_content_scenario));
 		mTabHost.addTab(mTabHost.newTabSpec(TAB_BOOKMARK)
-				.setIndicator("Bookmark", this.getResources().getDrawable(R.drawable.tab_bookmark))
+				.setIndicator(mRes.getString(R.string.tab_bar_bookmark), this.getResources().getDrawable(R.drawable.tab_bookmark_selector))
 				.setContent(R.id.tab_content_bookmark));
 		mTabHost.addTab(mTabHost.newTabSpec(TAB_INFO)
-				.setIndicator("Info", this.getResources().getDrawable(R.drawable.tab_help))
+				.setIndicator(mRes.getString(R.string.tab_bar_info), this.getResources().getDrawable(R.drawable.tab_help_selector))
 				.setContent(R.id.tab_content_info));
 		
-		mTabHost.setCurrentTabByTag(TAB_SEARCH);
+		for (int i = 0; i < mTabHost.getTabWidget().getChildCount(); i++)
+        {
+			View view = mTabHost.getTabWidget().getChildAt(i);
+			view.setBackgroundResource(R.drawable.tab_bg_selector);
+			
+            TextView title = (TextView)view.findViewById(android.R.id.title);
+            title.setTextColor(getResources().getColorStateList(R.color.tab_text_color));
+            title.invalidate();
+        }
 		
-//		int highlightColor = getResources().getColor(R.color.green_light);
-//		ColorFilter colorFilter = new LightingColorFilter(highlightColor);
-//		mTabHost.getBackground().setColorFilter(colorFilter);
-//		for (int i = 0; i < mTabHost.getTabWidget().getChildCount(); i++)
-//        {
-//            View view = mTabHost.getTabWidget().getChildAt(i);
-//            view.setBackgroundColor(getResources().getColor(R.color.tab_color));
-//        }
+		mTabHost.setCurrentTabByTag(TAB_SEARCH);
 		
 		this.updateTab(TAB_SEARCH, R.id.tab_content_search);
 		
@@ -128,22 +139,8 @@ public class MainActivity extends FragmentActivity implements
 	@Override
 	public void onTabChanged(String tabTag) {
 		Log.d(TAG, "[onTabChanged] + Begin,tabTag:" + tabTag);
-//		DBManagerment db = new DBManagerment(this);
-//		List<Dictionary> results = db.fuzzySearchDictionary(QueryType.EN, "Name");
-//		
-//		for(Dictionary d : results) {
-//			System.out.println("==========" + d.getKeyword() + "====" + d.getDestiontion());
-//		}
-//		
-//		AudioPlayer test = new AudioPlayer();
-//		try {
-//			test.playAudio(this, "audio/c3419fab-9810-4fd3-8c8b-5ff67196e94e.mp3");
-//		} catch (Exception e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} 
-//		test.downFile("http://ihuayu.gistxl.com/smc/audio/c3419fab-9810-4fd3-8c8b-5ff67196e94e.mp3", "/audio/", "c3419fab-9810-4fd3-8c8b-5ff67196e94e.mp3");
 		// TODO Auto-generated method stub
+        
 		if (TAB_SEARCH.equals(tabTag)) {
 			updateTab(tabTag, R.id.tab_content_search);
 			return;

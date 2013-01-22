@@ -875,9 +875,9 @@ public class BookmarkFragment extends Fragment {
 						if (bEditMode) {
 							deleteImg.setVisibility(View.VISIBLE);
 							if (item.getNeedDelete()) {
-								deleteImg.setImageResource(R.drawable.btn_clear_on);
+								deleteImg.setImageResource(R.drawable.list_check);
 							} else {
-								deleteImg.setImageResource(R.drawable.btn_clear_rest);
+								deleteImg.setImageResource(R.drawable.list_uncheck);
 							}
 							
 							deleteImg.setOnClickListener(new View.OnClickListener() {
@@ -886,10 +886,10 @@ public class BookmarkFragment extends Fragment {
 								{
 									// TODO Auto-generated method stub
 									if (item.getNeedDelete()) {
-										deleteImg.setImageResource(R.drawable.btn_clear_rest);
+										deleteImg.setImageResource(R.drawable.list_uncheck);
 										item.setNeedDelete(false);
 									} else {
-										deleteImg.setImageResource(R.drawable.btn_clear_on);
+										deleteImg.setImageResource(R.drawable.list_check);
 										item.setNeedDelete(true);
 									}
 								}

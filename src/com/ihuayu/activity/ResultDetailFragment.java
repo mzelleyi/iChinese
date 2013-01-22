@@ -766,7 +766,7 @@ public class ResultDetailFragment extends Fragment {
 					case 0:
 					{
 						TextLine.setText(item.getSample_sentance_en());
-						speakIcon.setVisibility(View.GONE);
+						speakIcon.setVisibility(View.INVISIBLE);
 						break;
 					}
 					case 1:
@@ -793,7 +793,7 @@ public class ResultDetailFragment extends Fragment {
 					case 2:
 					{
 						TextLine.setText(item.getSample_sentance_py());
-						speakIcon.setVisibility(View.GONE);
+						speakIcon.setVisibility(View.INVISIBLE);
 						break;
 					}
 				}

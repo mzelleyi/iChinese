@@ -52,6 +52,8 @@
         android:id="@+id/text_content_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/margin_h2"
+        android:paddingRight="@dimen/margin_h2"
         android:layout_below="@id/scenario_dialog_title" >
     	<RelativeLayout
     	    android:id="@+id/scenario_dialog_first_line_layout"
@@ -64,6 +66,7 @@
 		        android:layout_height="wrap_content"
 		        android:layout_centerVertical="true"
 		        android:layout_alignParentLeft="true"
+		        android:layout_marginTop="@dimen/margin_h2"
 		        android:layout_marginRight="@dimen/margin_h2"
 		        android:src="@drawable/btn_speaker_white"
 		        android:contentDescription="@string/dummy_img_des" />
@@ -78,16 +81,33 @@
 			    android:hint="@string/dummy_text"
 		        android:gravity="left" />
     	</RelativeLayout>
-        <TextView 
-            android:id="@+id/scenario_dialog_text_second_line"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:layout_below="@id/scenario_dialog_first_line_layout"
-	        android:background="@drawable/bg_dialog_female_2"
-	        android:layout_centerVertical="true"
-	        android:textSize="@dimen/scenario_dialog_text_size"
-	        android:textColor="@color/black_normal"
-	        android:hint="@string/dummy_text"
-	        android:gravity="left" />
+        <RelativeLayout
+    	    android:id="@+id/scenario_dialog_second_line_layout"
+    	    android:layout_width="match_parent"
+    	    android:layout_height="wrap_content"
+    	    android:background="@drawable/bg_dialog_female_2"
+    	    android:layout_below="@id/scenario_dialog_first_line_layout" >
+    	    <ImageView 
+		        android:id="@+id/scenario_dialog_img2_speaker"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_centerVertical="true"
+		        android:layout_alignParentLeft="true"
+		        android:layout_marginTop="@dimen/margin_h2"
+		        android:layout_marginRight="@dimen/margin_h2"
+		        android:src="@drawable/btn_speaker_white"
+		        android:visibility="invisible"
+		        android:contentDescription="@string/dummy_img_des" />
+    	    <TextView 
+	            android:id="@+id/scenario_dialog_text_second_line"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_centerVertical="true"
+		        android:layout_toRightOf="@id/scenario_dialog_img2_speaker"
+		        android:textSize="@dimen/scenario_dialog_text_size"
+		        android:textColor="@color/black_normal"
+		        android:hint="@string/dummy_text"
+		        android:gravity="left" />
+    	</RelativeLayout>
     </RelativeLayout>
 </RelativeLayout>

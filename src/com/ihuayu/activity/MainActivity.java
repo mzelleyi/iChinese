@@ -2,10 +2,7 @@ package com.ihuayu.activity;
 
 
 
-import android.annotation.SuppressLint;
 import android.content.res.Resources;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -13,7 +10,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TextView;
@@ -68,7 +64,8 @@ public class MainActivity extends FragmentActivity implements
 			view.setBackgroundResource(R.drawable.tab_bg_selector);
 			
             TextView title = (TextView)view.findViewById(android.R.id.title);
-            title.setTextColor(getResources().getColorStateList(R.color.tab_text_color));
+            title.setTextSize(mRes.getDimension(R.dimen.tab_bar_textview_size));
+            title.setTextColor(mRes.getColorStateList(R.color.tab_text_color));
             title.invalidate();
         }
 		

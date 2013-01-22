@@ -10,7 +10,7 @@
     <dimen name="foot_bar_side_button_width">52dp</dimen>
     
     <dimen name="search_bar_height">56dp</dimen>
-    <dimen name="tab_bar_height">60dp</dimen>
+    <dimen name="tab_bar_textview_size">6sp</dimen>
 
     <dimen name="scenario_listitem_height">100dp</dimen>
     <dimen name="scenario_listitem_icon_left_width">48dp</dimen>

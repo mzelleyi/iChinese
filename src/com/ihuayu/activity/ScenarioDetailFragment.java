@@ -117,11 +117,11 @@ public class ScenarioDetailFragment extends Fragment {
 				FragmentManager fm = parentActivity.getSupportFragmentManager();
 				fm.popBackStack();
 				
-				Fragment currentFragment = fm.findFragmentById(R.id.tab_content_scenario);
-				FragmentTransaction ft = fm.beginTransaction();
-				ft.remove(currentFragment);
-				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
-				ft.commit();
+//				Fragment currentFragment = fm.findFragmentById(R.id.tab_content_scenario);
+//				FragmentTransaction ft = fm.beginTransaction();
+//				ft.remove(currentFragment);
+//				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
+//				ft.commit();
 			}
 		});
 		

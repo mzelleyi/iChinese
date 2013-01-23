@@ -77,7 +77,7 @@ public class InfoFragment extends Fragment {
 				FragmentManager fm = activity.getSupportFragmentManager();
 				Fragment newFragment = HelpFragment.newInstance();
 				FragmentTransaction ft = fm.beginTransaction();
-				ft.add(R.id.tab_content_info, newFragment);
+				ft.replace(R.id.tab_content_info, newFragment);
 				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 				ft.addToBackStack(null);
 				ft.commit();

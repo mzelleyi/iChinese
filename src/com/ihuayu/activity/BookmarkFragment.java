@@ -60,8 +60,8 @@ public class BookmarkFragment extends Fragment {
 	private static Resources mRes = null;
 	private BookmarkListFragment mBookmarkListFragment = null;
 
-	private static WindowManager mWindowManager;
-	private static TextView mDialogText;
+	private static WindowManager mWindowManager = null;
+	private static TextView mDialogText = null;
 	private static boolean mShowing;
 	private static boolean mReady;
 	private static char mPrevLetter = Character.MIN_VALUE;
@@ -71,7 +71,7 @@ public class BookmarkFragment extends Fragment {
 	private static final int PLAY_AUDIO = 2;
 	private static final int REMOVE_SUCCESS = 3;
 	private static final int REMOVE_FAILED = 4;
-	private static final int INDICATE_SHOW = 5;
+	private static final int INDICATE_ADD = 5;
 	private static final int INDICATE_HIDE = 6;
 
 	// Define Thread Name
@@ -184,9 +184,9 @@ public class BookmarkFragment extends Fragment {
 					hideIndicateWindow();
 					break;
 				}
-				case INDICATE_SHOW: {
-					Log.d(TAG, "[mUihandler handleMessage] INDICATE_SHOW");
-					showIndicateWindow();
+				case INDICATE_ADD: {
+					Log.d(TAG, "[mUihandler handleMessage] INDICATE_ADD");
+					addIndicateWindow();
 					break;
 				}
 				default:{
@@ -297,7 +297,7 @@ public class BookmarkFragment extends Fragment {
         }
     }
     
-    private static void showIndicateWindow() {
+    private static void addIndicateWindow() {
     	mReady = true;
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams(
                 LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT,
@@ -357,26 +357,33 @@ public class BookmarkFragment extends Fragment {
 			Log.d(TAG, "[BookmarkListFragment][onActivityCreated] + End");
 		}
 		
-	    @Override
-		public void onResume() {
-	        super.onResume();
-	        mReady = true;
-	    }
+//	    @Override
+//		public void onResume() {
+//		    Log.d(TAG, "[onResume] + Begin");
+//	        super.onResume();
+//	        mReady = true;
+//	    }
+//
+//		@Override
+//	    public void onPause() {
+//	    Log.d(TAG, "[onPause] + Begin");
+//	        super.onPause();
+//	        hideIndicateWindow();
+//	        mReady = false;
+//	    }
 
 		@Override
-	    public void onPause() {
-	        super.onPause();
-	        hideIndicateWindow();
+		public void onDestroyView()
+		{
+			Log.d(TAG, "[onDestroyView] + Begin");
+			// TODO Auto-generated method stub
+			super.onDestroyView();
+	        if (null != mDialogText) {
+	        	Log.d(TAG, "[onDestroyView] remove mDialogText");
+	        	mWindowManager.removeView(mDialogText);
+	        }
 	        mReady = false;
-	    }
-
-	    @Override
-	    public void onDestroy() {
-	        super.onDestroy();
-	        mWindowManager.removeView(mDialogText);
-	        mReady = false;
-	    }
-	
+		}
 
 		@Override
 		public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -476,11 +483,11 @@ public class BookmarkFragment extends Fragment {
 			// Set Indicate For ListView
 	        mDialogText = (TextView) mInflater.inflate(R.layout.list_position_indicate, null);
 	        mDialogText.setVisibility(View.INVISIBLE);
-			if (mUiHandler.hasMessages(INDICATE_SHOW)) {
-				mUiHandler.removeMessages(INDICATE_SHOW);
+			if (mUiHandler.hasMessages(INDICATE_ADD)) {
+				mUiHandler.removeMessages(INDICATE_ADD);
 			}
-			Log.d(TAG, "Send INDICATE_SHOW Msg delay 100");
-	        mUiHandler.sendEmptyMessageDelayed(INDICATE_SHOW, 100);
+			Log.d(TAG, "Send INDICATE_ADD Msg");
+	        mUiHandler.sendEmptyMessage(INDICATE_ADD);
 			
 			mListView = this.getListView();
 			if (null != mListView) {
@@ -513,8 +520,8 @@ public class BookmarkFragment extends Fragment {
 				    			if (mUiHandler.hasMessages(INDICATE_HIDE)) {
 				    				mUiHandler.removeMessages(INDICATE_HIDE);
 				    			}
-				    			Log.d(TAG, "[onScroll] Send INDICATE_HIDE Msg delay 1500");
-					            mUiHandler.sendEmptyMessageDelayed(INDICATE_HIDE, 1500);
+				    			Log.d(TAG, "[onScroll] Send INDICATE_HIDE Msg delay 1000");
+					            mUiHandler.sendEmptyMessageDelayed(INDICATE_HIDE, 1000);
 					            mPrevLetter = firstLetter;
 				        	}
 				        }
@@ -786,7 +793,6 @@ public class BookmarkFragment extends Fragment {
 	                this.add(entry);
 	            }
 	        }
-	        Log.d(TAG, "[BookmarkListAdapter][setData] + End");
 	    }
 	    
 	    @Override

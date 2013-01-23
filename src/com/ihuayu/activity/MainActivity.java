@@ -33,6 +33,7 @@ public class MainActivity extends FragmentActivity implements
 	private static final String TAB_BOOKMARK = "Bookmark";
 	private static final String TAB_INFO = "Info";
 	private TabHost mTabHost = null;
+	public static boolean TAB_NEED_UPDATE = false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -134,6 +135,19 @@ public class MainActivity extends FragmentActivity implements
 	}
 
 	@Override
+	public void onBackPressed()
+	{
+		Log.d(TAG, "[onBackPressed] + Begin");
+		
+		FragmentManager fm = this.getSupportFragmentManager();
+		int stackCount = fm.getBackStackEntryCount();
+		Log.d(TAG, "[onBackPressed] stackCount = "+stackCount);
+		
+		// TODO Auto-generated method stub
+		super.onBackPressed();
+	}
+
+	@Override
 	public void onTabChanged(String tabTag) {
 		Log.d(TAG, "[onTabChanged] + Begin,tabTag:" + tabTag);
 		// TODO Auto-generated method stub
@@ -175,17 +189,23 @@ public class MainActivity extends FragmentActivity implements
 			} else {
 				Log.e(TAG, "Error Tab Type");
 			}
+			MainActivity.TAB_NEED_UPDATE = false;
 			// Add the fragment
 			ft.add(viewHolderId, newFragment);
 			ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 			ft.commit();
 		} else {
-			Log.d(TAG,"[updateTab] find fragment != null, do setCurrentTabByTag");
-			// Replace the fragment
-			//ft.replace(viewHolderId, newFragment);
-			//ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-			//ft.commit();
-			mTabHost.setCurrentTabByTag(tabTag);
+			if (TAB_NEED_UPDATE && TAB_BOOKMARK.equals(tabTag)) {
+				Log.d(TAG,"[updateTab] new BookmarkFragment, do replace");
+				MainActivity.TAB_NEED_UPDATE = false;
+				newFragment = BookmarkFragment.newInstance();
+				ft.replace(viewHolderId, newFragment);
+				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+				ft.commit();
+			} else {
+				Log.d(TAG,"[updateTab] find fragment != null, do setCurrentTabByTag");
+				mTabHost.setCurrentTabByTag(tabTag);
+			}
 		}
 		Log.d(TAG,"[updateTab] + End");
 	}

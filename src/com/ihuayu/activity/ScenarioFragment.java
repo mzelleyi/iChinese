@@ -84,8 +84,8 @@ public class ScenarioFragment extends Fragment {
         } else {
         	Log.d(TAG, "[onViewCreated] used ScenarioListFragment, do replace");
         	list = new ScenarioListFragment();
-			ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 			ft.replace(R.id.fragment_scenario_listview, list);
+			ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 			//ft.addToBackStack(null);
 			ft.commit();
         }
@@ -469,7 +469,7 @@ public class ScenarioFragment extends Fragment {
 						FragmentManager fm = parentActivity.getSupportFragmentManager();
 						Fragment newFragment = ScenarioDetailFragment.newInstance(item);
 						FragmentTransaction ft = fm.beginTransaction();
-						ft.add(R.id.tab_content_scenario, newFragment);
+						ft.replace(R.id.tab_content_scenario, newFragment);
 						ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 						ft.addToBackStack(null);
 						ft.commit();

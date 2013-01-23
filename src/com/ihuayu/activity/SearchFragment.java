@@ -171,7 +171,7 @@ public class SearchFragment extends Fragment {
 				FragmentTransaction ft = fm.beginTransaction();
 				ft.replace(R.id.tab_content_search, newFragment);
 				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-				ft.addToBackStack(null);
+				//ft.addToBackStack(null);
 				ft.commit();
 				mInputMethodManager.hideSoftInputFromWindow(mEditText.getWindowToken(),0);
 			}

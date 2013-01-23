@@ -70,14 +70,13 @@ public class HelpFragment extends Fragment {
 				// TODO Auto-generated method stub
 				FragmentManager fm = activity.getSupportFragmentManager();
 				fm.popBackStack();
-				
-				Fragment currentFragment = fm.findFragmentById(R.id.tab_content_info);
-				if (currentFragment != null) {
-					FragmentTransaction ft = fm.beginTransaction();
-					ft.remove(currentFragment);
-					ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
-					ft.commit();
-				}
+//				Fragment currentFragment = fm.findFragmentById(R.id.tab_content_info);
+//				if (currentFragment != null) {
+//					FragmentTransaction ft = fm.beginTransaction();
+//					ft.remove(currentFragment);
+//					ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
+//					ft.commit();
+//				}
 			}
 		});
 	}

@@ -151,6 +151,14 @@ public class MainActivity extends FragmentActivity implements
 	public void onTabChanged(String tabTag) {
 		Log.d(TAG, "[onTabChanged] + Begin,tabTag:" + tabTag);
 		// TODO Auto-generated method stub
+		
+		//Pop to home page
+        FragmentManager fm = getSupportFragmentManager();
+        if (fm.getBackStackEntryCount() > 0) {
+        	Log.d(TAG, "[onTabChanged] popBackStack ");
+            fm.popBackStack(fm.getBackStackEntryAt(0).getId(),
+                    FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        }
         
 		if (TAB_SEARCH.equals(tabTag)) {
 			updateTab(tabTag, R.id.tab_content_search);

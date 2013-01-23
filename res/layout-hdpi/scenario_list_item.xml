@@ -16,50 +16,72 @@
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/scenario_listitem_height"
+    android:layout_height="wrap_content"
     android:background="@color/green_light" >
     <ImageView 
         android:id="@+id/scenario_listitem_icon_left"
-        android:layout_width="@dimen/scenario_listitem_icon_left_width"
-        android:layout_height="@dimen/scenario_listitem_icon_left_height"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_alignParentLeft="true"
-        android:layout_margin="@dimen/margin_h3"
+        android:layout_margin="@dimen/margin_h2"
+        android:src="@drawable/icn_paper_2x"
         android:contentDescription="@string/dummy_img_des" />
-    
+    <ImageView 
+        android:id="@+id/scenario_listitem_icon_right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="@dimen/margin_h2"
+        android:src="@drawable/icn_accessoryview_2x"
+        android:contentDescription="@string/dummy_img_des" />
     <LinearLayout
         android:id="@+id/text_content_layout"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/scenario_listitem_height"
+        android:layout_height="wrap_content"
         android:layout_toRightOf="@id/scenario_listitem_icon_left"
+        android:layout_toLeftOf="@id/scenario_listitem_icon_right"
         android:orientation="vertical" >
-        <TextView android:id="@+id/scenario_listitem_text_first_line"
-	        android:layout_gravity="center_vertical"
+        <TextView 
+            android:id="@+id/scenario_listitem_text_first_line"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
-	        android:padding="@dimen/margin_h1"
+	        android:layout_gravity="center_vertical"
+	        android:layout_marginTop="@dimen/margin_h2"
+	        android:layout_marginLeft="@dimen/margin_h1"
+	        android:layout_marginRight="@dimen/margin_h1"
+	        android:layout_marginBottom="@dimen/margin_h1"
 	        android:textSize="@dimen/listview_primary_text_size"
+	        android:hint="@string/dummy_text"
 	        android:singleLine="true"
 		    android:ellipsize="marquee"
 		    android:textColor="@color/black_normal"
 		    android:marqueeRepeatLimit="1"
 	        android:gravity="left" />
-        <TextView android:id="@+id/scenario_listitem_text_second_line"
-	        android:layout_gravity="center_vertical"
+        <TextView 
+            android:id="@+id/scenario_listitem_text_second_line"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
-	        android:padding="@dimen/margin_h1"
+	        android:layout_gravity="center_vertical"
+	        android:layout_margin="@dimen/margin_h1"
+	        android:hint="@string/dummy_text"
 	        android:textSize="@dimen/listview_primary_text_size"
 	        android:textColor="@color/black_normal"
 	        android:singleLine="true"
 		    android:ellipsize="marquee"
 		    android:marqueeRepeatLimit="1"
 	        android:gravity="left" />
-        <TextView android:id="@+id/scenario_listitem_text_third_line"
+        <TextView 
+            android:id="@+id/scenario_listitem_text_third_line"
 	        android:layout_gravity="center_vertical"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
-	        android:padding="@dimen/margin_h1"
+	        android:hint="@string/dummy_text"
+	        android:layout_marginTop="@dimen/margin_h1"
+	        android:layout_marginLeft="@dimen/margin_h1"
+	        android:layout_marginRight="@dimen/margin_h1"
+	        android:layout_marginBottom="@dimen/margin_h2"
 	        android:singleLine="true"
 		    android:ellipsize="marquee"
 		    android:marqueeRepeatLimit="1"
@@ -67,13 +89,4 @@
 	        android:textSize="@dimen/listview_primary_text_size"
 	        android:gravity="left" />
     </LinearLayout>
-
-    <ImageView 
-        android:id="@+id/scenario_listitem_icon_right"
-        android:layout_width="@dimen/scenario_listitem_icon_right_width"
-        android:layout_height="@dimen/scenario_listitem_icon_right_height"
-        android:layout_centerVertical="true"
-        android:layout_alignParentRight="true"
-        android:layout_margin="@dimen/margin_h3"
-        android:contentDescription="@string/dummy_img_des" />
 </RelativeLayout>

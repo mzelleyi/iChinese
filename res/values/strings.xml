@@ -27,7 +27,7 @@
     
     <string name="title_bar_btn_help">HELP</string>
     <string name="title_bar_btn_back">Back</string>
-    <string name="title_bar_btn_edit">Edit</string>
+    <string name="title_bar_btn_edit">Delete</string>
     <string name="title_bar_btn_done">Done</string>
     
     <string name="foot_bar_btn_prev">Prev</string>

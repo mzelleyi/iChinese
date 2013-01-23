@@ -61,7 +61,7 @@ public class ResultDetailFragment extends Fragment {
 	private static final int		REMOVE_FROM_BOOKMARK	= 5;
 	private static final int		UPDATE_REMOVE_RESULT	= 6;
 	private static final int        PLAY_CHINESE_AUDIO      = 7;
-	private static final int        PLAY_SENTANCE_AUDIO   = 8;
+	private static final int        PLAY_SENTANCE_AUDIO     = 8;
 	
 	private static DialogFragment mCurrentDialog = null;
 

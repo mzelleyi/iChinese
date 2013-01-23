@@ -458,11 +458,9 @@ public class ScenarioFragment extends Fragment {
 
 	        final Scenario item = this.getItem(position);
 			if (holder != null && item != null) {
-				holder.listImageLeft.setImageResource(R.drawable.icn_paper_2x);
 				holder.listTextView1.setText(item.getTitle_en());
 				holder.listTextView2.setText(item.getTitle_cn());
 				holder.listTextView3.setText(item.getTitle_py());
-				holder.listImageRight.setImageResource(R.drawable.icn_accessoryview_2x);
 				holder.listImageRight.setOnClickListener(new View.OnClickListener()	{
 					@Override
 					public void onClick(View v)

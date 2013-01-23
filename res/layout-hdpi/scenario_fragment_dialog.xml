@@ -63,11 +63,18 @@
             android:gravity="top|center_horizontal" />
     </LinearLayout>
     <LinearLayout 
-        android:id="@+id/dialog_words_define_panel"
-        android:layout_width="match_parent"
+        android:id="@+id/dialog_words_define_panel_0"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_below="@id/dialog_text_panel" >
+    </LinearLayout>
+    <LinearLayout 
+        android:id="@+id/dialog_words_define_panel_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/dialog_words_define_panel_0" >
     </LinearLayout>
     <Button 
         android:id="@+id/scenario_fragment_dialog_btn"
@@ -75,6 +82,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
+        android:background="@drawable/btn_popup_ok"
         android:paddingLeft="@dimen/margin_h6"
         android:paddingTop="@dimen/margin_h4"
         android:paddingRight="@dimen/margin_h6"

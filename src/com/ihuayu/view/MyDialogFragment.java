@@ -191,7 +191,8 @@ public class MyDialogFragment extends DialogFragment {
 			nameLine.setText(dialogItem.getNarrator());
 			secondLine.setText(dialogItem.getSentence_py());
 			
-			LinearLayout wordslayout = (LinearLayout)dialogView.findViewById(R.id.dialog_words_define_panel);
+			LinearLayout wordslayout_0 = (LinearLayout)dialogView.findViewById(R.id.dialog_words_define_panel_0);
+			LinearLayout wordslayout_1 = (LinearLayout)dialogView.findViewById(R.id.dialog_words_define_panel_1);
 			for (int i = 0; i< keyWordList.size() ; i++) {
 				View wordsView = mInflater.inflate(R.layout.scenario_fragment_dialog_words,null);
 				TextView textEn = (TextView)wordsView.findViewById(R.id.dialog_text_word_en);
@@ -209,7 +210,11 @@ public class MyDialogFragment extends DialogFragment {
 					textPY.setText(pyStr);
 					textCN.setText(cnStr);
 				}
-				wordslayout.addView(wordsView, i, new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT));
+				if (i < 2) {
+					wordslayout_0.addView(wordsView);
+				} else if ( i < 4){
+					wordslayout_1.addView(wordsView);
+				}
 			}
 			
 			Button btnOK = (Button)dialogView.findViewById(R.id.scenario_fragment_dialog_btn);

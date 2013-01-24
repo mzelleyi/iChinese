@@ -217,13 +217,13 @@ public class ResultDetailFragment extends Fragment {
 					Log.d(TAG, "[mUihandler handleMessage] UPDATE_ADD_RESULT");
 					if (msg.arg1 > 0) {
 						//mDialogType = MyDialogFragment.ADD_RESULT;
-						MainActivity.TAB_NEED_UPDATE = true;
+						BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED = true;
 						mBeFavorited = true;
 			        	showDialog(MyDialogFragment.ADD_RESULT, true);
 			        	updateFavoriteImg(true);
 					} else {
 						//mDialogType = -1;
-						MainActivity.TAB_NEED_UPDATE = false;
+						BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED = false;
 						mBeFavorited = false;
 						showDialog(MyDialogFragment.ADD_RESULT, false);
 						updateFavoriteImg(false);
@@ -235,13 +235,13 @@ public class ResultDetailFragment extends Fragment {
 					if (msg.arg1 > 0) {
 						//mDialogType = -1;
 						mBeFavorited = false;
-						MainActivity.TAB_NEED_UPDATE = true;
+						BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED = true;
 						showDialog(MyDialogFragment.REMOVE_RESULT, true);
 						updateFavoriteImg(false);
 					} else {
 						//mDialogType = -1;
 						mBeFavorited = true;
-						MainActivity.TAB_NEED_UPDATE = false;
+						BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED = false;
 						showDialog(MyDialogFragment.REMOVE_RESULT, false);
 						updateFavoriteImg(true);
 					}

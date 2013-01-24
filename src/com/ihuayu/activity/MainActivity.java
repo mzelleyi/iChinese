@@ -25,15 +25,14 @@ import com.ihuayu.activity.operation.DBManagerment;
 public class MainActivity extends FragmentActivity implements
 		OnTabChangeListener {
 
-	public static DBManagerment dbManagerment = null;
-	
-	private static final String TAG = "iHuayu:MainActivity";
-	private static final String TAB_SEARCH = "Search";
-	private static final String TAB_SCENARIO = "Scenario";
-	private static final String TAB_BOOKMARK = "Bookmark";
-	private static final String TAB_INFO = "Info";
-	private TabHost mTabHost = null;
-	public static boolean TAB_NEED_UPDATE = false;
+	public static DBManagerment	dbManagerment	= null;
+
+	private static final String	TAG				= "iHuayu:MainActivity";
+	private static final String	TAB_SEARCH		= "Search";
+	private static final String	TAB_SCENARIO	= "Scenario";
+	private static final String	TAB_BOOKMARK	= "Bookmark";
+	private static final String	TAB_INFO		= "Info";
+	private TabHost				mTabHost		= null;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -197,19 +196,25 @@ public class MainActivity extends FragmentActivity implements
 			} else {
 				Log.e(TAG, "Error Tab Type");
 			}
-			MainActivity.TAB_NEED_UPDATE = false;
+			BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED = false;
 			// Add the fragment
 			ft.add(viewHolderId, newFragment);
 			ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 			ft.commit();
 		} else {
-			if (TAB_NEED_UPDATE && TAB_BOOKMARK.equals(tabTag)) {
-				Log.d(TAG,"[updateTab] new BookmarkFragment, do replace");
-				MainActivity.TAB_NEED_UPDATE = false;
-				newFragment = BookmarkFragment.newInstance();
-				ft.replace(viewHolderId, newFragment);
-				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-				ft.commit();
+			if (BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED && TAB_BOOKMARK.equals(tabTag)) {
+				//Log.i(TAG,"[updateTab] new BookmarkFragment, do replace");
+				Log.i(TAG,"[updateTab] BookmarkFragment do removeIndicateWindow");
+				BookmarkFragment.removeIndicateWindow();
+				Log.i(TAG,"[updateTab] BookmarkFragment do restartLoader");
+				BookmarkFragment mBookmarkFragment = (BookmarkFragment)newFragment;
+				mBookmarkFragment.getLoaderManager().restartLoader(0, null, mBookmarkFragment.mBookmarkListFragment);
+				BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED = false;
+
+				//newFragment = BookmarkFragment.newInstance();
+				//ft.replace(viewHolderId, newFragment);
+				//ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+				//ft.commit();
 			} else {
 				Log.d(TAG,"[updateTab] find fragment != null, do setCurrentTabByTag");
 				mTabHost.setCurrentTabByTag(tabTag);

@@ -10,9 +10,11 @@ import com.ihuayu.R;
 import com.ihuayu.activity.db.entity.Dictionary;
 import com.ihuayu.activity.db.entity.FuzzyResult;
 import com.ihuayu.activity.db.entity.QueryType;
+import com.ihuayu.activity.rest.AudioPlayer;
 import com.ihuayu.view.MyDialogFragment;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -52,6 +54,7 @@ public class SearchFragment extends Fragment {
 	private static final int			MSG_REFRESH_SUGGEST_LISTVIEW	= 2;
 	private static final int			MSG_DO_FUZZY_SEARCH				= 3;
 	private static final int			MSG_REFRESH_FUZZY_RESULT		= 4;
+	private static final int            MSG_PLAY_AUDIO                  = 5;
 
 	private static final int			VIEW_TYPE_SUGGEST				= 0;
 	private static final int			VIEW_TYPE_FUZZY				    = 1;
@@ -302,16 +305,25 @@ public class SearchFragment extends Fragment {
         			mDicList.add(object);
         		}
         		
-        		mDivider.setVisibility(View.VISIBLE);
-				if (!fuzzyResult.isExactResult()) {
-					mFuzzyHint.setVisibility(View.VISIBLE);
-					//String hintStr = (String) mFuzzyHint.getText();
-					//SpannableString spanStr = new SpannableString(hintStr);
-					//spanStr.setSpan(new ForegroundColorSpan(Color.BLUE), firstIndex, lastIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-					//mFuzzyHint.setText(spanStr);
+				if (mDicList.size() > 0) {
+					mDivider.setTextColor(Color.WHITE);
+					mDivider.setVisibility(View.VISIBLE);
+					mDivider.invalidate();
+					if (!fuzzyResult.isExactResult()) {
+						mFuzzyHint.setTextColor(Color.BLACK);
+						mFuzzyHint.setVisibility(View.VISIBLE);
+						mFuzzyHint.invalidate();
+						//String hintStr = (String) mFuzzyHint.getText();
+						//SpannableString spanStr = new SpannableString(hintStr);
+						//spanStr.setSpan(new ForegroundColorSpan(Color.BLUE), firstIndex, lastIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+						//mFuzzyHint.setText(spanStr);
+					} else {
+						mFuzzyHint.setVisibility(View.GONE);
+					}
 				} else {
+					mDivider.setVisibility(View.GONE);
 					mFuzzyHint.setVisibility(View.GONE);
-				}				
+				}
 
 				//mCurFilter = !TextUtils.isEmpty(searchResultStr) ? searchResultStr : null;
 				//mAdapter.getFilter().filter(mCurFilter);
@@ -360,6 +372,12 @@ public class SearchFragment extends Fragment {
 				doFuzzySearch(doSearchStr);
 				break;
 			}
+			case SearchFragment.MSG_PLAY_AUDIO: {
+				Log.d(TAG, "[NonUiHandler] handle msg [MSG_PLAY_AUDIO]");
+				String doSearchStr = (String) msg.obj;
+				doPlayAudio((String) msg.obj);
+				break;
+			}
 			default:
 				Log.d(TAG, "[NonUihandler][handleMessage] Something wrong in handleMessage()");
 				break;
@@ -400,6 +418,32 @@ public class SearchFragment extends Fragment {
 				mUiHandler.sendMessage(msg2);
 			}
 			Log.d(TAG, "[NonUihandler][doFuzzySearch] + End");
+		}
+		
+		private void doPlayAudio(String audio) {
+			Log.d(TAG, "[NonUihandler][doPlayAudio] + Begin");
+			String audioStr = null;
+			if (audio != null) {
+				audioStr = audio;
+			}
+			Log.d(TAG, "[NonUihandler][doPlayAudio] audioStr = "+audioStr);
+			
+			AudioPlayer mAudioPlayer = new AudioPlayer();
+			try {
+				mAudioPlayer.playAudio(parentActivity, audioStr);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+//			if (mUiHandler != null)
+//			{
+//				if (mUiHandler.hasMessages(UPDATE_FAV_IMAGE)) {
+//					mUiHandler.removeMessages(UPDATE_FAV_IMAGE);
+//    			}
+//				Message msg = Message.obtain(mUiHandler, UPDATE_FAV_IMAGE, mBeFavorited);
+//				mUiHandler.sendMessageDelayed(msg, 100);
+//			}
+			Log.d(TAG, "[NonUihandler][doPlayAudio] + End");
 		}
 	}
 	
@@ -455,16 +499,32 @@ public class SearchFragment extends Fragment {
                 view = convertView;
             }
 
-            Dictionary item = getItem(position);
+            final Dictionary item = getItem(position);
             if (null != view) {
             	if (getItemViewType(position) == VIEW_TYPE_SUGGEST) {
             		((TextView)view.findViewById(R.id.search_result_listitem_text)).setText(item.getKeyword());
             	} else {
-            		((ImageView)view.findViewById(R.id.bookmark_listitem_icon_speaker)).setImageResource(R.drawable.btn_speaker_black);
 					((TextView)view.findViewById(R.id.bookmark_listitem_text_first_line)).setText(item.getKeyword());
 					((TextView)view.findViewById(R.id.bookmark_listitem_text_second_line)).setText(item.getDestiontion());
 					((TextView)view.findViewById(R.id.bookmark_listitem_text_third_line)).setText(item.getChineser_tone_py());
 					((TextView)view.findViewById(R.id.bookmark_listitem_text_type)).setText(item.getDic_catagory());
+					((ImageView)view.findViewById(R.id.bookmark_listitem_icon_speaker)).setOnClickListener(new View.OnClickListener()
+					{
+						@Override
+						public void onClick(View v)
+						{
+							// TODO Auto-generated method stub
+							String strAudio = item.getChinese_audio();
+							Log.d(TAG, "[onClick] Chinese_audio = "+strAudio);
+					   		if (mNonUiHandler != null) {
+								if (mNonUiHandler.hasMessages(MSG_PLAY_AUDIO)) {
+									mNonUiHandler.removeMessages(MSG_PLAY_AUDIO);
+								}
+								Message msg = Message.obtain(mNonUiHandler, MSG_PLAY_AUDIO,strAudio);
+								mNonUiHandler.sendMessage(msg);
+							}
+						}
+					});
             	}
             }
             return view;

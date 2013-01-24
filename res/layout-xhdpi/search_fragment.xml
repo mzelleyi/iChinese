@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/tab_search_fragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -76,18 +75,17 @@
         android:contentDescription="@string/dummy_img_des"
         android:scaleType="fitXY"
         android:src="@drawable/app_intro" />
-    <TextView
+	<TextView
 	    android:id="@+id/search_fuzzy_hint_text"
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
 	    android:layout_margin="@dimen/margin_h3"
-	    android:layout_gravity="center"
-	    android:gravity="center"
+	    android:gravity="center_horizontal"
 	    android:textColor="@color/black_normal"
 	    android:visibility="gone"
+	    android:minLines="2"
 	    android:hint="@string/search_fuzzy_text_hint"
-	    android:textSize="@dimen/listview_primary_text_size"
-	    android:background="@color/green_light" />
+	    android:textSize="@dimen/search_result_fuzzy_text_hint_size" />
     <TextView
         android:id="@+id/search_fuzzy_divider_text"
         android:layout_width="match_parent"
@@ -97,9 +95,10 @@
         android:visibility="gone"
         android:gravity="left"
         android:singleLine="true"
-        android:textColorHighlight="@color/white_normal"
-        android:hint="@string/search_dictionariy_divider_hint"
+        android:textColor="@color/white_normal"
+        android:textStyle="bold"
         android:background="@drawable/bg_scenario"
+        android:hint="@string/search_dictionariy_divider_hint"
         android:textSize="@dimen/listview_primary_text_size" />
     <ListView
 	        android:id="@+id/search_result_list"

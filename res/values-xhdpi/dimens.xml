@@ -22,6 +22,7 @@
     <dimen name="result_description_left_width">460px</dimen>
     
     <dimen name="search_result_empty_text_hint_size">20sp</dimen>
+    <dimen name="search_result_fuzzy_text_hint_size">20sp</dimen>
     
     <dimen name="listview_primary_text_size">16sp</dimen>
     <dimen name="listview_second_text_size">14sp</dimen>

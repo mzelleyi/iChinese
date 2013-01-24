@@ -12,8 +12,11 @@ import java.util.List;
 import sg.gov.nhb.ihuayu.activity.db.entity.Dictionary;
 import sg.gov.nhb.ihuayu.activity.rest.AudioPlayer;
 
+<<<<<<< HEAD:src/sg/gov/nhb/ihuayu/activity/BookmarkFragment.java
 import sg.gov.nhb.ihuayu.R;
 
+=======
+>>>>>>> 3af46ce26bc9c0222153ff1319d6b50e8cd47bad:src/com/ihuayu/activity/BookmarkFragment.java
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;

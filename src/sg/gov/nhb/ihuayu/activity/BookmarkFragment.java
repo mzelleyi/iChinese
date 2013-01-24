@@ -12,11 +12,8 @@ import java.util.List;
 import sg.gov.nhb.ihuayu.activity.db.entity.Dictionary;
 import sg.gov.nhb.ihuayu.activity.rest.AudioPlayer;
 
-<<<<<<< HEAD:src/sg/gov/nhb/ihuayu/activity/BookmarkFragment.java
 import sg.gov.nhb.ihuayu.R;
 
-=======
->>>>>>> 3af46ce26bc9c0222153ff1319d6b50e8cd47bad:src/com/ihuayu/activity/BookmarkFragment.java
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
@@ -67,6 +64,7 @@ public class BookmarkFragment extends Fragment {
 	private static TextView			mDialogText					= null;
 	private static boolean			mShowing;
 	private static boolean			mReady;
+	private static char             mFirstLetter                = Character.MAX_VALUE;
 	private static char				mPrevLetter					= Character.MIN_VALUE;
 
 	private static final int		VIEW_TYPE_NORMAL			= 0;
@@ -76,8 +74,8 @@ public class BookmarkFragment extends Fragment {
 	private static final int		PLAY_AUDIO					= 2;
 	private static final int		REMOVE_SUCCESS				= 3;
 	private static final int		REMOVE_FAILED				= 4;
-//	private static final int		INDICATE_ADD				= 5;
-//	private static final int		INDICATE_HIDE				= 6;
+	private static final int		INDICATE_ADD				= 5;
+	private static final int		INDICATE_HIDE				= 6;
 
 	// Define Thread Name
 	private static final String		THREAD_NAME					= "BookmarkFragmentThread";
@@ -202,16 +200,16 @@ public class BookmarkFragment extends Fragment {
 					toast.show();
 					break;
 				}
-//				case INDICATE_HIDE: {
-//					Log.d(TAG, "[mUihandler handleMessage] INDICATE_HIDE");
-//					hideIndicateWindow();
-//					break;
-//				}
-//				case INDICATE_ADD: {
-//					Log.d(TAG, "[mUihandler handleMessage] INDICATE_ADD");
-//					addIndicateWindow();
-//					break;
-//				}
+				case INDICATE_HIDE: {
+					Log.d(TAG, "[mUihandler handleMessage] INDICATE_HIDE");
+					hideIndicateWindow();
+					break;
+				}
+				case INDICATE_ADD: {
+					Log.d(TAG, "[mUihandler handleMessage] INDICATE_ADD");
+					addIndicateWindow();
+					break;
+				}
 				default:{
 					Log.e(TAG, "[mUihandler handleMessage] Something wrong!!!");
 					break;
@@ -362,7 +360,7 @@ public class BookmarkFragment extends Fragment {
 		// List<Character> sDividerCharList = new ArrayList<Character>();
 
 		//The origin data that get from DB.
-		List<Dictionary> mOriginBookmarkList = null;
+		List<Dictionary> mOriginBookmarkList = new ArrayList<Dictionary>();
 		//The data that fill with divider elements.
 		List<Dictionary> mWithDividerList = new ArrayList<Dictionary>();
 		//The list used to keep need remove list normal item.
@@ -436,8 +434,8 @@ public class BookmarkFragment extends Fragment {
 		{
 			Log.d(TAG, "[onDestroyView] + Begin");
 			// TODO Auto-generated method stub
-			super.onDestroyView();
 			removeIndicateWindow();
+			super.onDestroyView();
 		}
 
 		@Override
@@ -452,8 +450,13 @@ public class BookmarkFragment extends Fragment {
 			// Insert desired behavior here.
 			Log.d(TAG, "[BookmarkListFragment][onItemClick] + position="+position+",id="+id);
 			if (mAdapter.getItemViewType(position) == VIEW_TYPE_NORMAL) {
+				
+				Dictionary dictionary = mAdapter.getItem(position);
+				int index = mOriginBookmarkList.indexOf(dictionary);
+				Log.d(TAG, "[BookmarkListFragment][onItemClick] dictionary index="+index);
+				
 				FragmentManager fm = mParentActivity.getSupportFragmentManager();
-				Fragment newFragment = ResultDetailFragment.newInstance(mOriginBookmarkList,position);
+				Fragment newFragment = ResultDetailFragment.newInstance(mOriginBookmarkList,index);
 				FragmentTransaction ft = fm.beginTransaction();
 				ft.replace(R.id.tab_content_bookmark, newFragment);
 				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
@@ -479,36 +482,37 @@ public class BookmarkFragment extends Fragment {
 			Log.d(TAG, "[BookmarkListFragment] mOriginBookmarkList Size = "+ data.size());
 			
 			//Save origin get data list
-			mOriginBookmarkList = data;
+			//mOriginBookmarkList = data;
 			
-//			mOriginBookmarkList = new ArrayList<Dictionary>(data.size());
-//	        for (int i=0; i<data.size(); i++) {
-//	            mOriginBookmarkList.add(data.get(i));
-//	        }
+			int originSize = data.size();
+			mOriginBookmarkList = new ArrayList<Dictionary>(originSize);
+			for (int i = 0; i < originSize; i++) {
+				mOriginBookmarkList.add(data.get(i));
+			}
 //			mWithDividerList = new ArrayList<Dictionary>(data.size());
 //			for (int i = 0; i < data.size(); i++) {
 //				mWithDividerList.add(data.get(i));
 //			}
 			
 			mWithDividerList.clear();
-			if (data.size() > 0) {
-				Dictionary firstEntry = data.get(0);
+			if (originSize > 0) {
+				Dictionary firstEntry = mOriginBookmarkList.get(0);
 	        	String temp = String.valueOf(firstEntry.getKeyword().charAt(0));
 	        	
 	        	//New First Entry As Divider
 	        	Dictionary firstAddEntry = new Dictionary();
-	        	firstAddEntry.setKeyword(data.get(0).getKeyword());
-	        	firstAddEntry.setId(data.get(0).getId());
+	        	firstAddEntry.setKeyword(mOriginBookmarkList.get(0).getKeyword());
+	        	firstAddEntry.setId(mOriginBookmarkList.get(0).getId());
 	        	firstAddEntry.setIsDivider(true);
 	        	mWithDividerList.add(firstAddEntry);
 	        	
 	        	//Add to dividers list
 	        	//sDividerCharList.add(firstAddEntry.getLabel().charAt(0));
 	        	Log.d(TAG, "add isDivider = "+firstAddEntry.getIsDivider()+"; entry = "+firstAddEntry.getKeyword());
-	            for (int i = 0; i < data.size() ; i++) {
+	            for (int i = 0; i < originSize ; i++) {
 	            	Log.d(TAG, " i = "+i);
 	            	//Add char flag for divider
-	            	Dictionary entry = data.get(i);
+	            	Dictionary entry = mOriginBookmarkList.get(i);
 	            	Character thisChar = entry.getKeyword().charAt(0);
 	            	if(String.valueOf(thisChar).equalsIgnoreCase(temp)) {
 	    	        	Log.d(TAG, "add isDivider = "+entry.getIsDivider()+	"; entry = "+entry.getKeyword());
@@ -520,8 +524,8 @@ public class BookmarkFragment extends Fragment {
 	            		//New duplicate fist char entry as list item
 	            		//Dictionary addEntry = new Dictionary(data.get(i).getApplicationInfo());
 	                   	Dictionary addEntry = new Dictionary();
-	                   	addEntry.setKeyword(data.get(i).getKeyword());
-	                   	addEntry.setId(data.get(i).getId());
+	                   	addEntry.setKeyword(mOriginBookmarkList.get(i).getKeyword());
+	                   	addEntry.setId(mOriginBookmarkList.get(i).getId());
 	                   	addEntry.setIsDivider(true);
 	    	        	Log.d(TAG, "add isDivider = "+addEntry.getIsDivider()+"; entry = "+addEntry.getKeyword());
 	    	        	//sDividerCharList.add(addEntry.getLabel().charAt(0));
@@ -549,31 +553,31 @@ public class BookmarkFragment extends Fragment {
 			// Set Indicate For ListView
 			mDialogText = (TextView) mInflater.inflate(R.layout.list_position_indicate, null);
 	        mDialogText.setVisibility(View.INVISIBLE);
-	        addIndicateWindow();
-//				if (mUiHandler.hasMessages(INDICATE_ADD)) {
-//					mUiHandler.removeMessages(INDICATE_ADD);
-//				}
-//				Log.d(TAG, "Send INDICATE_ADD Msg");
-//		        mUiHandler.sendEmptyMessage(INDICATE_ADD);
+			if (mUiHandler.hasMessages(INDICATE_ADD)) {
+				mUiHandler.removeMessages(INDICATE_ADD);
+			}
+			Log.d(TAG, "Send INDICATE_ADD Msg delay 100");
+	        mUiHandler.sendEmptyMessageDelayed(INDICATE_ADD, 100);
 			
 			mListView = this.getListView();
 			if (null != mListView) {
 				mListView.setOnScrollListener(new AbsListView.OnScrollListener()
 				{
-					
 					@Override
 					public void onScrollStateChanged(AbsListView view, int scrollState)
 					{
 						// TODO Auto-generated method stub
 						Log.d(TAG, "[onScrollStateChanged] + scrollState = "+scrollState);
-						if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE) {
-							hideIndicateWindow();
-//							if (mUiHandler.hasMessages(INDICATE_HIDE)) {
-//			    				mUiHandler.removeMessages(INDICATE_HIDE);
-//			    			}
-//			    			Log.d(TAG, "[onScroll] Send INDICATE_HIDE Msg");
-//				            mUiHandler.sendEmptyMessage(INDICATE_HIDE);
-						}
+//						if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE) {
+//							hideIndicateWindow();
+////							if (mUiHandler.hasMessages(INDICATE_HIDE)) {
+////			    				mUiHandler.removeMessages(INDICATE_HIDE);
+////			    			}
+////			    			Log.d(TAG, "[onScroll] Send INDICATE_HIDE Msg");
+////				            mUiHandler.sendEmptyMessage(INDICATE_HIDE);
+//						} else if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+//
+//						}
 					}
 					
 					@Override
@@ -584,15 +588,20 @@ public class BookmarkFragment extends Fragment {
 								+",visibleItemCount = "+visibleItemCount+",totalItemCount = "+totalItemCount);
 				        if (mReady) {
 				        	if (mWithDividerList.size() > 0) {
-				        		char firstLetter = mWithDividerList.get(firstVisibleItem).getKeyword().charAt(0);
-					            
-					            if (!mShowing && firstLetter != mPrevLetter) {
+				        		//char firstLetter = mWithDividerList.get(firstVisibleItem).getKeyword().charAt(0);
+				        		mFirstLetter = mWithDividerList.get(firstVisibleItem).getKeyword().charAt(0);
+				        		if (!mShowing && mFirstLetter != mPrevLetter) {
 					                mShowing = true;
 					                Log.i(TAG, "show mDialogText");
 					                mDialogText.setVisibility(View.VISIBLE);
-					                mDialogText.setText(((Character)firstLetter).toString());
 					            }
-					            mPrevLetter = firstLetter;
+				        		mDialogText.setText(((Character)mFirstLetter).toString());
+				        		if (mUiHandler.hasMessages(INDICATE_HIDE)) {
+				    				mUiHandler.removeMessages(INDICATE_HIDE);
+				    			}
+				    			Log.d(TAG, "[onScroll] Send INDICATE_HIDE Msg Delay 500");
+					            mUiHandler.sendEmptyMessageDelayed(INDICATE_HIDE,500);
+					            mPrevLetter = mFirstLetter;
 				        	}
 				        }
 					}
@@ -637,7 +646,6 @@ public class BookmarkFragment extends Fragment {
             for (Dictionary entry : mRemoveBookmarkList) {
             	mWithDividerList.remove(entry);
             }
-            mRemoveBookmarkList.clear();
             Log.d(TAG, "[BookmarkListFragment] After Remove Delete Item, The Size ="+mWithDividerList.size());
             
 			
@@ -669,7 +677,6 @@ public class BookmarkFragment extends Fragment {
             	mWithDividerList.remove(entry);
             	//sDividerCharList.remove(entry.getLabel().charAt(0));
             }
-            mRemoveDividerList.clear();
             //Log.d(TAG, "[BookmarkListFragment] After Remove Unused Divider, The sDividerCharList Size ="+sDividerCharList.size());
             Log.d(TAG, "[BookmarkListFragment] After Remove Unused Divider, The mWithDividerList Size ="+mWithDividerList.size());
 			

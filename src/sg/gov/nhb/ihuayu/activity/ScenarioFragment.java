@@ -135,13 +135,13 @@ public class ScenarioFragment extends Fragment {
 		public void onListItemClick(ListView l, View v, int position, long id) {
 			// Insert desired behavior here.
 			Log.i(TAG, "[ScenarioListFragment][onListItemClick] Item clicked: " + id);
-//			FragmentManager fm = parentActivity.getSupportFragmentManager();
-//			Fragment newFragment = ResultDetailFragment.newInstance(mOriginScenarioList,position);
-//			FragmentTransaction ft = fm.beginTransaction();
-//			ft.add(R.id.tab_content_scenario, newFragment);
-//			ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-//			ft.addToBackStack(null);
-//			ft.commit();
+			FragmentManager fm = parentActivity.getSupportFragmentManager();
+			Fragment newFragment = ScenarioDetailFragment.newInstance(mAdapter.getItem(position));
+			FragmentTransaction ft = fm.beginTransaction();
+			ft.replace(R.id.tab_content_scenario, newFragment);
+			ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+			ft.addToBackStack(null);
+			ft.commit();
 		}
 
 		public Loader<List<Scenario>> onCreateLoader(int id, Bundle args) {
@@ -173,91 +173,17 @@ public class ScenarioFragment extends Fragment {
 		}
 	}
 	
-//	/**
-//	 * This class holds the per-item data in our Loader.
-//	 */
-//	public static class ScenarioEntry {
-//	    public ScenarioEntry(ScenarioListLoader loader, ApplicationInfo info) {
-//	        mLoader = loader;
-//	        mInfo = info;
-//	        mApkFile = new File(info.sourceDir);
-//	    }
-//
-//	    public ApplicationInfo getApplicationInfo() {
-//	        return mInfo;
-//	    }
-//
-//	    public String getLabel() {
-//	        return mLabel;
-//	    }
-//
-//	    public Drawable getIcon() {
-//	        if (mIcon == null) {
-//	            if (mApkFile.exists()) {
-//	                mIcon = mInfo.loadIcon(mLoader.mPm);
-//	                return mIcon;
-//	            } else {
-//	                mMounted = false;
-//	            }
-//	        } else if (!mMounted) {
-//	            // If the Scenario wasn't mounted but is now mounted, reload
-//	            // its icon.
-//	            if (mApkFile.exists()) {
-//	                mMounted = true;
-//	                mIcon = mInfo.loadIcon(mLoader.mPm);
-//	                return mIcon;
-//	            }
-//	        } else {
-//	            return mIcon;
-//	        }
-//
-//	        return mLoader.getContext().getResources().getDrawable(
-//	                android.R.drawable.sym_def_app_icon);
-//	    }
-//
-//	    @Override 
-//	    public String toString() {
-//	        return mLabel;
-//	    }
-//
-//	    void loadLabel(Context context) {
-//	        if (mLabel == null || !mMounted) {
-//	            if (!mApkFile.exists()) {
-//	                mMounted = false;
-//	                mLabel = mInfo.packageName;
-//	            } else {
-//	                mMounted = true;
-//	                CharSequence label = mInfo.loadLabel(context.getPackageManager());
-//	                mLabel = label != null ? label.toString() : mInfo.packageName;
-//	            }
-//	        }
-//	    }
-//
-//	    private final ScenarioListLoader mLoader;
-//	    private final ApplicationInfo mInfo;
-//	    private final File mApkFile;
-//	    private String mLabel;
-//	    private Drawable mIcon;
-//	    private boolean mMounted;
-//	}
 
 	/**
-	 * A custom Loader that loads all of the installed applications.
+	 * A custom Loader that loads all of the Scenarios from DB.
 	 */
 	public static class ScenarioListLoader extends AsyncTaskLoader<List<Scenario>> {
 	    //final InterestingConfigChanges mLastConfig = new InterestingConfigChanges();
-	    //final PackageManager mPm;
 
 	    List<Scenario> mScenarioList;
-	    //PackageIntentReceiver mPackageObserver;
 
 	    public ScenarioListLoader(Context context) {
 	        super(context);
-
-	        // Retrieve the package manager for later use; note we don't
-	        // use 'context' directly but instead the save global application
-	        // context returned by getContext().
-	        // mPm = getContext().getPackageManager();
 	    }
 
 	    /**
@@ -272,13 +198,6 @@ public class ScenarioFragment extends Fragment {
 	    	
 	    	mScenarioList = MainActivity.dbManagerment.getAllScenarios();
 	    	
-//	        List<ApplicationInfo> apps = mPm.getInstalledApplications(
-//	                PackageManager.GET_UNINSTALLED_PACKAGES |
-//	                PackageManager.GET_DISABLED_COMPONENTS);
-//	        if (apps == null) {
-//	            apps = new ArrayList<ApplicationInfo>();
-//	        }
-
 //	        final Context context = getContext();
 
 	        // Create corresponding array of entries and load their labels.
@@ -409,7 +328,6 @@ public class ScenarioFragment extends Fragment {
 
 	    public ScenarioListAdapter(Context context) {
 	        //super(context, android.R.layout.simple_list_item_2);
-	        //super(context, R.layout.scenario_list_item);
 	    	super(context, R.layout.scenario_list_item);
 	        mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	    }
@@ -481,33 +399,6 @@ public class ScenarioFragment extends Fragment {
 	    }
 	}
 
-//	/**
-//	 * Helper class to look for interesting changes to the installed apps
-//	 * so that the loader can be updated.
-//	 */
-//	public static class PackageIntentReceiver extends BroadcastReceiver {
-//	    final ScenarioListLoader mLoader;
-//
-//	    public PackageIntentReceiver(ScenarioListLoader loader) {
-//	        mLoader = loader;
-//	        IntentFilter filter = new IntentFilter(Intent.ACTION_PACKAGE_ADDED);
-//	        filter.addAction(Intent.ACTION_PACKAGE_REMOVED);
-//	        filter.addAction(Intent.ACTION_PACKAGE_CHANGED);
-//	        filter.addDataScheme("package");
-//	        mLoader.getContext().registerReceiver(this, filter);
-//	        // Register for events related to sdcard installation.
-//	        IntentFilter sdFilter = new IntentFilter();
-//	        sdFilter.addAction(IntentCompat.ACTION_EXTERNAL_APPLICATIONS_AVAILABLE);
-//	        sdFilter.addAction(IntentCompat.ACTION_EXTERNAL_APPLICATIONS_UNAVAILABLE);
-//	        mLoader.getContext().registerReceiver(this, sdFilter);
-//	    }
-//
-//	    @Override 
-//	    public void onReceive(Context context, Intent intent) {
-//	        // Tell the loader about the change.
-//	        mLoader.onContentChanged();
-//	    }
-//	}
 
 //	/**
 //	 * Perform alphabetical comparison of application entry objects.

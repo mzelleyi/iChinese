@@ -13,13 +13,7 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-
-<resources>
-   <color name="cyan">#00FFFF</color> 
-   <color name="black_normal">#000000</color>
-   <color name="white_normal">#FFFFFF</color>
-   <color name="green_light">#BBFFFF</color>
-   <color name="listview_press">#00BFFF</color>
-   <color name="red_normal">#FF0000</color>
-   <color name="blue_normal">#0000FF</color>
-</resources>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true"
+          android:color="#00BBFF"/> <!-- pressed -->
+    <item android:color="#BBFFFF" />   <!-- default --></selector>

@@ -17,8 +17,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/bookmark_listitem_height"
-    android:background="#BBFFFF" >
+    android:layout_height="@dimen/bookmark_listitem_height" >
     
     <ImageView
         android:id="@+id/bookmark_listitem_icon_speaker"

@@ -553,11 +553,12 @@ public class BookmarkFragment extends Fragment {
 			// Set Indicate For ListView
 			mDialogText = (TextView) mInflater.inflate(R.layout.list_position_indicate, null);
 	        mDialogText.setVisibility(View.INVISIBLE);
-			if (mUiHandler.hasMessages(INDICATE_ADD)) {
-				mUiHandler.removeMessages(INDICATE_ADD);
-			}
-			Log.d(TAG, "Send INDICATE_ADD Msg delay 100");
-	        mUiHandler.sendEmptyMessageDelayed(INDICATE_ADD, 100);
+	        addIndicateWindow();
+//			if (mUiHandler.hasMessages(INDICATE_ADD)) {
+//				mUiHandler.removeMessages(INDICATE_ADD);
+//			}
+//			Log.d(TAG, "Send INDICATE_ADD Msg delay 0");
+//	        mUiHandler.sendEmptyMessage(INDICATE_ADD);
 			
 			mListView = this.getListView();
 			if (null != mListView) {

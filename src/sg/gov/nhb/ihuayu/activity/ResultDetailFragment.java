@@ -11,6 +11,7 @@ import sg.gov.nhb.ihuayu.view.MyDialogFragment;
 import sg.gov.nhb.ihuayu.R;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -25,6 +26,9 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -770,7 +774,14 @@ public class ResultDetailFragment extends Fragment {
 				{
 					case 0:
 					{
-						TextLine.setText(item.getSample_sentance_en());
+						String sectenceStr = item.getSample_sentance_en();
+						SpannableString spanStr = new SpannableString(sectenceStr);
+			            String hightStr = item.getKeyword();
+		            	int firstIndex = sectenceStr.indexOf(hightStr);
+		            	int lastIndex = firstIndex + hightStr.length();
+		            	spanStr.setSpan(new ForegroundColorSpan(Color.RED), firstIndex, lastIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+						TextLine.setText(spanStr);
+						
 						speakIcon.setVisibility(View.INVISIBLE);
 						break;
 					}
@@ -792,12 +803,25 @@ public class ResultDetailFragment extends Fragment {
 								}
 							}
 						});
-						TextLine.setText(item.getSample_sentence_ch());
+						String sectenceStr = item.getSample_sentence_ch();
+						SpannableString spanStr = new SpannableString(sectenceStr);
+			            String hightStr = item.getDestiontion();
+		            	int firstIndex = sectenceStr.indexOf(hightStr);
+		            	int lastIndex = firstIndex + hightStr.length();
+		            	spanStr.setSpan(new ForegroundColorSpan(Color.RED), firstIndex, lastIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+						TextLine.setText(spanStr);
 						break;
 					}
 					case 2:
 					{
-						TextLine.setText(item.getSample_sentance_py());
+						String sectenceStr = item.getSample_sentance_py();
+						SpannableString spanStr = new SpannableString(sectenceStr);
+			            String hightStr = item.getChineser_tone_py();
+		            	int firstIndex = sectenceStr.indexOf(hightStr);
+		            	int lastIndex = firstIndex + hightStr.length();
+		            	spanStr.setSpan(new ForegroundColorSpan(Color.RED), firstIndex, lastIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+						TextLine.setText(spanStr);
+						
 						speakIcon.setVisibility(View.INVISIBLE);
 						break;
 					}

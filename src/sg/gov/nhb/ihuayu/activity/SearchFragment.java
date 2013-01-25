@@ -307,13 +307,9 @@ public class SearchFragment extends Fragment {
         		}
         		
 				if (mDicList.size() > 0) {
-					mDivider.setTextColor(Color.WHITE);
 					mDivider.setVisibility(View.VISIBLE);
-					mDivider.invalidate();
 					if (!fuzzyResult.isExactResult()) {
-						mFuzzyHint.setTextColor(Color.BLACK);
 						mFuzzyHint.setVisibility(View.VISIBLE);
-						mFuzzyHint.invalidate();
 						//String hintStr = (String) mFuzzyHint.getText();
 						//SpannableString spanStr = new SpannableString(hintStr);
 						//spanStr.setSpan(new ForegroundColorSpan(Color.BLUE), firstIndex, lastIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);

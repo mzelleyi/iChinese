@@ -81,7 +81,7 @@
 	    android:layout_height="wrap_content"
 	    android:layout_margin="@dimen/margin_h3"
 	    android:gravity="center_horizontal"
-	    android:textColor="@color/black_normal"
+	    android:textColorHint="@color/black_normal"
 	    android:visibility="gone"
 	    android:minLines="2"
 	    android:hint="@string/search_fuzzy_text_hint"
@@ -90,16 +90,16 @@
         android:id="@+id/search_fuzzy_divider_text"
         android:layout_width="match_parent"
         android:layout_height="@dimen/bookmark_listitem_separate_height"
-        android:paddingLeft="@dimen/margin_h3"
         android:layout_gravity="center_vertical"
-        android:visibility="gone"
-        android:gravity="left"
-        android:singleLine="true"
-        android:textColor="@color/white_normal"
-        android:textStyle="bold"
         android:background="@drawable/bg_scenario"
+        android:gravity="left"
         android:hint="@string/search_dictionariy_divider_hint"
-        android:textSize="@dimen/listview_primary_text_size" />
+        android:paddingLeft="@dimen/margin_h3"
+        android:textColorHint="@color/white_normal"
+        android:textSize="@dimen/listview_primary_text_size"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
     <ListView
 	        android:id="@+id/search_result_list"
 	        android:layout_width="match_parent"
@@ -111,21 +111,24 @@
 	    android:layout_width="match_parent"
 	    android:layout_height="match_parent"
 	    android:paddingTop="@dimen/margin_h7" >
-	    <TextView android:id="@+id/search_empty_view_text_firstline"
+	    <TextView 
+	        android:id="@+id/search_empty_view_text_firstline"
 	        android:layout_gravity="center_vertical"
 	        android:gravity="center"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
 	        android:hint="@string/search_no_result_hint_first_line"
 	        android:textStyle="bold"
-	        android:textSize="@dimen/search_result_empty_text_hint_size"
-	        android:textColor="@color/red_normal" />
-	    <TextView android:id="@+id/search_empty_view_text_second_line"
+	        android:textColorHint="@color/red_normal"
+	        android:textSize="@dimen/search_result_empty_text_hint_size" />
+	    <TextView 
+	        android:id="@+id/search_empty_view_text_second_line"
 	        android:layout_gravity="center_vertical"
 	        android:gravity="center"
+	        android:layout_marginTop="@dimen/margin_h5"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
-	        android:textColor="@color/blue_normal"
+	        android:textColorHint="@color/blue_normal"
 	        android:textSize="@dimen/search_result_empty_text_hint_size"
 	        android:textStyle="bold"
 	        android:hint="@string/search_no_result_hint_second_line" />

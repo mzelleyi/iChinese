@@ -3,6 +3,7 @@
  */
 package sg.gov.nhb.ihuayu.activity.db;
 
+import sg.gov.nhb.ihuayu.activity.rest.FileUtils;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -18,8 +19,9 @@ public class DBSqlite {
 	}
 	
 	public SQLiteDatabase getSqlDB() {
-		DatabaseHelper helper = new DatabaseHelper(context, "database.sqlite");
-		return helper.getWritableDatabase();
+//		DatabaseHelper helper = new DatabaseHelper(context, "database.sqlite");
+//		return helper.getWritableDatabase();
+		return new FileUtils().openDatabase(getContext());
 	}
 	
 	public Context getContext() {

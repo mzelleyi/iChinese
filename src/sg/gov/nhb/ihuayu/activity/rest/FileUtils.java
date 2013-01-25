@@ -9,8 +9,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 import android.util.Log;
+
 
 /**
  * @author lixingwang
@@ -18,6 +21,7 @@ import android.util.Log;
  */
 public class FileUtils {
 	private static final String TAG = "iHuayu:FileUtils";
+	private static final String DATABASE_FILENAME = "database.sqlite";
 	private String SDPATH;
 
 	private int FILESIZE = 4 * 1024;
@@ -27,13 +31,11 @@ public class FileUtils {
 	}
 
 	public FileUtils() {
-		// 寰楀埌褰撳墠澶栭儴瀛樺偍璁惧鐨勭洰褰� /SDCARD )
 		SDPATH = Environment.getExternalStorageDirectory() + "/";
 		Log.d(TAG, "[FileUtils] SDPATH = "+SDPATH);
 	}
 
 	/**
-	 * 鍦⊿D鍗′笂鍒涘缓鏂囦欢
 	 * 
 	 * @param fileName
 	 * @return
@@ -46,19 +48,17 @@ public class FileUtils {
 	}
 
 	/**
-	 * 鍦⊿D鍗′笂鍒涘缓鐩綍
 	 * 
 	 * @param dirName
 	 * @return
 	 */
 	public File createSDDir(String dirName) {
 		File dir = new File(SDPATH + dirName);
-		dir.mkdir();
+		dir.mkdirs();
 		return dir;
 	}
 
 	/**
-	 * 鍒ゆ柇SD鍗′笂鐨勬枃浠跺す鏄惁瀛樺湪
 	 * 
 	 * @param fileName
 	 * @return
@@ -74,7 +74,6 @@ public class FileUtils {
 	}
 
 	/**
-	 * 灏嗕竴涓狪nputStream閲岄潰鐨勬暟鎹啓鍏ュ埌SD鍗′腑
 	 * 
 	 * @param path
 	 * @param fileName
@@ -109,5 +108,32 @@ public class FileUtils {
 			}
 		}
 		return file;
+	}
+	
+	public SQLiteDatabase openDatabase(Context context) {
+		String DB_PATH = "/data/data/sg.gov.nhb.ihuayu/databases/";
+
+		if ((new File(DB_PATH + DATABASE_FILENAME)).exists() == false) {
+			File f = new File(DB_PATH);
+			if (!f.exists()) {
+				f.mkdir();
+			}
+
+			try {
+				InputStream is = context.getAssets().open(DATABASE_FILENAME);
+				OutputStream os = new FileOutputStream(DB_PATH + DATABASE_FILENAME);
+				byte[] buffer = new byte[1024];
+				int length;
+				while ((length = is.read(buffer)) > 0) {
+					os.write(buffer, 0, length);
+				}
+				os.flush();
+				os.close();
+				is.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return SQLiteDatabase.openOrCreateDatabase(DB_PATH + DATABASE_FILENAME, null);
 	}
 }

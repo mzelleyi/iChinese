@@ -72,8 +72,14 @@ public class MainActivity extends FragmentActivity implements
 		mTabHost.setCurrentTabByTag(TAB_SEARCH);
 		
 		this.updateTab(TAB_SEARCH, R.id.tab_content_search);
-		
-		dbManagerment = new DBManagerment(this);
+		//TODO maybe we need async to handle this
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				dbManagerment = new DBManagerment(MainActivity.this);
+			}
+		}).start();
+	
 		Log.d(TAG, "[onCreate] + End");
 	}
 

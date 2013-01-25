@@ -37,10 +37,12 @@
     
     <string name="dialog_msg_add_to_bookmark">Add To Bookmark?</string>
     <string name="dialog_msg_remove_from_bookmark">Remove From Bookmark?</string>
-    <string name="dialog_msg_success">Successful</string>
-    <string name="dialog_msg_failed">Failed</string>
+    <string name="dialog_msg_add_success">Add Success</string>
+    <string name="dialog_msg_add_failed">Add Failed</string>
+    <string name="dialog_msg_remove_success">Remove Success</string>
+    <string name="dialog_msg_remove_failed">Remove Failed</string>
     
     <string name="dialog_btn_ok">OK</string>
-    <string name="dialog_words_define_hint">Words definition</string>
+    <string name="dialog_words_define_hint">Words definition:</string>
 
 </resources>

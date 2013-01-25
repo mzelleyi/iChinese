@@ -74,7 +74,7 @@
 			        android:hint="@string/dummy_text"
 			        android:singleLine="true"
 				    android:ellipsize="marquee"
-				    android:textColor="@color/black_normal"
+				    android:textColor="@color/white_normal"
 				    android:marqueeRepeatLimit="1"
 			        android:gravity="left" />
 		        <TextView 
@@ -85,7 +85,7 @@
 			        android:layout_margin="@dimen/margin_h1"
 			        android:hint="@string/dummy_text"
 			        android:textSize="@dimen/listview_primary_text_size"
-			        android:textColor="@color/black_normal"
+			        android:textColor="@color/white_normal"
 			        android:singleLine="true"
 				    android:ellipsize="marquee"
 				    android:marqueeRepeatLimit="1"
@@ -103,7 +103,7 @@
 			        android:singleLine="true"
 				    android:ellipsize="marquee"
 				    android:marqueeRepeatLimit="1"
-				    android:textColor="@color/black_normal"
+				    android:textColor="@color/white_normal"
 			        android:textSize="@dimen/listview_primary_text_size"
 			        android:gravity="left" />
 		    </LinearLayout>

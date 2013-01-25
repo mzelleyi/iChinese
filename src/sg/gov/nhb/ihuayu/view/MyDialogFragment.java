@@ -110,7 +110,7 @@ public class MyDialogFragment extends DialogFragment {
         	if (actionResult) {
         		return new AlertDialog.Builder(parentActivity)
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle(R.string.dialog_msg_success)
+                .setTitle(R.string.dialog_msg_add_success)
                 .setPositiveButton(android.R.string.ok,
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
@@ -121,7 +121,7 @@ public class MyDialogFragment extends DialogFragment {
         	} else {
         		return new AlertDialog.Builder(parentActivity)
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle(R.string.dialog_msg_failed)
+                .setTitle(R.string.dialog_msg_add_failed)
                 .setPositiveButton(android.R.string.ok,
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
@@ -153,7 +153,7 @@ public class MyDialogFragment extends DialogFragment {
         	if (actionResult) {
         		return new AlertDialog.Builder(parentActivity)
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle(R.string.dialog_msg_success)
+                .setTitle(R.string.dialog_msg_remove_success)
                 .setPositiveButton(android.R.string.ok,
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
@@ -164,7 +164,7 @@ public class MyDialogFragment extends DialogFragment {
         	} else {
         		return new AlertDialog.Builder(parentActivity)
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle(R.string.dialog_msg_failed)
+                .setTitle(R.string.dialog_msg_remove_failed)
                 .setPositiveButton(android.R.string.ok,
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {

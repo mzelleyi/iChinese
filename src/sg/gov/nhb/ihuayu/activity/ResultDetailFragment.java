@@ -129,7 +129,7 @@ public class ResultDetailFragment extends Fragment {
 			}
 		});
 		
-		Button btnPrev = (Button)parentActivity.findViewById(R.id.result_detail_footbar_btn_prev);
+		final Button btnPrev = (Button)parentActivity.findViewById(R.id.result_detail_footbar_btn_prev);
 		btnPrev.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -143,6 +143,8 @@ public class ResultDetailFragment extends Fragment {
 					updateDataFragment();
 				} else {
 					mCurrentPos = mCurrentPos + 1;
+//					btnPrev.setEnabled(false);
+//					btnPrev.setClickable(false);
 					Toast toast = Toast.makeText(parentActivity, "The First One!", Toast.LENGTH_SHORT);
 					toast.setGravity(Gravity.CENTER, 0, 0);
 					toast.show();
@@ -150,7 +152,7 @@ public class ResultDetailFragment extends Fragment {
 			}
 		});
 		
-		Button btnNext = (Button)parentActivity.findViewById(R.id.result_detail_footbar_btn_next);
+		final Button btnNext = (Button)parentActivity.findViewById(R.id.result_detail_footbar_btn_next);
 		btnNext.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -164,6 +166,8 @@ public class ResultDetailFragment extends Fragment {
 					updateDataFragment();
 				} else {
 					mCurrentPos = mCurrentPos - 1;
+//					btnNext.setEnabled(false);
+//					btnNext.setClickable(false);
 					Toast toast = Toast.makeText(parentActivity, "The Last One!", Toast.LENGTH_SHORT);
 					toast.setGravity(Gravity.CENTER, 0, 0);
 					toast.show();
@@ -504,7 +508,7 @@ public class ResultDetailFragment extends Fragment {
 	
 			// Give some text to display if there is no data. In a real
 			// application this would come from a resource.
-			this.setEmptyText("No Result");
+			this.setEmptyText("");
 	
 			// We have a menu item to show in action bar.
 			this.setHasOptionsMenu(false);

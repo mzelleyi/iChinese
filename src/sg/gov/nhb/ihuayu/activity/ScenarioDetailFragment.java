@@ -363,7 +363,7 @@ public class ScenarioDetailFragment extends Fragment {
 	        }
 
 	        // At this point we can release the resources associated with
-	        // 'oldScenarioList' if needed; now that the new result is delivered we
+	        // 'oldDialogList' if needed; now that the new result is delivered we
 	        // know that it is no longer in use.
 	        if (dialogList != null) {
 	            this.onReleaseResources(oldDialogList);
@@ -465,81 +465,110 @@ public class ScenarioDetailFragment extends Fragment {
 	        Log.d(TAG, "[ScenarioDialogAdapter][setData] + End");
 	    }
 	    
-	    /**
+//	    @Override
+//		public int getItemViewType(int position) {
+//			// TODO Auto-generated method stub
+//	    	final HashMap<Dialog, List<DialogKeywords>> mapItem = this.getItem(position);
+//	        Iterator<Dialog> iterator = mapItem.keySet().iterator();
+//	        while(iterator.hasNext()) {
+//	        	dialogItem = (Dialog) iterator.next();
+//	        }
+//	    	if (dialogItem.getGender().equalsIgnoreCase("f")) {
+//	    		Log.d(TAG, "[getItemViewType], return VIEW_TYPE_FEMALE");
+//	    		return VIEW_TYPE_FEMALE;
+//	    	} else {
+//	    		Log.d(TAG, "[getItemViewType], return VIEW_TYPE_MALE");
+//	    		return VIEW_TYPE_MALE;
+//	    	}
+//			//return super.getItemViewType(position);
+//		}
+
+		@Override
+		public int getViewTypeCount() {
+			Log.d(TAG, "[getViewTypeCount], return 2");
+			// TODO Auto-generated method stub
+			return 2;
+			//return super.getViewTypeCount();
+		}
+
+		/**
 		 * Populate new items in the list.
 		 */
 	    @Override 
 	    public View getView(int position, View convertView, ViewGroup parent) {
 	    	Log.d(TAG, "[ScenarioDetailAdapter][getView] + pos="+position);
-	        View view;
-	        
-	        //String dialogGender = null;
-	        //String dialogAudio = null;
-	        
-	        SpannableString spanStr = null;
-			
-	        final HashMap<Dialog, List<DialogKeywords>> mapItem = this.getItem(position);
-	        
+	        final int pos = position;
+	    	
+	    	final HashMap<Dialog, List<DialogKeywords>> mapItem = this.getItem(position);
 	        Iterator<Dialog> iterator = mapItem.keySet().iterator();
 	        while(iterator.hasNext()) {
 	        	dialogItem = (Dialog) iterator.next();
 	        }
 	        keyWordList = mapItem.get(dialogItem);
-
+	    	
+	        //String dialogGender = null;
+	        //String dialogAudio = null;
+	        SpannableString spanStr = null;
+			
 	        if (convertView == null) {
 	        	if (dialogItem.getGender().equalsIgnoreCase("f")) {
 	        		Log.d(TAG, "[ScenarioDialogAdapter][getView] new female item");
-	        		view = mInflater.inflate(R.layout.scenario_detail_listitem_female, parent, false);
+	        		convertView = mInflater.inflate(R.layout.scenario_detail_listitem_female, parent, false);
 	        	} else {
 	        		Log.d(TAG, "[ScenarioDialogAdapter][getView] new male item");
-	        		view = mInflater.inflate(R.layout.scenario_detail_listitem_male, parent, false);
+	        		convertView = mInflater.inflate(R.layout.scenario_detail_listitem_male, parent, false);
 	        	}
-	        } else {
-	            view = convertView;
 	        }
-
-
-			if (dialogItem != null) {
-				TextView firstLine = (TextView)view.findViewById(R.id.scenario_dialog_text_first_line);
-				TextView secondLine = (TextView)view.findViewById(R.id.scenario_dialog_text_second_line);
-				TextView nameLine = (TextView)view.findViewById(R.id.scenario_dialog_textview_name);
-				nameLine.setText(dialogItem.getNarrator());
-				secondLine.setText(dialogItem.getSentence_py());
-				
-				String sectenceStr = dialogItem.getSentence();
-				spanStr = new SpannableString(sectenceStr);
-				Log.d(TAG, "[getView] sectenceStr = "+sectenceStr);
-				
-	            for (int i = 0; i < keyWordList.size(); i++ ) {
-	            	DialogKeywords keyItem = keyWordList.get(i);
-	            	String keyStr = keyItem.getDest_keyword();
-	            	Log.d(TAG, "[getView] keyStr = "+keyStr);
-	            	int firstIndex = sectenceStr.indexOf(keyStr);
-	            	int lastIndex = firstIndex + keyStr.length();
-	            	Log.d(TAG, "[getView] firstIndex = "+firstIndex+",lastIndex = "+lastIndex);
-	            	spanStr.setSpan(new ForegroundColorSpan(Color.RED), firstIndex, lastIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-	            }
-				firstLine.setText(spanStr);
-				
-				ImageView speakIcon = (ImageView)view.findViewById(R.id.scenario_dialog_img_speaker);
-				speakIcon.setOnClickListener(new View.OnClickListener()	{
-					@Override
-					public void onClick(View v)
-					{
-						// TODO Auto-generated method stub
-						String strAudio = dialogItem.getAudio();
-						Log.d(TAG, "[onClick] dialogAudio = "+strAudio);
-				   		if (mNonUiHandler != null) {
-							if (mNonUiHandler.hasMessages(PLAY_DIALOG_AUDIO)) {
-								mNonUiHandler.removeMessages(PLAY_DIALOG_AUDIO);
+	        
+	        if (convertView != null) {
+				if (dialogItem != null) {
+					TextView firstLine = (TextView)convertView.findViewById(R.id.scenario_dialog_text_first_line);
+					TextView secondLine = (TextView)convertView.findViewById(R.id.scenario_dialog_text_second_line);
+					TextView nameLine = (TextView)convertView.findViewById(R.id.scenario_dialog_textview_name);
+					nameLine.setText(dialogItem.getNarrator());
+					secondLine.setText(dialogItem.getSentence_py());
+					
+					String sectenceStr = dialogItem.getSentence();
+					spanStr = new SpannableString(sectenceStr);
+					Log.d(TAG, "[getView] Info (1)Name = "+dialogItem.getNarrator());
+					Log.d(TAG, "[getView] Info (2)secondLine = "+dialogItem.getSentence_py());
+					Log.d(TAG, "[getView] Info (3)firstLine = "+dialogItem.getSentence());
+					for (int i = 0; i < keyWordList.size(); i++ ) {
+		            	DialogKeywords keyItem = keyWordList.get(i);
+		            	String keyStr = keyItem.getDest_keyword();
+		            	Log.d(TAG, "[getView] keyStr = "+keyStr);
+		            	int firstIndex = sectenceStr.indexOf(keyStr);
+		            	int lastIndex = firstIndex + keyStr.length();
+		            	Log.d(TAG, "[getView] firstIndex = "+firstIndex+",lastIndex = "+lastIndex);
+		            	spanStr.setSpan(new ForegroundColorSpan(Color.RED), firstIndex, lastIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+		            }
+					firstLine.setText(spanStr);
+					
+					ImageView speakIcon = (ImageView)convertView.findViewById(R.id.scenario_dialog_img_speaker);
+					speakIcon.setOnClickListener(new View.OnClickListener()	{
+						@Override
+						public void onClick(View v)
+						{
+							// TODO Auto-generated method stub
+					    	final HashMap<Dialog, List<DialogKeywords>> mapItem = getItem(pos);
+					        Iterator<Dialog> iterator = mapItem.keySet().iterator();
+					        while(iterator.hasNext()) {
+					        	dialogItem = (Dialog) iterator.next();
+					        }
+					        String strAudio = dialogItem.getAudio();
+							Log.d(TAG, "[onClick] dialogAudio = "+strAudio);
+					   		if (mNonUiHandler != null) {
+								if (mNonUiHandler.hasMessages(PLAY_DIALOG_AUDIO)) {
+									mNonUiHandler.removeMessages(PLAY_DIALOG_AUDIO);
+								}
+								Message msg = Message.obtain(mNonUiHandler, PLAY_DIALOG_AUDIO,strAudio);
+								mNonUiHandler.sendMessage(msg);
 							}
-							Message msg = Message.obtain(mNonUiHandler, PLAY_DIALOG_AUDIO,strAudio);
-							mNonUiHandler.sendMessage(msg);
 						}
-					}
-				});
-			}
-	        return view;
+					});
+				}
+	        }
+	        return convertView;
 	    }
 	}
 }

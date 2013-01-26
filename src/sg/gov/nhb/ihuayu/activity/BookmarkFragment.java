@@ -916,6 +916,7 @@ public class BookmarkFragment extends Fragment {
 	    public View getView(int position, View convertView, ViewGroup parent) {
 	    	Log.d(TAG, "[BookmarkListAdapter][getView] + pos = "+position+",EditMode = "+bEditMode);
 	        //View view = null;
+	    	final int pos = position;
 			ViewHolder holder = null;
 			TextView 	separatorText = null;
 			
@@ -999,6 +1000,7 @@ public class BookmarkFragment extends Fragment {
 									public void onClick(View v)
 									{
 										// TODO Auto-generated method stub
+										Dictionary item = getItem(pos);
 										String strAudio = item.getChinese_audio();
 										Log.d(TAG, "[onClick] Chinese_audio = "+strAudio);
 								   		if (mNonUiHandler != null) {

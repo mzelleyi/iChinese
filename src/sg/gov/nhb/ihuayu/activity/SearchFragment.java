@@ -520,6 +520,7 @@ public class SearchFragment extends Fragment {
             }
 
             final Dictionary item = getItem(position);
+            final int pos = position;
             if (null != view) {
             	if (getItemViewType(position) == VIEW_TYPE_SUGGEST) {
             		((TextView)view.findViewById(R.id.search_result_listitem_text)).setText(item.getKeyword());
@@ -534,6 +535,7 @@ public class SearchFragment extends Fragment {
 						public void onClick(View v)
 						{
 							// TODO Auto-generated method stub
+							final Dictionary item = getItem(pos);
 							String strAudio = item.getChinese_audio();
 							Log.d(TAG, "[onClick] Chinese_audio = "+strAudio);
 					   		if (mNonUiHandler != null) {

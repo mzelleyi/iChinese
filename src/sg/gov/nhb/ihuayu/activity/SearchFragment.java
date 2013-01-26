@@ -193,6 +193,8 @@ public class SearchFragment extends Fragment {
 			{
 				// TODO Auto-generated method stub
 				Log.d(TAG, "[onItemClick] + arg 2="+arg2+",arg 3="+arg3);
+				mInputMethodManager.hideSoftInputFromWindow(mEditText.getWindowToken(),0);
+				
 				FragmentManager fm = parentActivity.getSupportFragmentManager();
 				Fragment newFragment = ResultDetailFragment.newInstance(mDicList,arg2);
 				FragmentTransaction ft = fm.beginTransaction();
@@ -200,7 +202,6 @@ public class SearchFragment extends Fragment {
 				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 				ft.addToBackStack(null);
 				ft.commit();
-				mInputMethodManager.hideSoftInputFromWindow(mEditText.getWindowToken(),0);
 			}
 		});
 		

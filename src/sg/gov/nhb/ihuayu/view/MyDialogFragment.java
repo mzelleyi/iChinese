@@ -186,10 +186,10 @@ public class MyDialogFragment extends DialogFragment {
         	
         	TextView firstLine = (TextView)dialogView.findViewById(R.id.dialog_text_firstline);
 			TextView secondLine = (TextView)dialogView.findViewById(R.id.dialog_text_secondline);
-			TextView nameLine = (TextView)dialogView.findViewById(R.id.dialog_text_thridline);
+			TextView thridLine = (TextView)dialogView.findViewById(R.id.dialog_text_thridline);
 			firstLine.setText(dialogItem.getSentence());
-			nameLine.setText(dialogItem.getNarrator());
 			secondLine.setText(dialogItem.getSentence_py());
+			thridLine.setText(dialogItem.getSentence_en());
 			
 			LinearLayout wordslayout_0 = (LinearLayout)dialogView.findViewById(R.id.dialog_words_define_panel_0);
 			LinearLayout wordslayout_1 = (LinearLayout)dialogView.findViewById(R.id.dialog_words_define_panel_1);

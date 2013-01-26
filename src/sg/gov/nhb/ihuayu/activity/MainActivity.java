@@ -146,13 +146,12 @@ public class MainActivity extends FragmentActivity implements
 	public void onBackPressed()
 	{
 		Log.d(TAG, "[onBackPressed] + Begin");
-		
-		FragmentManager fm = this.getSupportFragmentManager();
-		int stackCount = fm.getBackStackEntryCount();
-		Log.d(TAG, "[onBackPressed] stackCount = "+stackCount);
-		
+//		FragmentManager fm = this.getSupportFragmentManager();
+//		int stackCount = fm.getBackStackEntryCount();
+//		Log.d(TAG, "[onBackPressed] stackCount = "+stackCount);
 		// TODO Auto-generated method stub
-		super.onBackPressed();
+		// super.onBackPressed();
+		this.finish();
 	}
 
 	@Override
@@ -160,13 +159,13 @@ public class MainActivity extends FragmentActivity implements
 		Log.d(TAG, "[onTabChanged] + Begin,tabTag:" + tabTag);
 		// TODO Auto-generated method stub
 		
-		//Pop to home page
-        FragmentManager fm = getSupportFragmentManager();
-        if (fm.getBackStackEntryCount() > 0) {
-        	Log.d(TAG, "[onTabChanged] popBackStack ");
-            fm.popBackStack(fm.getBackStackEntryAt(0).getId(),
-                    FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        }
+//		//Pop to home page
+//        FragmentManager fm = getSupportFragmentManager();
+//        if (fm.getBackStackEntryCount() > 0) {
+//        	Log.d(TAG, "[onTabChanged] popBackStack ");
+//            fm.popBackStack(fm.getBackStackEntryAt(0).getId(),
+//                    FragmentManager.POP_BACK_STACK_INCLUSIVE);
+//        }
         
 		if (TAB_SEARCH.equals(tabTag)) {
 			updateTab(tabTag, R.id.tab_content_search);

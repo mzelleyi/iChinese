@@ -43,6 +43,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * @author Kesen
@@ -50,19 +51,21 @@ import android.widget.TextView;
  */
 public class ScenarioDetailFragment extends Fragment {
 
-	private static final String TAG = "iHuayu:ScenarioDetailFragment";
-	private static FragmentActivity parentActivity = null;
-	private static LayoutInflater mInflater = null;
-	private static Scenario mScenario = null;
-	
-	private static final int        PLAY_DIALOG_AUDIO   = 8;
-	
+	private static final String     TAG                  = "iHuayu:ScenarioDetailFragment";
+	private static FragmentActivity parentActivity       = null;
+	private static LayoutInflater   mInflater            = null;
+	private static Scenario         mScenario            = null;
+
+	private static final int        PLAY_DIALOG_AUDIO    = 201;
+	private static final int        SHOW_DOWNLOAD_DIALOG = 202;
+	private static final int        HIDE_DOWNLOAD_DIALOG = 203;
+
 	// Define Thread Name
-	private static final String		THREAD_NAME		= "ScenarioDetailFragmentThread";
+	private static final String     THREAD_NAME          = "ScenarioDetailFragmentThread";
 	// The DB Handler Thread
-	private HandlerThread			mHandlerThread	= null;
+	private HandlerThread           mHandlerThread       = null;
 	// The DB Operation Thread
-	private static NonUiHandler	    mNonUiHandler	= null;
+	private static NonUiHandler     mNonUiHandler        = null;
 
 
     /**
@@ -148,25 +151,33 @@ public class ScenarioDetailFragment extends Fragment {
         }
 	}
 	
-	private final Handler mUiHandler = new Handler()
-	{
-		@Override
-		public void handleMessage(Message msg)
-		{
-			switch (msg.what)
-			{
-//				case UPDATE_FAV_IMAGE:	{
-//					Log.d(TAG, "[mUihandler handleMessage] UPDATE_FAV_IMAGE");
-//					updateFavoriteImg((Boolean) msg.obj);
-//					break;
-//				}
-				default:{
-					Log.e(TAG, "[mUihandler handleMessage] Something wrong!!!");
-					break;
-				}
-			}
-		}
-	};
+	private final Handler mUiHandler = new Handler() {
+         DialogFragment downloadDialog = null;
+         @Override
+         public void handleMessage(Message msg) {
+             switch (msg.what) {
+  			   case SHOW_DOWNLOAD_DIALOG: {
+				   Log.d(TAG, "[mUihandler handleMessage] SHOW_DOWNLOAD_DIALOG");
+				   downloadDialog = MyDialogFragment.newInstance(parentActivity,
+				           MyDialogFragment.DIALOG_DOWNLOAD, false, null);
+				   downloadDialog.show(parentActivity.getSupportFragmentManager(),
+				           "dialog_download");
+				   break;
+			   }
+			   case HIDE_DOWNLOAD_DIALOG: {
+				   Log.d(TAG, "[mUihandler handleMessage] HIDE_DOWNLOAD_DIALOG");
+				   if (downloadDialog != null) {
+					   downloadDialog.dismiss();
+				   }
+				   break;
+			   }
+				 default: {
+					 Log.e(TAG, "[mUihandler handleMessage] Something wrong!!!");
+					 break;
+				 }
+			 }
+		 }
+     };
 	
 	/**
 	 * The NonUiHandler to do DB action
@@ -205,21 +216,31 @@ public class ScenarioDetailFragment extends Fragment {
 			}
 			Log.d(TAG, "[NonUihandler][doPlayAudio] audioStr = "+audioStr);
 			
-			AudioPlayer mAudioPlayer = new AudioPlayer();
+			AudioPlayer mAudioPlayer = AudioPlayer.newInstance();
 			try {
-				mAudioPlayer.playAudio(parentActivity, audioStr);
+				boolean bDownloaded = mAudioPlayer.doCheckDownloaded(audioStr);
+				if (bDownloaded) {
+					mAudioPlayer.doPlay(audioStr);
+				} else {
+					if (mUiHandler.hasMessages(SHOW_DOWNLOAD_DIALOG)) {
+	    				mUiHandler.removeMessages(SHOW_DOWNLOAD_DIALOG);
+	    			}
+		            mUiHandler.sendEmptyMessage(SHOW_DOWNLOAD_DIALOG);
+					boolean result = mAudioPlayer.doDownload(audioStr);
+					if (result) {
+						if (mUiHandler.hasMessages(HIDE_DOWNLOAD_DIALOG)) {
+		    				mUiHandler.removeMessages(HIDE_DOWNLOAD_DIALOG);
+		    			}
+			            mUiHandler.sendEmptyMessage(HIDE_DOWNLOAD_DIALOG);
+			            mAudioPlayer.doPlay(audioStr);
+					} else {
+						Toast.makeText(parentActivity, parentActivity.getResources().getString(R.string.toast_download_failed), Toast.LENGTH_SHORT).show();
+					}
+				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-//			if (mUiHandler != null)
-//			{
-//				if (mUiHandler.hasMessages(UPDATE_FAV_IMAGE)) {
-//					mUiHandler.removeMessages(UPDATE_FAV_IMAGE);
-//    			}
-//				Message msg = Message.obtain(mUiHandler, UPDATE_FAV_IMAGE, mBeFavorited);
-//				mUiHandler.sendMessageDelayed(msg, 100);
-//			}
 			Log.d(TAG, "[NonUihandler][doPlayAudio] + End");
 		}
 	}

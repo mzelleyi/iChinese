@@ -42,6 +42,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * @author Kesen
@@ -51,11 +52,13 @@ public class SearchFragment extends Fragment {
 
 	private static final String			TAG								= "iHuayu:SearchFragment";
 	private static final int			DELAY_REFRESH_LIST_VIEW			= 300;
-	private static final int			MSG_DO_SUGGEST_SEARCH			= 1;
-	private static final int			MSG_REFRESH_SUGGEST_LISTVIEW	= 2;
-	private static final int			MSG_DO_FUZZY_SEARCH				= 3;
-	private static final int			MSG_REFRESH_FUZZY_RESULT		= 4;
-	private static final int            MSG_PLAY_AUDIO                  = 5;
+	private static final int			MSG_DO_SUGGEST_SEARCH			= 101;
+	private static final int			MSG_REFRESH_SUGGEST_LISTVIEW	= 102;
+	private static final int			MSG_DO_FUZZY_SEARCH				= 103;
+	private static final int			MSG_REFRESH_FUZZY_RESULT		= 104;
+	private static final int            MSG_PLAY_AUDIO                  = 105;
+	private static final int            SHOW_DOWNLOAD_DIALOG            = 106;
+	private static final int            HIDE_DOWNLOAD_DIALOG            = 107;
 
 	private static final int			VIEW_TYPE_SUGGEST				= 0;
 	private static final int			VIEW_TYPE_FUZZY				    = 1;
@@ -297,64 +300,89 @@ public class SearchFragment extends Fragment {
 	}
 	
 	private Handler mUiHandler = new Handler() {
+	   DialogFragment downloadDialog = null;
 		@Override
-		public void handleMessage(Message msg) {
-			switch (msg.what) {
-			case SearchFragment.MSG_REFRESH_SUGGEST_LISTVIEW: {
-				Log.d(TAG, "[mUiHandler][MSG_REFRESH_SUGGEST_LISTVIEW]");
-				@SuppressWarnings("unchecked")
-				List<Dictionary> dicList = (List<Dictionary>) msg.obj;
-				
-				mDicList.clear();
-        		for(Dictionary object: dicList) {
-        			mDicList.add(object);
-        		}
-				
-        		mFuzzyHintLayout.setVisibility(View.GONE);
-				mDivider.setVisibility(View.GONE);
-				
-				bFuzzyMode = false;
-				mAdapter.setData(mDicList);
-				mAdapter.notifyDataSetChanged();
-				break;
-			}
-			case SearchFragment.MSG_REFRESH_FUZZY_RESULT: {
-				Log.d(TAG, "[mUiHandler][MSG_REFRESH_FUZZY_RESULT]");
-				searchDialog.dismiss();
+       public void handleMessage(Message msg) {
+           switch (msg.what) {
+			   case SearchFragment.MSG_REFRESH_SUGGEST_LISTVIEW: {
+				   Log.d(TAG, "[mUiHandler][MSG_REFRESH_SUGGEST_LISTVIEW]");
+				   @SuppressWarnings("unchecked")
+				   List<Dictionary> dicList = (List<Dictionary>) msg.obj;
 
-				FuzzyResult fuzzyResult = (FuzzyResult) msg.obj;
-				List<Dictionary> dicList =  fuzzyResult.getDictionaryList();
-				
-				mDicList.clear();
-        		for(Dictionary object: dicList) {
-        			mDicList.add(object);
-        		}
-        		
-				if (mDicList.size() > 0) {
-					mDivider.setVisibility(View.VISIBLE);
-					if (!fuzzyResult.isExactResult()) {
-						mFuzzyHintLayout.setVisibility(View.VISIBLE);
-						//String hintStr = (String) mFuzzyHint.getText();
-						//SpannableString spanStr = new SpannableString(hintStr);
-						//spanStr.setSpan(new ForegroundColorSpan(Color.BLUE), firstIndex, lastIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-						//mFuzzyHint.setText(spanStr);
-					} else {
-						mFuzzyHintLayout.setVisibility(View.GONE);
-					}
-				} else {
-					mDivider.setVisibility(View.GONE);
-					mFuzzyHintLayout.setVisibility(View.GONE);
-				}
+				   mDicList.clear();
+				   for (Dictionary object : dicList) {
+					   mDicList.add(object);
+				   }
 
-				//mCurFilter = !TextUtils.isEmpty(searchResultStr) ? searchResultStr : null;
-				//mAdapter.getFilter().filter(mCurFilter);
-				bFuzzyMode = true;
-				mAdapter.setData(mDicList);
-				mAdapter.notifyDataSetChanged();
-				break;
-			}
-			}
-		}
+				   mFuzzyHintLayout.setVisibility(View.GONE);
+				   mDivider.setVisibility(View.GONE);
+
+				   bFuzzyMode = false;
+				   mAdapter.setData(mDicList);
+				   mAdapter.notifyDataSetChanged();
+				   break;
+			   }
+			   case SearchFragment.MSG_REFRESH_FUZZY_RESULT: {
+				   Log.d(TAG, "[mUiHandler][MSG_REFRESH_FUZZY_RESULT]");
+				   searchDialog.dismiss();
+
+				   FuzzyResult fuzzyResult = (FuzzyResult) msg.obj;
+				   List<Dictionary> dicList = fuzzyResult.getDictionaryList();
+
+				   mDicList.clear();
+				   for (Dictionary object : dicList) {
+					   mDicList.add(object);
+				   }
+
+				   if (mDicList.size() > 0) {
+					   mDivider.setVisibility(View.VISIBLE);
+					   if (!fuzzyResult.isExactResult()) {
+						   mFuzzyHintLayout.setVisibility(View.VISIBLE);
+						   // String hintStr =
+						   // (String)
+						   // mFuzzyHint.getText();
+						   // SpannableString
+						   // spanStr = new
+						   // SpannableString(hintStr);
+						   // spanStr.setSpan(new
+						   // ForegroundColorSpan(Color.BLUE),
+						   // firstIndex, lastIndex,
+						   // Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+						   // mFuzzyHint.setText(spanStr);
+					   } else {
+						   mFuzzyHintLayout.setVisibility(View.GONE);
+					   }
+				   } else {
+					   mDivider.setVisibility(View.GONE);
+					   mFuzzyHintLayout.setVisibility(View.GONE);
+				   }
+
+				   // mCurFilter =
+				   // !TextUtils.isEmpty(searchResultStr)
+				   // ? searchResultStr : null;
+				   // mAdapter.getFilter().filter(mCurFilter);
+				   bFuzzyMode = true;
+				   mAdapter.setData(mDicList);
+				   mAdapter.notifyDataSetChanged();
+				   break;
+			   }
+			   case SHOW_DOWNLOAD_DIALOG: {
+				   Log.d(TAG, "[mUihandler handleMessage] SHOW_DOWNLOAD_DIALOG");
+				   downloadDialog = MyDialogFragment.newInstance(parentActivity,
+				           MyDialogFragment.DIALOG_DOWNLOAD, false, null);
+				   downloadDialog.show(parentActivity.getSupportFragmentManager(),
+				           "dialog_download");
+				   break;
+			   }
+			   case HIDE_DOWNLOAD_DIALOG: {
+				   Log.d(TAG, "[mUihandler handleMessage] HIDE_DOWNLOAD_DIALOG");
+				   if (downloadDialog != null) {
+					   downloadDialog.dismiss();
+				   }
+				   break;
+			   }
+		   }
+	   }
 	};
 	
 	/**
@@ -449,21 +477,31 @@ public class SearchFragment extends Fragment {
 			}
 			Log.d(TAG, "[NonUihandler][doPlayAudio] audioStr = "+audioStr);
 			
-			AudioPlayer mAudioPlayer = new AudioPlayer();
+			AudioPlayer mAudioPlayer = AudioPlayer.newInstance();
 			try {
-				mAudioPlayer.playAudio(parentActivity, audioStr);
+				boolean bDownloaded = mAudioPlayer.doCheckDownloaded(audioStr);
+				if (bDownloaded) {
+					mAudioPlayer.doPlay(audioStr);
+				} else {
+					if (mUiHandler.hasMessages(SHOW_DOWNLOAD_DIALOG)) {
+	    				mUiHandler.removeMessages(SHOW_DOWNLOAD_DIALOG);
+	    			}
+		            mUiHandler.sendEmptyMessage(SHOW_DOWNLOAD_DIALOG);
+					boolean result = mAudioPlayer.doDownload(audioStr);
+					if (result) {
+						if (mUiHandler.hasMessages(HIDE_DOWNLOAD_DIALOG)) {
+		    				mUiHandler.removeMessages(HIDE_DOWNLOAD_DIALOG);
+		    			}
+			            mUiHandler.sendEmptyMessage(HIDE_DOWNLOAD_DIALOG);
+			            mAudioPlayer.doPlay(audioStr);
+					} else {
+						Toast.makeText(parentActivity, parentActivity.getResources().getString(R.string.toast_download_failed), Toast.LENGTH_SHORT).show();
+					}
+				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-//			if (mUiHandler != null)
-//			{
-//				if (mUiHandler.hasMessages(UPDATE_FAV_IMAGE)) {
-//					mUiHandler.removeMessages(UPDATE_FAV_IMAGE);
-//    			}
-//				Message msg = Message.obtain(mUiHandler, UPDATE_FAV_IMAGE, mBeFavorited);
-//				mUiHandler.sendMessageDelayed(msg, 100);
-//			}
 			Log.d(TAG, "[NonUihandler][doPlayAudio] + End");
 		}
 	}

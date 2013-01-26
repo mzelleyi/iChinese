@@ -11,6 +11,7 @@ import java.util.List;
 
 import sg.gov.nhb.ihuayu.activity.db.entity.Dictionary;
 import sg.gov.nhb.ihuayu.activity.rest.AudioPlayer;
+import sg.gov.nhb.ihuayu.view.MyDialogFragment;
 
 import sg.gov.nhb.ihuayu.R;
 
@@ -23,6 +24,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -55,7 +57,7 @@ import android.widget.Toast;
 public class BookmarkFragment extends Fragment {
 	
 	private static final String		TAG							= "iHuayu:BookmarkFragment";
-	private static FragmentActivity	mParentActivity				= null;
+	private static FragmentActivity	parentActivity				= null;
 	private static LayoutInflater	mInflater					= null;
 	private static Resources		mRes						= null;
 	public BookmarkListFragment	    mBookmarkListFragment		= null;
@@ -76,6 +78,8 @@ public class BookmarkFragment extends Fragment {
 	private static final int		REMOVE_FAILED				= 4;
 	private static final int		INDICATE_ADD				= 5;
 	private static final int		INDICATE_HIDE				= 6;
+	private static final int        SHOW_DOWNLOAD_DIALOG        = 7;
+	private static final int        HIDE_DOWNLOAD_DIALOG        = 8;
 
 	// Define Thread Name
 	private static final String		THREAD_NAME					= "BookmarkFragmentThread";
@@ -113,10 +117,10 @@ public class BookmarkFragment extends Fragment {
 		Log.d(TAG, "[onViewCreated] + Begin");
 		// TODO Auto-generated method stub
 		super.onViewCreated(view, savedInstanceState);
-		mParentActivity = this.getActivity();
-		mRes = mParentActivity.getResources();
+		parentActivity = this.getActivity();
+		mRes = parentActivity.getResources();
 		
-		mWindowManager = (WindowManager)mParentActivity.getSystemService(Context.WINDOW_SERVICE);
+		mWindowManager = (WindowManager)parentActivity.getSystemService(Context.WINDOW_SERVICE);
 		
         
 		//Init Thread
@@ -125,12 +129,12 @@ public class BookmarkFragment extends Fragment {
 		mHandlerThread.start();
 		mNonUiHandler = new NonUiHandler(mHandlerThread.getLooper());
 		
-		FragmentManager fm = mParentActivity.getSupportFragmentManager();
+		FragmentManager fm = parentActivity.getSupportFragmentManager();
 		FragmentTransaction ft = fm.beginTransaction();
 		mBookmarkListFragment = (BookmarkListFragment) fm.findFragmentById(R.id.fragment_bookmark_listview);
 		
 		//Set Edit Button On Click Listener
-		final Button editBtn = (Button)mParentActivity.findViewById(R.id.bookmark_titlebar_btn_edit);
+		final Button editBtn = (Button)parentActivity.findViewById(R.id.bookmark_titlebar_btn_edit);
 		editBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
@@ -181,6 +185,7 @@ public class BookmarkFragment extends Fragment {
 	
 	private final static Handler mUiHandler = new Handler()
 	{
+		DialogFragment downloadDialog = null;
 		@Override
 		public void handleMessage(Message msg)
 		{
@@ -188,14 +193,14 @@ public class BookmarkFragment extends Fragment {
 			{
 				case REMOVE_FAILED:	{
 					Log.d(TAG, "[mUihandler handleMessage] REMOVE_FAILED");
-					Toast toast = Toast.makeText(mParentActivity, "Remove Failed", Toast.LENGTH_SHORT);
+					Toast toast = Toast.makeText(parentActivity, "Remove Failed", Toast.LENGTH_SHORT);
 					toast.setGravity(Gravity.CENTER, 0, 0);
 					toast.show();
 					break;
 				}
 				case REMOVE_SUCCESS: {
 					Log.d(TAG, "[mUihandler handleMessage] REMOVE_SUCCESS");
-					Toast toast = Toast.makeText(mParentActivity, "Remove Successed", Toast.LENGTH_SHORT);
+					Toast toast = Toast.makeText(parentActivity, "Remove Successed", Toast.LENGTH_SHORT);
 					toast.setGravity(Gravity.CENTER, 0, 0);
 					toast.show();
 					break;
@@ -208,6 +213,21 @@ public class BookmarkFragment extends Fragment {
 				case INDICATE_ADD: {
 					Log.d(TAG, "[mUihandler handleMessage] INDICATE_ADD");
 					addIndicateWindow();
+					break;
+				}
+				case SHOW_DOWNLOAD_DIALOG: {
+					Log.d(TAG, "[mUihandler handleMessage] SHOW_DOWNLOAD_DIALOG");
+					downloadDialog = MyDialogFragment.newInstance(parentActivity,
+							MyDialogFragment.DIALOG_DOWNLOAD, false, null);
+					downloadDialog.show(parentActivity.getSupportFragmentManager(),
+							"dialog_download");
+					break;
+				}
+				case HIDE_DOWNLOAD_DIALOG: {
+					Log.d(TAG, "[mUihandler handleMessage] HIDE_DOWNLOAD_DIALOG");
+					if (downloadDialog != null) {
+					    downloadDialog.dismiss();
+					}
 					break;
 				}
 				default:{
@@ -292,21 +312,31 @@ public class BookmarkFragment extends Fragment {
 			}
 			Log.d(TAG, "[NonUihandler][doPlayAudio] audioStr = "+audioStr);
 			
-			AudioPlayer mAudioPlayer = new AudioPlayer();
+			AudioPlayer mAudioPlayer = AudioPlayer.newInstance();
 			try {
-				mAudioPlayer.playAudio(mParentActivity, audioStr);
+				boolean bDownloaded = mAudioPlayer.doCheckDownloaded(audioStr);
+				if (bDownloaded) {
+					mAudioPlayer.doPlay(audioStr);
+				} else {
+					if (mUiHandler.hasMessages(SHOW_DOWNLOAD_DIALOG)) {
+	    				mUiHandler.removeMessages(SHOW_DOWNLOAD_DIALOG);
+	    			}
+		            mUiHandler.sendEmptyMessage(SHOW_DOWNLOAD_DIALOG);
+					boolean result = mAudioPlayer.doDownload(audioStr);
+					if (result) {
+						if (mUiHandler.hasMessages(HIDE_DOWNLOAD_DIALOG)) {
+		    				mUiHandler.removeMessages(HIDE_DOWNLOAD_DIALOG);
+		    			}
+			            mUiHandler.sendEmptyMessage(HIDE_DOWNLOAD_DIALOG);
+			            mAudioPlayer.doPlay(audioStr);
+					} else {
+						Toast.makeText(parentActivity, mRes.getString(R.string.toast_download_failed), Toast.LENGTH_SHORT).show();
+					}
+				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-//			if (mUiHandler != null)
-//			{
-//				if (mUiHandler.hasMessages(UPDATE_FAV_IMAGE)) {
-//					mUiHandler.removeMessages(UPDATE_FAV_IMAGE);
-//    			}
-//				Message msg = Message.obtain(mUiHandler, UPDATE_FAV_IMAGE, mBeFavorited);
-//				mUiHandler.sendMessageDelayed(msg, 100);
-//			}
 			Log.d(TAG, "[NonUihandler][doPlayAudio] + End");
 		}
 	}
@@ -373,7 +403,7 @@ public class BookmarkFragment extends Fragment {
 			Log.d(TAG, "[onActivityCreated] + Begin");
 			super.onActivityCreated(savedInstanceState);
 			
-			mInflater = (LayoutInflater)mParentActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			mInflater = (LayoutInflater)parentActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	        
 	        // Give some text to display if there is no data. In a real
 			// application this would come from a resource.
@@ -455,7 +485,7 @@ public class BookmarkFragment extends Fragment {
 				int index = mOriginBookmarkList.indexOf(dictionary);
 				Log.d(TAG, "[BookmarkListFragment][onItemClick] dictionary index="+index);
 				
-				FragmentManager fm = mParentActivity.getSupportFragmentManager();
+				FragmentManager fm = parentActivity.getSupportFragmentManager();
 				Fragment newFragment = ResultDetailFragment.newInstance(mOriginBookmarkList,index);
 				FragmentTransaction ft = fm.beginTransaction();
 				ft.replace(R.id.tab_content_bookmark, newFragment);

@@ -20,6 +20,11 @@
     <string name="send_mail_body_contact_text">Not Found!</string>
     <string name="send_mail_title_text">Send mail using</string>
     
+    <string name="toast_download_failed">Download Failed</string>
+    
+    <string name="dialog_msg_search_hint">Please wait while searching!</string>
+    <string name="dialog_msg_download_hint">Please wait while downloading!</string>
+    
     
     <string name="tab_bar_search">SEARCH</string>
     <string name="tab_bar_scenario">SCENARIOS</string>

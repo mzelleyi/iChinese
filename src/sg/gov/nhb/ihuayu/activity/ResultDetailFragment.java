@@ -59,14 +59,16 @@ public class ResultDetailFragment extends Fragment {
 	private static boolean			mBeFavorited	= false;
 
 	// Message Code
-	private static final int		CHECK_FAV_STATUS		= 1;
-	private static final int		UPDATE_FAV_IMAGE		= 2;
-	private static final int		ADD_TO_BOOKMARK	    	= 3;
-	private static final int        UPDATE_ADD_RESULT       = 4;
-	private static final int		REMOVE_FROM_BOOKMARK	= 5;
-	private static final int		UPDATE_REMOVE_RESULT	= 6;
-	private static final int        PLAY_CHINESE_AUDIO      = 7;
-	private static final int        PLAY_SENTANCE_AUDIO     = 8;
+	private static final int		CHECK_FAV_STATUS		= 501;
+	private static final int		UPDATE_FAV_IMAGE		= 502;
+	private static final int		ADD_TO_BOOKMARK	    	= 503;
+	private static final int        UPDATE_ADD_RESULT       = 504;
+	private static final int		REMOVE_FROM_BOOKMARK	= 505;
+	private static final int		UPDATE_REMOVE_RESULT	= 506;
+	private static final int        PLAY_CHINESE_AUDIO      = 507;
+	private static final int        PLAY_SENTANCE_AUDIO     = 508;
+	private static final int        SHOW_DOWNLOAD_DIALOG    = 509;
+	private static final int        HIDE_DOWNLOAD_DIALOG    = 10;
 	
 	private static DialogFragment mCurrentDialog = null;
 
@@ -210,59 +212,74 @@ public class ResultDetailFragment extends Fragment {
 		updateDataFragment();
 	}
 	
-	private final Handler mUiHandler = new Handler()
-	{
-		@Override
-		public void handleMessage(Message msg)
-		{
-			switch (msg.what)
-			{
-				case UPDATE_FAV_IMAGE:	{
-					Log.d(TAG, "[mUihandler handleMessage] UPDATE_FAV_IMAGE");
-					updateFavoriteImg((Boolean) msg.obj);
-					break;
-				}
-				case UPDATE_ADD_RESULT: {
-					Log.d(TAG, "[mUihandler handleMessage] UPDATE_ADD_RESULT");
-					if (msg.arg1 > 0) {
-						//mDialogType = MyDialogFragment.ADD_RESULT;
-						BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED = true;
-						mBeFavorited = true;
-			        	showDialog(MyDialogFragment.ADD_RESULT, true);
-			        	updateFavoriteImg(true);
-					} else {
-						//mDialogType = -1;
-						BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED = false;
-						mBeFavorited = false;
-						showDialog(MyDialogFragment.ADD_RESULT, false);
-						updateFavoriteImg(false);
-					}
-					break;
-				}
-				case UPDATE_REMOVE_RESULT: {
-					Log.d(TAG, "[mUihandler handleMessage] UPDATE_REMOVE_RESULT");
-					if (msg.arg1 > 0) {
-						//mDialogType = -1;
-						mBeFavorited = false;
-						BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED = true;
-						showDialog(MyDialogFragment.REMOVE_RESULT, true);
-						updateFavoriteImg(false);
-					} else {
-						//mDialogType = -1;
-						mBeFavorited = true;
-						BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED = false;
-						showDialog(MyDialogFragment.REMOVE_RESULT, false);
-						updateFavoriteImg(true);
-					}
-					break;
-				}
-				default:{
-					Log.e(TAG, "[mUihandler handleMessage] Something wrong!!!");
-					break;
-				}
-			}
-		}
-	};
+        private final Handler mUiHandler = new Handler() {
+             DialogFragment downloadDialog = null;
+            
+             @Override
+             public void handleMessage(Message msg) {
+                 switch (msg.what) {
+            	 case UPDATE_FAV_IMAGE: {
+            	     Log.d(TAG, "[mUihandler handleMessage] UPDATE_FAV_IMAGE");
+            	     updateFavoriteImg((Boolean) msg.obj);
+            	     break;
+            	 }
+            	 case UPDATE_ADD_RESULT: {
+            	     Log.d(TAG, "[mUihandler handleMessage] UPDATE_ADD_RESULT");
+            	     if (msg.arg1 > 0) {
+            		 // mDialogType =
+            		 // MyDialogFragment.ADD_RESULT;
+            		 BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED = true;
+            		 mBeFavorited = true;
+            		 showDialog(MyDialogFragment.ADD_RESULT, true);
+            		 updateFavoriteImg(true);
+            	     } else {
+            		 // mDialogType = -1;
+            		 BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED = false;
+            		 mBeFavorited = false;
+            		 showDialog(MyDialogFragment.ADD_RESULT, false);
+            		 updateFavoriteImg(false);
+            	     }
+            	     break;
+            	 }
+            	 case UPDATE_REMOVE_RESULT: {
+            	     Log.d(TAG, "[mUihandler handleMessage] UPDATE_REMOVE_RESULT");
+            	     if (msg.arg1 > 0) {
+            		 // mDialogType = -1;
+            		 mBeFavorited = false;
+            		 BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED = true;
+            		 showDialog(MyDialogFragment.REMOVE_RESULT, true);
+            		 updateFavoriteImg(false);
+            	     } else {
+            		 // mDialogType = -1;
+            		 mBeFavorited = true;
+            		 BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED = false;
+            		 showDialog(MyDialogFragment.REMOVE_RESULT, false);
+            		 updateFavoriteImg(true);
+            	     }
+            	     break;
+            	 }
+            	 case SHOW_DOWNLOAD_DIALOG: {
+            	     Log.d(TAG, "[mUihandler handleMessage] SHOW_DOWNLOAD_DIALOG");
+            	     downloadDialog = MyDialogFragment.newInstance(parentActivity,
+            		     MyDialogFragment.DIALOG_DOWNLOAD, false, null);
+            	     downloadDialog.show(parentActivity.getSupportFragmentManager(),
+            		     "dialog_download");
+            	     break;
+            	 }
+            	 case HIDE_DOWNLOAD_DIALOG: {
+            	     Log.d(TAG, "[mUihandler handleMessage] HIDE_DOWNLOAD_DIALOG");
+            	     if (downloadDialog != null) {
+            		 downloadDialog.dismiss();
+            	     }
+            	     break;
+            	 }
+            	 default: {
+            	     Log.e(TAG, "[mUihandler handleMessage] Something wrong!!!");
+            	     break;
+            	 }
+                 }
+             }
+         };
 	
 	/**
 	 * The NonUiHandler to do DB action
@@ -370,28 +387,36 @@ public class ResultDetailFragment extends Fragment {
 		private void doPlayAudio(String audio) {
 			Log.d(TAG, "[NonUihandler][doPlayAudio] + Begin");
 			String audioStr = null;
-			if (audio == null) {
-				audioStr = mCurrentDic.getChinese_audio();
-			} else {
+			if (audio != null) {
 				audioStr = audio;
 			}
 			Log.d(TAG, "[NonUihandler][doPlayAudio] audioStr = "+audioStr);
 			
-			AudioPlayer mAudioPlayer = new AudioPlayer();
+			AudioPlayer mAudioPlayer = AudioPlayer.newInstance();
 			try {
-				mAudioPlayer.playAudio(parentActivity, audioStr);
+				boolean bDownloaded = mAudioPlayer.doCheckDownloaded(audioStr);
+				if (bDownloaded) {
+					mAudioPlayer.doPlay(audioStr);
+				} else {
+					if (mUiHandler.hasMessages(SHOW_DOWNLOAD_DIALOG)) {
+	    				mUiHandler.removeMessages(SHOW_DOWNLOAD_DIALOG);
+	    			}
+		            mUiHandler.sendEmptyMessage(SHOW_DOWNLOAD_DIALOG);
+					boolean result = mAudioPlayer.doDownload(audioStr);
+					if (result) {
+						if (mUiHandler.hasMessages(HIDE_DOWNLOAD_DIALOG)) {
+		    				mUiHandler.removeMessages(HIDE_DOWNLOAD_DIALOG);
+		    			}
+			            mUiHandler.sendEmptyMessage(HIDE_DOWNLOAD_DIALOG);
+			            mAudioPlayer.doPlay(audioStr);
+					} else {
+						Toast.makeText(parentActivity, parentActivity.getResources().getString(R.string.toast_download_failed), Toast.LENGTH_SHORT).show();
+					}
+				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-//			if (mUiHandler != null)
-//			{
-//				if (mUiHandler.hasMessages(UPDATE_FAV_IMAGE)) {
-//					mUiHandler.removeMessages(UPDATE_FAV_IMAGE);
-//    			}
-//				Message msg = Message.obtain(mUiHandler, UPDATE_FAV_IMAGE, mBeFavorited);
-//				mUiHandler.sendMessageDelayed(msg, 100);
-//			}
 			Log.d(TAG, "[NonUihandler][doPlayAudio] + End");
 		}
 	}

@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.util.Log;
@@ -19,21 +20,64 @@ import android.util.Log;
  */
 public class AudioPlayer {
 	
-	private static final String	TAG				= "iHuayu:AudioPlayer";
-	private static final String AUDIO_DOWNLOAD_URL = "http://ihuayu.gistxl.com/smc";
+	private static final String	 TAG				   = "iHuayu:AudioPlayer";
+	private static final String  AUDIO_DOWNLOAD_URL    = "http://ihuayu.gistxl.com/smc";
+	private static final String  STORAGE_PATH          = "/audio/";
+	//private static Context mContext              = null;
 	
-	public void playAudio(Context context, String audioURL) throws Exception {
-		Log.d(TAG, "[playAudio] + Begin");
-		Log.d(TAG, "[playAudio] + audioURL = "+audioURL);
+    /**
+     * Create a new instance of AudioPlayer
+     */
+    public static AudioPlayer newInstance() {
+    	Log.d(TAG, "[newInstance] + Begin");
+    	AudioPlayer audioplayer = new AudioPlayer();
+    	//mContext = context;
+    	Log.d(TAG, "[newInstance] + End");
+        return audioplayer;
+    }
+	
+	public boolean doCheckDownloaded(String audioURL) throws Exception {
+		Log.d(TAG, "[doCheckDownloaded] + Begin");
+		Log.d(TAG, "[doCheckDownloaded] + audioURL = "+audioURL);
 		String audioName = audioURL.split("/")[1];
-		Log.d(TAG, "[playAudio] audioName = "+audioName);
-		//Check the internet first
-		int result = downFile("/audio/", audioName);
-		if(result == -1) throw new Exception("Dowload audio failed");
-		play(context,"/audio/" +  audioName);
+		Log.d(TAG, "[doCheckDownloaded] audioName = "+audioName);
+		FileUtils fileUtils = new FileUtils();
+		if (fileUtils.isFileExist(STORAGE_PATH + audioName)) {
+			Log.i(TAG, "[doCheckDownloaded] the audio file is exist, return true");
+			return true;
+		} else {
+			Log.i(TAG, "[doCheckDownloaded] the audio file isn't exist, return false");
+			return false;
+		}
 	}
 	
-	private void play(Context context, String fileName) throws IllegalArgumentException, IllegalStateException, IOException {
+	public void doPlay(String audioURL) throws Exception {
+		Log.d(TAG, "[doDirectPlay] + Begin");
+		Log.d(TAG, "[doDirectPlay] audioURL = "+audioURL);
+		String audioName = audioURL.split("/")[1];
+		Log.d(TAG, "[doDirectPlay] audioName = "+audioName);
+		play(STORAGE_PATH +  audioName);
+		Log.d(TAG, "[doDirectPlay] + End");
+	}
+	
+	public boolean doDownload(String audioURL) throws Exception {
+		Log.d(TAG, "[doDownload] + Begin");
+		Log.d(TAG, "[doDownload] audioURL = "+audioURL);
+		String audioName = audioURL.split("/")[1];
+		Log.d(TAG, "[doDownload] audioName = "+audioName);
+		boolean result = false;
+		try {
+			result = downFile(STORAGE_PATH, audioName);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(result == false) throw new Exception("Dowload audio failed");
+		Log.d(TAG, "[doDownload] + End");
+		return result;
+	}
+	
+	private void play(String fileName) throws IllegalArgumentException, IllegalStateException, IOException {
 		FileUtils fileUtils = new FileUtils();  
 		MediaPlayer player = new MediaPlayer();
 		player.setDataSource(fileUtils.getFilePath(fileName));
@@ -41,28 +85,26 @@ public class AudioPlayer {
 		player.start();
 	}
 	
-	private int downFile(String path, String fileName) throws Exception {
+	private boolean downFile(String path, String fileName) throws Exception {
 		Log.d(TAG, "[downFile] + Begin");
-//		Log.d(TAG, "[downFile] urlStr = "+ urlStr);
 		Log.d(TAG, "[downFile] path = "+ path);
 		Log.d(TAG, "[downFile] fileName = "+ fileName);
 		InputStream inputStream = null;
 		try {
 			FileUtils fileUtils = new FileUtils();
 
-			if (fileUtils.isFileExist(path + fileName)) {
-				Log.d(TAG, "[downFile] the audio file is exist");
-				return 1;
-			} else {
-				Log.d(TAG, "[downFile] the audio file isn't exist, do download");
+//			if (fileUtils.isFileExist(path + fileName)) {
+//				Log.d(TAG, "[downFile] the audio file is exist");
+//				return 1;
+//			} else {
 				Log.d(TAG, "[downFile] urlStr = "+ AUDIO_DOWNLOAD_URL + path + fileName);
 				inputStream = getInputStreamFromURL(AUDIO_DOWNLOAD_URL + path + fileName);
 				File resultFile = fileUtils.write2SDFromInput(path, fileName,inputStream);
 				if (resultFile == null) {
 					Log.e(TAG, "[downFile] write to sdcard failed");
-					return -1;
+					return false;
 				}
-			}
+//			}
 		} catch (Exception e) {
 			throw new Exception(e);
 		} finally {
@@ -74,7 +116,7 @@ public class AudioPlayer {
 				throw new Exception(e);
 			}
 		}
-		return 0;
+		return true;
 	}
 	
 	private InputStream getInputStreamFromURL(String urlStr) throws IOException {

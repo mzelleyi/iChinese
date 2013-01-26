@@ -23,7 +23,7 @@
     <string name="toast_download_failed">Download Failed</string>
     
     <string name="dialog_msg_search_hint">Please wait while searching!</string>
-    <string name="dialog_msg_download_hint">Please wait while downloading!</string>
+    <string name="dialog_msg_download_hint">Downloading!</string>
     
     
     <string name="tab_bar_search">SEARCH</string>

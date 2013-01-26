@@ -11,10 +11,15 @@
     <string name="dummy_text">Just For Test</string>
     
     <string name="searchbox_hint">Search</string>
-    <string name="search_no_result_hint_first_line">No Result Found!</string>
-    <string name="search_no_result_hint_second_line">Suggest</string>
+    <string name="search_result_empty">No Result Found!</string>
+    <string name="search_result_fuzzy_no_match">No match found.Fuzzy search result</string>
+    <string name="search_result_suggest">Suggest</string>
     <string name="search_dictionariy_divider_hint">Dictionaries</string>
-    <string name="search_fuzzy_text_hint">No match found.Fuzzy search result.Suggest</string>
+    
+    <string name="send_mail_subject_text">Dictionary Suggestion</string>
+    <string name="send_mail_body_contact_text">Not Found!</string>
+    <string name="send_mail_title_text">Send mail using</string>
+    
     
     <string name="tab_bar_search">SEARCH</string>
     <string name="tab_bar_scenario">SCENARIOS</string>

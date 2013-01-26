@@ -15,7 +15,6 @@ import sg.gov.nhb.ihuayu.view.MyDialogFragment;
 import sg.gov.nhb.ihuayu.R;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -40,6 +39,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -75,7 +75,9 @@ public class SearchFragment extends Fragment {
 	private static DialogFragment		searchDialog;
 	private static QueryType			mSearchKeyType					= null;
 	private static EditText				mEditText						= null;
-	private static TextView				mFuzzyHint						= null;
+	private static LinearLayout         mFuzzyHintLayout                = null;
+	private static TextView				mFuzzySuggestHint			    = null;
+	private static TextView				mEmptySuggestHint				= null;
 	private static TextView				mDivider						= null;
 	private static List<Dictionary>		mDicList						= new ArrayList<Dictionary>();
 	private InputMethodManager			mInputMethodManager				= null;
@@ -155,9 +157,30 @@ public class SearchFragment extends Fragment {
 		
 		final ImageView mPromptImg = (ImageView)parentActivity.findViewById(R.id.search_fragment_prompt_image);
 		final ImageView mClearImg = (ImageView)parentActivity.findViewById(R.id.search_bar_edit_clear);
-		mFuzzyHint = (TextView)parentActivity.findViewById(R.id.search_fuzzy_hint_text);
+		mFuzzyHintLayout = (LinearLayout)parentActivity.findViewById(R.id.search_fuzzy_hint_layout);
 		mDivider = (TextView)parentActivity.findViewById(R.id.search_fuzzy_divider_text);
 	    mEditText = (EditText)parentActivity.findViewById(R.id.search_bar_edit_text);
+		mFuzzySuggestHint = (TextView)parentActivity.findViewById(R.id.search_fuzzy_hint_text_suggest);
+		mFuzzySuggestHint.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				if (null != mEditText) {
+					Utils.sendMailToFeedback(parentActivity,mEditText.getText().toString());
+				}
+			}
+		});
+		
+		mEmptySuggestHint = (TextView)parentActivity.findViewById(R.id.search_empty_view_text_second_line);
+		mEmptySuggestHint.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				if (null != mEditText) {
+					Utils.sendMailToFeedback(parentActivity,mEditText.getText().toString());
+				}
+			}
+		});
 		
 	    mAdapter = new SearchListAdapter(parentActivity);
 		mListView = (ListView)parentActivity.findViewById(R.id.search_result_list);
@@ -286,7 +309,7 @@ public class SearchFragment extends Fragment {
         			mDicList.add(object);
         		}
 				
-				mFuzzyHint.setVisibility(View.GONE);
+        		mFuzzyHintLayout.setVisibility(View.GONE);
 				mDivider.setVisibility(View.GONE);
 				
 				bFuzzyMode = false;
@@ -309,17 +332,17 @@ public class SearchFragment extends Fragment {
 				if (mDicList.size() > 0) {
 					mDivider.setVisibility(View.VISIBLE);
 					if (!fuzzyResult.isExactResult()) {
-						mFuzzyHint.setVisibility(View.VISIBLE);
+						mFuzzyHintLayout.setVisibility(View.VISIBLE);
 						//String hintStr = (String) mFuzzyHint.getText();
 						//SpannableString spanStr = new SpannableString(hintStr);
 						//spanStr.setSpan(new ForegroundColorSpan(Color.BLUE), firstIndex, lastIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 						//mFuzzyHint.setText(spanStr);
 					} else {
-						mFuzzyHint.setVisibility(View.GONE);
+						mFuzzyHintLayout.setVisibility(View.GONE);
 					}
 				} else {
 					mDivider.setVisibility(View.GONE);
-					mFuzzyHint.setVisibility(View.GONE);
+					mFuzzyHintLayout.setVisibility(View.GONE);
 				}
 
 				//mCurFilter = !TextUtils.isEmpty(searchResultStr) ? searchResultStr : null;

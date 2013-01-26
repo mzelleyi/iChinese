@@ -75,17 +75,36 @@
         android:contentDescription="@string/dummy_img_des"
         android:scaleType="fitXY"
         android:src="@drawable/app_intro" />
-	<TextView
-	    android:id="@+id/search_fuzzy_hint_text"
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:layout_margin="@dimen/margin_h3"
-	    android:gravity="center_horizontal"
-	    android:textColorHint="@color/black_normal"
-	    android:visibility="gone"
-	    android:minLines="2"
-	    android:hint="@string/search_fuzzy_text_hint"
-	    android:textSize="@dimen/search_result_fuzzy_text_hint_size" />
+    <LinearLayout
+        android:id="@+id/search_fuzzy_hint_layout"
+        android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="vertical"
+		android:visibility="gone" >
+        <TextView
+		    android:id="@+id/search_fuzzy_hint_text_no_result"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:layout_margin="@dimen/margin_h3"
+		    android:gravity="center_horizontal"
+		    android:textColorHint="@color/black_normal"
+		    android:textStyle="bold"
+		    android:hint="@string/search_result_fuzzy_no_match"
+		    android:textSize="@dimen/search_result_fuzzy_text_hint_size" />
+        <TextView
+		    android:id="@+id/search_fuzzy_hint_text_suggest"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:layout_marginTop="@dimen/margin_h1"
+		    android:layout_marginBottom="@dimen/margin_h3"
+		    android:gravity="center_horizontal"
+		    android:textColorHint="@color/blue_normal"
+		    android:textColorLink="@color/blue_normal"
+		    android:textStyle="bold"
+		    android:hint="@string/search_result_suggest"
+		    android:textSize="@dimen/search_result_fuzzy_text_hint_size" />
+    </LinearLayout>
+	
     <TextView
         android:id="@+id/search_fuzzy_divider_text"
         android:layout_width="match_parent"
@@ -105,6 +124,7 @@
 	        android:layout_width="match_parent"
 	        android:layout_height="match_parent" >
     </ListView>
+    
     <LinearLayout
         android:id="@+id/search_fragment_emptyview"
 	    android:orientation="vertical"
@@ -117,7 +137,7 @@
 	        android:gravity="center"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
-	        android:hint="@string/search_no_result_hint_first_line"
+	        android:hint="@string/search_result_empty"
 	        android:textStyle="bold"
 	        android:textColorHint="@color/red_normal"
 	        android:textSize="@dimen/search_result_empty_text_hint_size" />
@@ -125,12 +145,14 @@
 	        android:id="@+id/search_empty_view_text_second_line"
 	        android:layout_gravity="center_vertical"
 	        android:gravity="center"
+	        android:layout_marginTop="@dimen/margin_h5"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
 	        android:textColorHint="@color/blue_normal"
+	        android:textColorLink="@color/blue_normal"
 	        android:textSize="@dimen/search_result_empty_text_hint_size"
 	        android:textStyle="bold"
-	        android:hint="@string/search_no_result_hint_second_line" />
+	        android:hint="@string/search_result_suggest" />
 	</LinearLayout>
     <!-- 
 <LinearLayout 

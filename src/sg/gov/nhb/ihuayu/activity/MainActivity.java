@@ -26,6 +26,8 @@ public class MainActivity extends FragmentActivity implements
 		OnTabChangeListener {
 
 	public static DBManagerment	dbManagerment	= null;
+	//public static Context       mContext       = null;
+	public static Resources     mRes            = null;
 
 	private static final String	TAG				= "iHuayu:MainActivity";
 	private static final String	TAB_SEARCH		= "Search";
@@ -40,8 +42,9 @@ public class MainActivity extends FragmentActivity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		Resources mRes = this.getResources();
-
+		mRes = this.getResources();
+		//mContext = this.getApplication();		
+		
 		mTabHost = (TabHost) findViewById(android.R.id.tabhost);
 		mTabHost.setup();
 		mTabHost.getTabWidget().setDividerDrawable(null);

@@ -479,21 +479,25 @@ public class BookmarkFragment extends Fragment {
 		public void onListItemClick(ListView l, View v, int position, long id) {
 			// Insert desired behavior here.
 			Log.d(TAG, "[BookmarkListFragment][onItemClick] + position="+position+",id="+id);
-			if (mAdapter.getItemViewType(position) == VIEW_TYPE_NORMAL) {
-				
-				Dictionary dictionary = mAdapter.getItem(position);
-				int index = mOriginBookmarkList.indexOf(dictionary);
-				Log.d(TAG, "[BookmarkListFragment][onItemClick] dictionary index="+index);
-				
-				FragmentManager fm = parentActivity.getSupportFragmentManager();
-				Fragment newFragment = ResultDetailFragment.newInstance(mOriginBookmarkList,index);
-				FragmentTransaction ft = fm.beginTransaction();
-				ft.replace(R.id.tab_content_bookmark, newFragment);
-				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-				ft.addToBackStack(null);
-				ft.commit();
+			if (mAdapter.bEditMode) {
+				Log.w(TAG, "[BookmarkListFragment][onItemClick] Edit Mode,do return");
+				return;
 			} else {
-				Log.w(TAG, "[BookmarkListFragment][onItemClick] Item Type is Divider,do return");
+				if (mAdapter.getItemViewType(position) == VIEW_TYPE_NORMAL) {
+					Dictionary dictionary = mAdapter.getItem(position);
+					int index = mOriginBookmarkList.indexOf(dictionary);
+					Log.d(TAG, "[BookmarkListFragment][onItemClick] dictionary index="+index);
+					
+					FragmentManager fm = parentActivity.getSupportFragmentManager();
+					Fragment newFragment = ResultDetailFragment.newInstance(mOriginBookmarkList,index);
+					FragmentTransaction ft = fm.beginTransaction();
+					ft.replace(R.id.tab_content_bookmark, newFragment);
+					ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+					ft.addToBackStack(null);
+					ft.commit();
+				} else {
+					Log.w(TAG, "[BookmarkListFragment][onItemClick] Item Type is Divider,do return");
+				}
 			}
 		}
 	

@@ -14,7 +14,6 @@ import sg.gov.nhb.ihuayu.activity.operation.DBManagerment;
 import sg.gov.nhb.ihuayu.activity.rest.FileUtils;
 import sg.gov.nhb.ihuayu.activity.rest.RestService;
 import sg.gov.nhb.ihuayu.view.MyDialogFragment;
-import android.annotation.SuppressLint;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
@@ -37,21 +36,30 @@ import android.widget.TextView;
  * @author Kesen
  * 
  */
-@SuppressLint("HandlerLeak")
 public class MainActivity extends FragmentActivity implements
 		OnTabChangeListener {
 
-	public static DBManagerment	dbManagerment	= null;
-	//public static Context       mContext       = null;
-	public static Resources     mRes            = null;
+	public static DBManagerment dbManagerment          = null;
+	// public static Context mContext = null;
+	public static Resources     mRes                   = null;
 
-	private static final String	TAG				= "iHuayu:MainActivity";
-	private static final String	TAB_SEARCH		= "Search";
-	private static final String	TAB_SCENARIO	= "Scenario";
-	private static final String	TAB_BOOKMARK	= "Bookmark";
-	private static final String	TAB_INFO		= "Info";
-	private TabHost				mTabHost		= null;
-	private static final String		THREAD_NAME		= "MainActivity";
+	private static final int    COPY_DB_TO_PHONE       = 1;
+	private static final int    CHECK_UPDATE_COUNT     = 2;
+	private static final int    UPDATE_DB              = 3;
+	private static final int    SHOW_DOWNLOAD_DIALOG   = 509;
+	private static final int    HIDE_DOWNLOAD_DIALOG   = 10;
+	private static final int    SHOW_NUMBER_OF_UPDATES = 666;
+	private static final int    HIDE_NUMBER_OF_UPDATES = 665;
+	private static final int    DOWNLOAD_UPDATES       = 668;
+	private static final int    HIDE_DOWNLOAD_UPDATES  = 667;
+
+	private static final String TAG                    = "iHuayu:MainActivity";
+	private static final String TAB_SEARCH             = "Search";
+	private static final String TAB_SCENARIO           = "Scenario";
+	private static final String TAB_BOOKMARK           = "Bookmark";
+	private static final String TAB_INFO               = "Info";
+	private TabHost             mTabHost               = null;
+	private static final String THREAD_NAME            = "MainActivity";
 	
 	// The update/copyDB Handler Thread
 	private HandlerThread			mHandlerThread	= null;
@@ -274,16 +282,6 @@ public class MainActivity extends FragmentActivity implements
 		Log.d(TAG,"[updateTab] + End");
 	}
 	
-	private static final int COPY_DB_TO_PHONE = 1;
-	private static final int CHECK_UPDATE_COUNT = 2;
-	private static final int UPDATE_DB = 3;
-	private static final int SHOW_DOWNLOAD_DIALOG    = 509;
-	private static final int HIDE_DOWNLOAD_DIALOG    = 10;
-	private static final int SHOW_NUMBER_OF_UPDATES    = 666;
-	private static final int HIDE_NUMBER_OF_UPDATES    = 665;
-	private static final int DOWNLOAD_UPDATES    = 668;
-	private static final int HIDE_DOWNLOAD_UPDATES    = 667;
-
 	private final class NonUiHandler extends Handler {
 		
 		public NonUiHandler(Looper looper) {

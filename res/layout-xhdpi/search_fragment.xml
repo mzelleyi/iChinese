@@ -106,23 +106,41 @@
     </LinearLayout>
 	
     <TextView
-        android:id="@+id/search_fuzzy_divider_text"
+        android:id="@+id/search_fuzzy_divider_dic"
         android:layout_width="match_parent"
         android:layout_height="@dimen/bookmark_listitem_separate_height"
         android:layout_gravity="center_vertical"
         android:background="@drawable/bg_scenario"
         android:gravity="left"
-        android:hint="@string/search_dictionariy_divider_hint"
+        android:hint="@string/search_divider_dictionary_hint"
         android:paddingLeft="@dimen/margin_h3"
         android:textColorHint="@color/white_normal"
         android:textSize="@dimen/listview_primary_text_size"
         android:textStyle="bold"
         android:visibility="gone" />
-
     <ListView
 	        android:id="@+id/search_result_list"
 	        android:layout_width="match_parent"
-	        android:layout_height="match_parent" >
+	        android:layout_height="wrap_content" >
+    </ListView>
+    <TextView
+        android:id="@+id/search_fuzzy_divider_sce"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/bookmark_listitem_separate_height"
+        android:layout_gravity="center_vertical"
+        android:background="@drawable/bg_scenario"
+        android:gravity="left"
+        android:hint="@string/search_divider_scenario_hint"
+        android:paddingLeft="@dimen/margin_h3"
+        android:textColorHint="@color/white_normal"
+        android:textSize="@dimen/listview_primary_text_size"
+        android:textStyle="bold"
+        android:visibility="gone" />
+    <ListView
+	        android:id="@+id/search_result_scenario"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:visibility="gone" >
     </ListView>
     
     <LinearLayout
@@ -154,17 +172,4 @@
 	        android:textStyle="bold"
 	        android:hint="@string/search_result_suggest" />
 	</LinearLayout>
-    <!-- 
-<LinearLayout 
-        android:id="@+id/search_fragment_list_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/prompt" >
-        <ListView
-	        android:id="@+id/search_result_list"
-	        android:layout_width="match_parent"
-	        android:layout_height="match_parent"
-	        android:layout_weight="1"
-	        android:background="@color/green_light"  />
-    </LinearLayout> -->
 </LinearLayout>

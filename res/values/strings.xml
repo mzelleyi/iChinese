@@ -14,7 +14,8 @@
     <string name="search_result_empty">No Result Found!</string>
     <string name="search_result_fuzzy_no_match">No match found.Fuzzy search result</string>
     <string name="search_result_suggest">Suggest</string>
-    <string name="search_dictionariy_divider_hint">Dictionaries</string>
+    <string name="search_divider_dictionary_hint">Dictionaries</string>
+    <string name="search_divider_scenario_hint">Scenarios</string>
     
     <string name="send_mail_subject_text">Dictionary Suggestion</string>
     <string name="send_mail_body_contact_text">Not Found!</string>

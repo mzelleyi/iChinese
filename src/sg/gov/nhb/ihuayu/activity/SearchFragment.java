@@ -9,6 +9,7 @@ import java.util.List;
 import sg.gov.nhb.ihuayu.activity.db.entity.Dictionary;
 import sg.gov.nhb.ihuayu.activity.db.entity.FuzzyResult;
 import sg.gov.nhb.ihuayu.activity.db.entity.QueryType;
+import sg.gov.nhb.ihuayu.activity.db.entity.Scenario;
 import sg.gov.nhb.ihuayu.activity.rest.AudioPlayer;
 import sg.gov.nhb.ihuayu.view.MyDialogFragment;
 
@@ -50,41 +51,45 @@ import android.widget.Toast;
  */
 public class SearchFragment extends Fragment {
 
-	private static final String			TAG								= "iHuayu:SearchFragment";
-	private static final int			DELAY_REFRESH_LIST_VIEW			= 300;
-	private static final int			MSG_DO_SUGGEST_SEARCH			= 101;
-	private static final int			MSG_REFRESH_SUGGEST_LISTVIEW	= 102;
-	private static final int			MSG_DO_FUZZY_SEARCH				= 103;
-	private static final int			MSG_REFRESH_FUZZY_RESULT		= 104;
-	private static final int            MSG_PLAY_AUDIO                  = 105;
-	private static final int            SHOW_DOWNLOAD_DIALOG            = 106;
-	private static final int            HIDE_DOWNLOAD_DIALOG            = 107;
+	private static final String          TAG                          = "iHuayu:SearchFragment";
+	private static final int             DELAY_REFRESH_LIST_VIEW      = 300;
+	private static final int             MSG_DO_SUGGEST_SEARCH        = 101;
+	private static final int             MSG_REFRESH_SUGGEST_LISTVIEW = 102;
+	private static final int             MSG_DO_FUZZY_SEARCH          = 103;
+	private static final int             MSG_REFRESH_FUZZY_RESULT     = 104;
+	private static final int             MSG_PLAY_AUDIO               = 105;
+	private static final int             SHOW_DOWNLOAD_DIALOG         = 106;
+	private static final int             HIDE_DOWNLOAD_DIALOG         = 107;
 
-	private static final int			VIEW_TYPE_SUGGEST				= 0;
-	private static final int			VIEW_TYPE_FUZZY				    = 1;
-	
+	private static final int             VIEW_TYPE_SUGGEST            = 0;
+	private static final int             VIEW_TYPE_FUZZY              = 1;
+	// private static final int VIEW_TYPE_SCENARIO = 3;
+
 	// Define Thread Name
-	private static final String THREAD_NAME = "SearchFragmentThread";
+	private static final String          THREAD_NAME                  = "SearchFragmentThread";
 	// The DB Handler Thread
-	private HandlerThread mHandlerThread = null;
+	private HandlerThread                mHandlerThread               = null;
 	// The DB Operation Thread
-	private static NonUiHandler mNonUiHandler = null;
+	private static NonUiHandler          mNonUiHandler                = null;
 
-	private static FragmentActivity		parentActivity					= null;
-	// private static String[] mStrings = Cheeses.sCheeseStrings;
-	private static SearchListAdapter	mAdapter;
-	private static ListView				mListView;
-	private static LayoutInflater		mInflater;
-	private static DialogFragment		searchDialog;
-	private static QueryType			mSearchKeyType					= null;
-	private static EditText				mEditText						= null;
-	private static LinearLayout         mFuzzyHintLayout                = null;
-	private static TextView				mFuzzySuggestHint			    = null;
-	private static TextView				mEmptySuggestHint				= null;
-	private static TextView				mDivider						= null;
-	private static List<Dictionary>		mDicList						= new ArrayList<Dictionary>();
-	private InputMethodManager			mInputMethodManager				= null;
-	private static boolean				bFuzzyMode						= false;
+	private static FragmentActivity      parentActivity               = null;
+	private static SearchListAdapter     mAdapter                     = null;
+	private static SearchScenarioAdapter mScenarioAdapter             = null;
+	private static ListView              mListView                    = null;
+	private static ListView              mScenarioListView            = null;
+	private static LayoutInflater        mInflater                    = null;
+	private static DialogFragment        searchDialog                 = null;
+	private static QueryType             mSearchKeyType               = null;
+	private static EditText              mEditText                    = null;
+	private static LinearLayout          mFuzzyHintLayout             = null;
+	private static TextView              mFuzzySuggestHint            = null;
+	private static TextView              mEmptySuggestHint            = null;
+	private static TextView              mDicDivider                  = null;
+	private static TextView              mSceDivider                  = null;
+	private static List<Dictionary>      mDicList                     = new ArrayList<Dictionary>();
+	private static List<Scenario>        mSceList                     = new ArrayList<Scenario>();
+	private InputMethodManager           mInputMethodManager          = null;
+	private static boolean               bFuzzyMode                   = false;
 	
  // If non-null, this is the current filter the user has provided.
     String mCurFilter;
@@ -161,8 +166,9 @@ public class SearchFragment extends Fragment {
 		final ImageView mPromptImg = (ImageView)parentActivity.findViewById(R.id.search_fragment_prompt_image);
 		final ImageView mClearImg = (ImageView)parentActivity.findViewById(R.id.search_bar_edit_clear);
 		mFuzzyHintLayout = (LinearLayout)parentActivity.findViewById(R.id.search_fuzzy_hint_layout);
-		mDivider = (TextView)parentActivity.findViewById(R.id.search_fuzzy_divider_text);
-	    mEditText = (EditText)parentActivity.findViewById(R.id.search_bar_edit_text);
+		mDicDivider = (TextView)parentActivity.findViewById(R.id.search_fuzzy_divider_dic);
+		mSceDivider = (TextView)parentActivity.findViewById(R.id.search_fuzzy_divider_sce);
+		mEditText = (EditText)parentActivity.findViewById(R.id.search_bar_edit_text);
 		mFuzzySuggestHint = (TextView)parentActivity.findViewById(R.id.search_fuzzy_hint_text_suggest);
 		mFuzzySuggestHint.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -189,7 +195,6 @@ public class SearchFragment extends Fragment {
 		mListView = (ListView)parentActivity.findViewById(R.id.search_result_list);
 		mListView.setAdapter(mAdapter);
 		mListView.setEmptyView(parentActivity.findViewById(R.id.search_fragment_emptyview));
-		
 		mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3)
@@ -200,6 +205,24 @@ public class SearchFragment extends Fragment {
 				
 				FragmentManager fm = parentActivity.getSupportFragmentManager();
 				Fragment newFragment = ResultDetailFragment.newInstance(mAdapter.getItem(arg2));
+				FragmentTransaction ft = fm.beginTransaction();
+				ft.replace(R.id.tab_content_search, newFragment);
+				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+				ft.addToBackStack(null);
+				ft.commit();
+			}
+		});
+		
+		mScenarioListView = (ListView) parentActivity.findViewById(R.id.search_result_scenario);
+		mScenarioAdapter = new SearchScenarioAdapter(parentActivity);
+		mScenarioListView.setAdapter(mScenarioAdapter);
+		mScenarioListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+				// TODO Auto-generated method stub
+				Log.d(TAG, "[onItemClick] + arg 2=" + arg2 + ",arg 3=" + arg3);
+				FragmentManager fm = parentActivity.getSupportFragmentManager();
+				Fragment newFragment = ScenarioDetailFragment.newInstance(mScenarioAdapter.getItem(arg2));
 				FragmentTransaction ft = fm.beginTransaction();
 				ft.replace(R.id.tab_content_search, newFragment);
 				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
@@ -273,6 +296,20 @@ public class SearchFragment extends Fragment {
 		});
 	}
 	
+	@Override
+    public void onSaveInstanceState(Bundle outState) {
+		Log.d(TAG, "[onSaveInstanceState] + Begin");
+	    // TODO Auto-generated method stub
+	    super.onSaveInstanceState(outState);
+    }
+
+	@Override
+    public void onViewStateRestored(Bundle savedInstanceState) {
+		Log.d(TAG, "[onViewStateRestored] + Begin");
+	    // TODO Auto-generated method stub
+	    super.onViewStateRestored(savedInstanceState);
+    }
+
 	private void sendSuggentSearchMsg(String key, long delayTime) {
 		if (mNonUiHandler.hasMessages(MSG_DO_SUGGEST_SEARCH)) {
 			mNonUiHandler.removeMessages(MSG_DO_SUGGEST_SEARCH);
@@ -315,7 +352,8 @@ public class SearchFragment extends Fragment {
 				   }
 
 				   mFuzzyHintLayout.setVisibility(View.GONE);
-				   mDivider.setVisibility(View.GONE);
+				   mDicDivider.setVisibility(View.GONE);
+				   mSceDivider.setVisibility(View.GONE);
 
 				   bFuzzyMode = false;
 				   mAdapter.setData(mDicList);
@@ -328,42 +366,51 @@ public class SearchFragment extends Fragment {
 
 				   FuzzyResult fuzzyResult = (FuzzyResult) msg.obj;
 				   List<Dictionary> dicList = fuzzyResult.getDictionaryList();
+				   List<Scenario> sceList = fuzzyResult.getScenarioList();
+				   int dicListSize = dicList.size();
+				   int sceListSize = sceList.size();
+				   Log.d(TAG, "[mUiHandler] FuzzyResult Dictionary size = "+dicListSize);
+				   Log.d(TAG, "[mUiHandler] FuzzyResult Scenario size = "+sceListSize);
 
-				   mDicList.clear();
-				   for (Dictionary object : dicList) {
-					   mDicList.add(object);
+				   // Handle dictionary search result
+				   if (dicListSize > 0) {
+					   mDicList.clear();
+					   for (Dictionary object : dicList) {
+						   mDicList.add(object);
+					   }
 				   }
-
 				   if (mDicList.size() > 0) {
-					   mDivider.setVisibility(View.VISIBLE);
+					   mDicDivider.setVisibility(View.VISIBLE);
 					   if (!fuzzyResult.isExactResult()) {
 						   mFuzzyHintLayout.setVisibility(View.VISIBLE);
-						   // String hintStr =
-						   // (String)
-						   // mFuzzyHint.getText();
-						   // SpannableString
-						   // spanStr = new
-						   // SpannableString(hintStr);
-						   // spanStr.setSpan(new
-						   // ForegroundColorSpan(Color.BLUE),
-						   // firstIndex, lastIndex,
-						   // Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-						   // mFuzzyHint.setText(spanStr);
 					   } else {
 						   mFuzzyHintLayout.setVisibility(View.GONE);
 					   }
 				   } else {
-					   mDivider.setVisibility(View.GONE);
+					   mDicDivider.setVisibility(View.GONE);
 					   mFuzzyHintLayout.setVisibility(View.GONE);
 				   }
-
-				   // mCurFilter =
-				   // !TextUtils.isEmpty(searchResultStr)
-				   // ? searchResultStr : null;
-				   // mAdapter.getFilter().filter(mCurFilter);
 				   bFuzzyMode = true;
 				   mAdapter.setData(mDicList);
 				   mAdapter.notifyDataSetChanged();
+				   
+				   // Handle scenario search result
+				   if (sceListSize > 0) {
+					   mSceList.clear();
+					   for (Scenario object : sceList) {
+						   mSceList.add(object);
+					   }
+					   Log.d(TAG, "[mUiHandler] mSceList size = "+mSceList.size());
+					   if (mSceList.size() > 0) {
+						   mSceDivider.setVisibility(View.VISIBLE);
+						   mScenarioListView.setVisibility(View.VISIBLE);
+					   }
+					   mScenarioAdapter.setData(mSceList);
+					   mScenarioAdapter.notifyDataSetChanged();
+				   } else {
+					   mSceDivider.setVisibility(View.GONE);
+					   mScenarioListView.setVisibility(View.GONE);
+				   }
 				   break;
 			   }
 			   case SHOW_DOWNLOAD_DIALOG: {
@@ -588,6 +635,63 @@ public class SearchFragment extends Fragment {
 					});
             	}
             }
+            return view;
+        }
+    }
+    
+    public static class SearchScenarioAdapter extends ArrayAdapter<Scenario> {
+        public SearchScenarioAdapter(Context context) {
+            super(context, android.R.layout.simple_list_item_2);
+        }
+
+        public void setData(List<Scenario> data) {
+            this.clear();
+            if (data != null && data.size() > 0) {
+            	//Dummy First Item For Divider
+                for (Scenario str : data) {
+                    this.add(str);
+                }
+            }
+        }
+
+		/**
+         * Populate new items in the list.
+         */
+        @Override 
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View view;
+            Log.d(TAG, "[getView] pos = "+position);
+            if (convertView == null) {
+        		view = mInflater.inflate(R.layout.scenario_list_item, parent, false);
+            } else {
+                view = convertView;
+            }
+
+	        final Scenario item = this.getItem(position);
+			if (view != null && item != null) {
+				//ImageView listImageLeft = (ImageView) convertView.findViewById(R.id.scenario_listitem_icon_left);
+				TextView listTextView1 = (TextView) view.findViewById(R.id.scenario_listitem_text_first_line);
+				TextView listTextView2 = (TextView) view.findViewById(R.id.scenario_listitem_text_second_line);
+				TextView listTextView3 = (TextView) view.findViewById(R.id.scenario_listitem_text_third_line);
+				ImageView listImageRight = (ImageView) view.findViewById(R.id.scenario_listitem_icon_right);
+				listTextView1.setText(item.getTitle_en());
+				listTextView2.setText(item.getTitle_cn());
+				listTextView3.setText(item.getTitle_py());
+				listImageRight.setOnClickListener(new View.OnClickListener()	{
+					@Override
+					public void onClick(View v)
+					{
+						// TODO Auto-generated method stub
+						FragmentManager fm = parentActivity.getSupportFragmentManager();
+						Fragment newFragment = ScenarioDetailFragment.newInstance(item);
+						FragmentTransaction ft = fm.beginTransaction();
+						ft.replace(R.id.tab_content_search, newFragment);
+						ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+						ft.addToBackStack(null);
+						ft.commit();
+					}
+				});
+			}
             return view;
         }
     }

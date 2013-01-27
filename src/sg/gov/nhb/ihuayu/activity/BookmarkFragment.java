@@ -531,35 +531,55 @@ public class BookmarkFragment extends Fragment {
 			mWithDividerList.clear();
 			if (originSize > 0) {
 				Dictionary firstEntry = mOriginBookmarkList.get(0);
-	        	String temp = String.valueOf(firstEntry.getKeyword().charAt(0));
+				String temp = null;
+				char tempchar = firstEntry.getKeyword().charAt(0);
+	        	if (isNotCnChar(tempchar)) {
+	        		temp = String.valueOf(tempchar);
+	        	} else {
+	        		temp = String.valueOf(firstEntry.getDestiontion().charAt(0));
+	        	}
 	        	
+	        	//TODO:[Kesen] This solution is very tricky. Need fine tuning.
 	        	//New First Entry As Divider
 	        	Dictionary firstAddEntry = new Dictionary();
-	        	firstAddEntry.setKeyword(mOriginBookmarkList.get(0).getKeyword());
-	        	firstAddEntry.setId(mOriginBookmarkList.get(0).getId());
+	        	char firstChar = firstEntry.getKeyword().charAt(0);
+	        	if (isNotCnChar(firstChar)) {
+	        		firstAddEntry.setKeyword(firstEntry.getKeyword());
+	        	} else {
+	        		firstAddEntry.setKeyword(firstEntry.getDestiontion());
+	        	}
+	        	firstAddEntry.setId(firstEntry.getId());
 	        	firstAddEntry.setIsDivider(true);
 	        	mWithDividerList.add(firstAddEntry);
 	        	
 	        	//Add to dividers list
-	        	//sDividerCharList.add(firstAddEntry.getLabel().charAt(0));
 	        	Log.d(TAG, "add isDivider = "+firstAddEntry.getIsDivider()+"; entry = "+firstAddEntry.getKeyword());
 	            for (int i = 0; i < originSize ; i++) {
 	            	Log.d(TAG, " i = "+i);
 	            	//Add char flag for divider
 	            	Dictionary entry = mOriginBookmarkList.get(i);
-	            	Character thisChar = entry.getKeyword().charAt(0);
+	            	Character thisChar = null;
+	            	char valuechar = entry.getKeyword().charAt(0);
+		        	if (isNotCnChar(valuechar)) {
+		        		thisChar = valuechar;
+		        	} else {
+		        		thisChar = entry.getDestiontion().charAt(0);
+		        	}
+		        	
 	            	if(String.valueOf(thisChar).equalsIgnoreCase(temp)) {
 	    	        	Log.d(TAG, "add isDivider = "+entry.getIsDivider()+	"; entry = "+entry.getKeyword());
 	    	        	mWithDividerList.add(entry);
-	    	        	//sDividerChars[i] = thisChar;
 	            	} else {
 	            		temp = String.valueOf(thisChar);
 	            		
 	            		//New duplicate fist char entry as list item
-	            		//Dictionary addEntry = new Dictionary(data.get(i).getApplicationInfo());
 	                   	Dictionary addEntry = new Dictionary();
-	                   	addEntry.setKeyword(mOriginBookmarkList.get(i).getKeyword());
-	                   	addEntry.setId(mOriginBookmarkList.get(i).getId());
+	                   	if (isNotCnChar(entry.getKeyword().charAt(0))) {
+	                   		addEntry.setKeyword(entry.getKeyword());
+	    	        	} else {
+	    	        		addEntry.setKeyword(entry.getDestiontion());
+	    	        	}
+	                   	addEntry.setId(entry.getId());
 	                   	addEntry.setIsDivider(true);
 	    	        	Log.d(TAG, "add isDivider = "+addEntry.getIsDivider()+"; entry = "+addEntry.getKeyword());
 	    	        	//sDividerCharList.add(addEntry.getLabel().charAt(0));
@@ -1067,13 +1087,39 @@ public class BookmarkFragment extends Fragment {
 	    }
 	}
 	
+	private static boolean isNotCnChar (char thisChar) {
+		if(((thisChar>='a'&& thisChar<='z') || (thisChar>='A'&&thisChar<='Z')) || Character.isDigit(thisChar)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	/**
 	 * Perform alphabetical comparison of application entry objects.
 	 */
 	public static final Comparator<Dictionary> ALPHA_COMPARATOR = new Comparator<Dictionary>() {
 	    private final Collator sCollator = Collator.getInstance();
 	    public int compare(Dictionary object1, Dictionary object2) {
-	        return sCollator.compare(object1.getKeyword(), object2.getKeyword());
+	    	char Char1 = object1.getSrc().charAt(0);
+	    	char Char2 = object2.getSrc().charAt(0);
+	    	boolean object_1_not_cn = isNotCnChar(Char1);
+	    	boolean object_2_not_cn = isNotCnChar(Char2);
+	    	Log.d(TAG, "object_1_not_cn ="+object_1_not_cn);
+	    	Log.d(TAG, "object_2_not_cn ="+object_2_not_cn);
+	    	if (object_1_not_cn) {
+	    		if (object_2_not_cn) {
+	    			return sCollator.compare(object1.getSrc(), object2.getSrc());
+	    		} else {
+	    			return sCollator.compare(object1.getSrc(), object2.getDestiontion());
+	    		}
+	    	} else {
+	    		if (object_2_not_cn) {
+	    			return sCollator.compare(object1.getDestiontion(), object2.getSrc());
+	    		} else {
+	    			return sCollator.compare(object1.getDestiontion(), object2.getDestiontion());
+	    		}
+	    	}
 	    }
 	};
 }

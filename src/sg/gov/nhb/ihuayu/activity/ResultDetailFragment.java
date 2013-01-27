@@ -643,6 +643,7 @@ public class ResultDetailFragment extends Fragment {
 	    	} else if (mUpdateType == UPDATE_PREV) {
 	    		entries = MainActivity.dbManagerment.getPreviousDictionary(mCurrentDic.getId());
 	    	}
+	    	mUpdateType = UPDATE_CURRENT;
 	        Log.d(TAG, "[ResultDemoLoader][loadInBackground] + End");
 	        // Done!
 	        return entries;

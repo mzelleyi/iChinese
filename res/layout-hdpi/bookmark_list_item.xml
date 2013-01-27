@@ -18,7 +18,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="@dimen/bookmark_listitem_height" >
-    
     <ImageView
         android:id="@+id/bookmark_listitem_icon_speaker"
         android:layout_width="@dimen/bookmark_speaker_width"
@@ -31,16 +30,13 @@
 
     <TextView
         android:id="@+id/bookmark_listitem_text_type"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_margin="@dimen/margin_h2"
+        android:layout_marginLeft="@dimen/margin_h2"
         android:layout_toLeftOf="@id/bookmark_listitem_icon_speaker"
-        android:ellipsize="marquee"
         android:gravity="right"
         android:hint="@string/dummy_text"
-        android:marqueeRepeatLimit="1"
-        android:singleLine="true"
         android:textColor="@color/black_normal"
         android:textSize="@dimen/listview_primary_text_size" />
 
@@ -49,6 +45,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
+        android:layout_toLeftOf="@id/bookmark_listitem_text_type"
         android:layout_centerVertical="true"
         android:orientation="horizontal" >
         <ImageView
@@ -56,7 +53,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:padding="@dimen/margin_h2"
+            android:paddingLeft="@dimen/margin_h2"
+            android:paddingRight="@dimen/margin_h1"
             android:contentDescription="@string/dummy_img_des"
             android:src="@drawable/list_uncheck"
             android:visibility="gone" />
@@ -64,44 +62,33 @@
         <RelativeLayout
             android:id="@+id/bookmark_listitem_text_three_line"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/margin_h2" >
             <TextView
                 android:id="@+id/bookmark_listitem_text_second_line"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_margin="@dimen/margin_h3"
-                android:ellipsize="marquee"
-                android:gravity="left"
+                android:gravity="left|center_vertical"
                 android:hint="@string/dummy_text"
-                android:marqueeRepeatLimit="1"
-                android:singleLine="true"
                 android:textColor="@color/black_normal"
                 android:textSize="@dimen/listview_primary_text_size" />
             <TextView
                 android:id="@+id/bookmark_listitem_text_first_line"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_above="@id/bookmark_listitem_text_second_line"
-                android:layout_marginLeft="@dimen/margin_h3"
-                android:ellipsize="marquee"
-                android:gravity="left"
+                android:gravity="left|center_vertical"
                 android:hint="@string/dummy_text"
-                android:marqueeRepeatLimit="1"
-                android:singleLine="true"
                 android:textColor="@color/black_normal"
                 android:textSize="@dimen/listview_primary_text_size" />
             <TextView
                 android:id="@+id/bookmark_listitem_text_third_line"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_below="@id/bookmark_listitem_text_second_line"
-                android:layout_marginLeft="@dimen/margin_h3"
-                android:ellipsize="marquee"
-                android:gravity="left"
+                android:gravity="left|center_vertical"
                 android:hint="@string/dummy_text"
-                android:marqueeRepeatLimit="1"
-                android:singleLine="true"
                 android:textColor="@color/black_normal"
                 android:textSize="@dimen/listview_primary_text_size" />
         </RelativeLayout>

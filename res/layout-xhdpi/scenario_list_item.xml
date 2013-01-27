@@ -53,10 +53,7 @@
 	        android:layout_marginBottom="@dimen/margin_h1"
 	        android:textSize="@dimen/listview_primary_text_size"
 	        android:hint="@string/dummy_text"
-	        android:singleLine="true"
-		    android:ellipsize="marquee"
 		    android:textColor="@color/black_normal"
-		    android:marqueeRepeatLimit="1"
 	        android:gravity="left" />
         <TextView 
             android:id="@+id/scenario_listitem_text_second_line"
@@ -67,9 +64,6 @@
 	        android:hint="@string/dummy_text"
 	        android:textSize="@dimen/listview_primary_text_size"
 	        android:textColor="@color/black_normal"
-	        android:singleLine="true"
-		    android:ellipsize="marquee"
-		    android:marqueeRepeatLimit="1"
 	        android:gravity="left" />
         <TextView 
             android:id="@+id/scenario_listitem_text_third_line"
@@ -81,9 +75,6 @@
 	        android:layout_marginLeft="@dimen/margin_h1"
 	        android:layout_marginRight="@dimen/margin_h1"
 	        android:layout_marginBottom="@dimen/margin_h2"
-	        android:singleLine="true"
-		    android:ellipsize="marquee"
-		    android:marqueeRepeatLimit="1"
 		    android:textColor="@color/black_normal"
 	        android:textSize="@dimen/listview_primary_text_size"
 	        android:gravity="left" />

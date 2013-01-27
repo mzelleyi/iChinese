@@ -21,6 +21,9 @@
     
     <dimen name="result_description_left_width">460px</dimen>
     
+    <dimen name="keywords_box_width">90dp</dimen>
+    <dimen name="keywords_box_textsize">14sp</dimen>
+    
     <dimen name="search_result_empty_text_hint_size">20sp</dimen>
     <dimen name="search_result_fuzzy_text_hint_size">18sp</dimen>
     

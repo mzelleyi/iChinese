@@ -18,31 +18,37 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/dialog_text_panel"
-        android:layout_width="wrap_content"
+        android:layout_width="@dimen/keywords_box_width"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="@dimen/margin_h1"
         android:background="@drawable/bg_wordmap_tab" >
         <TextView
             android:id="@+id/dialog_text_word_en"
-            android:layout_width="wrap_content"
+            android:layout_width="@dimen/keywords_box_width"
             android:layout_height="wrap_content"
             android:hint="@string/dummy_text"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:gravity="center_horizontal" />
+            android:textColor="@color/white_normal"
+            android:textColorHint="@color/white_normal"
+            android:textSize="@dimen/keywords_box_textsize"
+            android:gravity="center" />
         <TextView
             android:id="@+id/dialog_text_word_py"
-            android:layout_width="wrap_content"
+            android:layout_width="@dimen/keywords_box_width"
             android:layout_height="wrap_content"
             android:hint="@string/dummy_text"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:gravity="center_horizontal" />
+            android:textColor="@color/white_normal"
+            android:textColorHint="@color/white_normal"
+            android:textSize="@dimen/keywords_box_textsize"
+            android:gravity="center" />
         <TextView
             android:id="@+id/dialog_text_word_cn"
-            android:layout_width="wrap_content"
+            android:layout_width="@dimen/keywords_box_width"
             android:layout_height="wrap_content"
             android:hint="@string/dummy_text"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:gravity="center_horizontal" />
+            android:textColor="@color/white_normal"
+            android:textColorHint="@color/white_normal"
+            android:textSize="@dimen/keywords_box_textsize"
+            android:gravity="center" />
 </LinearLayout>
 

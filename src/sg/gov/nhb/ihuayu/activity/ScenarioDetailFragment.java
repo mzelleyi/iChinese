@@ -106,12 +106,14 @@ public class ScenarioDetailFragment extends Fragment {
 		//Init Item Outline Info
 		ImageView leftImg = (ImageView)parentActivity.findViewById(R.id.scenario_detail_item_icon_left);
 		leftImg.setImageResource(R.drawable.icn_paper_2x);
-		TextView TextView1 = (TextView) parentActivity.findViewById(R.id.scenario_detail_item_text_first_line);
-		TextView1.setText(mScenario.getTitle_en());
-		TextView TextView2 = (TextView) parentActivity.findViewById(R.id.scenario_detail_item_text_second_line);
-		TextView2.setText(mScenario.getTitle_cn());
-		TextView TextView3 = (TextView) parentActivity.findViewById(R.id.scenario_detail_item_text_third_line);
-		TextView3.setText(mScenario.getTitle_py());
+		if (mScenario != null) {
+			TextView TextView1 = (TextView) parentActivity.findViewById(R.id.scenario_detail_item_text_first_line);
+			TextView1.setText(mScenario.getTitle_en());
+			TextView TextView2 = (TextView) parentActivity.findViewById(R.id.scenario_detail_item_text_second_line);
+			TextView2.setText(mScenario.getTitle_cn());
+			TextView TextView3 = (TextView) parentActivity.findViewById(R.id.scenario_detail_item_text_third_line);
+			TextView3.setText(mScenario.getTitle_py());
+		}
 		
 		//Set Back Button On Click Listener
 		Button backBtn = (Button)parentActivity.findViewById(R.id.scenario_detail_backbtn);

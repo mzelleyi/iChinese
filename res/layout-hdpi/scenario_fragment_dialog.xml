@@ -16,10 +16,13 @@
 
 <!-- Top-level content view for the simple fragment sample. -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:background="@drawable/bg_wordmap"
-    android:padding="@dimen/margin_h5" >
+    android:paddingLeft="@dimen/margin_h3"
+    android:paddingTop="@dimen/margin_h5"
+    android:paddingRight="@dimen/margin_h3"
+    android:paddingBottom="@dimen/margin_h5" >
     
     <LinearLayout 
         android:id="@+id/dialog_text_panel"
@@ -58,8 +61,10 @@
             android:layout_marginTop="@dimen/margin_h5"
             android:layout_marginBottom="@dimen/margin_h3"
             android:hint="@string/dialog_words_define_hint"
+            android:textColor="@color/white_normal"
+            android:textColorHint="@color/white_normal"
             android:layout_gravity="center_vertical|center_horizontal"
-            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textAppearance="?android:attr/textAppearanceSmall"
             android:gravity="top|center_horizontal" />
     </LinearLayout>
     <LinearLayout 
@@ -87,6 +92,7 @@
         android:paddingTop="@dimen/margin_h4"
         android:paddingRight="@dimen/margin_h6"
         android:paddingBottom="@dimen/margin_h4"
+        android:textColor="@color/white_normal"
         android:text="@string/dialog_btn_ok"
         android:textSize="@dimen/btn_dialog_text_size" >
         <requestFocus />

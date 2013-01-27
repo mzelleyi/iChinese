@@ -25,7 +25,6 @@
     <string name="dialog_msg_search_hint">Please wait while searching!</string>
     <string name="dialog_msg_download_hint">Downloading!</string>
     
-    
     <string name="tab_bar_search">SEARCH</string>
     <string name="tab_bar_scenario">SCENARIOS</string>
     <string name="tab_bar_bookmark">BOOKMARKS</string>

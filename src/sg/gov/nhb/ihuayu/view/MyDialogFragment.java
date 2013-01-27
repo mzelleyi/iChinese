@@ -226,9 +226,9 @@ public class MyDialogFragment extends DialogFragment {
 		    textPY.setText(pyStr);
 		    textCN.setText(cnStr);
 		}
-		if (i < 2) {
+		if (i < 3) {
 		    wordslayout_0.addView(wordsView);
-		} else if (i < 4) {
+		} else if (i < 6) {
 		    wordslayout_1.addView(wordsView);
 		}
 	    }

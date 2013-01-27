@@ -136,4 +136,9 @@ public class FileUtils {
 		}
 		return SQLiteDatabase.openOrCreateDatabase(DB_PATH + DATABASE_FILENAME, null);
 	}
+	
+	public static boolean hasDBFileInPhone() {
+		String DB_PATH = "/data/data/sg.gov.nhb.ihuayu/databases/";
+		return new File(DB_PATH + DATABASE_FILENAME).exists();
+	}
 }

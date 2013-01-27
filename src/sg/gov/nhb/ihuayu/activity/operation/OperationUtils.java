@@ -301,6 +301,7 @@ public class OperationUtils {
 					value.put("Keyword_PY", object.getString(name));
 				}
 			}
+			valuesList.add(value);
 		}
 		return valuesList;
 	}

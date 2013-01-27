@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import sg.gov.nhb.ihuayu.activity.MainActivity;
 import sg.gov.nhb.ihuayu.activity.ResultDetailFragment;
 import sg.gov.nhb.ihuayu.activity.db.entity.DialogKeywords;
 
@@ -33,6 +34,9 @@ public class MyDialogFragment extends DialogFragment {
     public static final int	   DO_SEARCH_DB	        = 4;
     public static final int	   SCENARIO_DIALOG      = 5;
     public static final int	   DIALOG_DOWNLOAD      = 6;
+    public static final int	   PREPARE_DB      = 7;
+    public static final int	   UPDATE_COUNT      = 8;
+    
     private static final String    TAG  = "iHuayu:MyDialogFragment";
 
     private static FragmentActivity parentActivity       = null;
@@ -53,7 +57,7 @@ public class MyDialogFragment extends DialogFragment {
      * @return
      */
     @SuppressWarnings("unchecked")
-    public static MyDialogFragment newInstance(Context context, int dialogType, boolean succuss, Object param) {
+    public static MyDialogFragment newInstance(Context context, int dialogType, boolean succuss, Object param, int numberOfUpdates) {
 	Log.d(TAG, "[newInstance] + Begin");
 	MyDialogFragment frag = new MyDialogFragment();
 
@@ -82,9 +86,14 @@ public class MyDialogFragment extends DialogFragment {
 	Bundle args = new Bundle();
 	args.putInt("dialogType", dialogType);
 	args.putBoolean("actionResult", succuss);
+	args.putInt("numberOfUpdates", numberOfUpdates);
 	frag.setArguments(args);
 	Log.d(TAG, "[newInstance] + End");
 	return frag;
+    }
+    
+    public static MyDialogFragment newInstance(Context context, int dialogType, boolean succuss, Object param) {
+    	return newInstance(context, dialogType, succuss, param, 0);
     }
 
     @Override
@@ -133,7 +142,23 @@ public class MyDialogFragment extends DialogFragment {
 			    ResultDetailFragment.doNegativeClick();
 			}
 		    }).create();
-	} else if (dialogType == REMOVE_RESULT) {
+	}else if (dialogType == UPDATE_COUNT) {
+		int numberOfUpdates = getArguments().getInt("numberOfUpdates");
+	    return new AlertDialog.Builder(parentActivity).setIcon(android.R.drawable.ic_dialog_alert)
+	    .setTitle(numberOfUpdates + " new items available! Do you want to update?")
+	    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+		public void onClick(DialogInterface dialog, int whichButton) {
+			//Nothing to do
+//		    ResultDetailFragment.doPositiveClick(REMOVE_FROM_BOOKMARK);
+			 MainActivity.updateDB();
+		}
+	    }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+		public void onClick(DialogInterface dialog, int whichButton) {
+		   
+		}
+	    }).create();
+	} 
+	else if (dialogType == REMOVE_RESULT) {
 	    if (actionResult) {
 		return new AlertDialog.Builder(parentActivity).setIcon(android.R.drawable.ic_dialog_alert)
 			.setTitle(R.string.dialog_msg_remove_success)
@@ -161,6 +186,12 @@ public class MyDialogFragment extends DialogFragment {
 	else if (dialogType == DIALOG_DOWNLOAD) {
 	    ProgressDialog dialog = new ProgressDialog(parentActivity);
 	    dialog.setMessage(parentActivity.getResources().getString(R.string.dialog_msg_download_hint));
+	    dialog.setIndeterminate(true);
+	    dialog.setCancelable(true);
+	    return dialog;
+	}else if (dialogType == PREPARE_DB) {
+	    ProgressDialog dialog = new ProgressDialog(parentActivity);
+	    dialog.setMessage(parentActivity.getResources().getString(R.string.dialog_msg_prepare_db_hint));
 	    dialog.setIndeterminate(true);
 	    dialog.setCancelable(true);
 	    return dialog;

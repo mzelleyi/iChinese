@@ -21,26 +21,19 @@ public class Fuzzy {
 
 	public List<Dictionary> fuzzySearch(String keyword, String langDir, IhuayuOperationImpl operation){
 
-		// 模糊匹配精度
 		double kFuzzyMatchPercent = 0.4;
 
-		// 模糊匹配结果集截取
 		double kFuzzyResultsMaxCount = 15;
 
-		// 计算模糊匹配精度
 		int nMaxAllowed = (int)(kFuzzyMatchPercent * keyword.length());
-		// 抽取模糊串
 		String strSubText  = keyword.substring(0, nMaxAllowed);//[keyword substringWithRange:NSMakeRange(0,  nMaxAllowed)];
 
-		// 查询数据库
 		String querySql = "SELECT * FROM Dictionary WHERE keyword LIKE ? AND language_dir= ? AND keyword_length >= ? AND keyword_length <= ? ORDER BY dict_category ASC, src ASC";
 		
 		String[] param = new String[]{strSubText + "%", langDir, (keyword.length() - nMaxAllowed) + "",(nMaxAllowed + keyword.length())+""};
 		
 
-		// 根据SQL查询的结果集results，进行模糊匹配。
 		List<Dictionary> results = operation.queryDictionary(querySql, param);
-		// 计算results中每项item的distance
 		List<Dictionary> finalResults = new ArrayList<Dictionary>();
 		List<Integer> distances = new ArrayList<Integer>(); 
 		for(Dictionary dictionary : results){
@@ -67,8 +60,6 @@ public class Fuzzy {
 				finalSortResults.add(getDictionary(distance, finalResults));
 				if(finalSortResults.size() >= kFuzzyResultsMaxCount) break;
 			}
-			// 根据item.distance 降序（ASC）排列结果集finalResults。如果排序后的结果集大于kFuzzyResultsMaxCount（15）项，则截取排序后的结果集的前kFuzzyResultsMaxCount （15）项
-			// 此处省略代码若干…O(∩_∩)O~…
 		}
 
 	 return finalSortResults;
@@ -88,7 +79,7 @@ public class Fuzzy {
 	{
 	    if (s1.length() < s2.length())
 	    {
-	        // 这个需要把NSString替换为JAVA string class?
+	        // è¿™ä¸ªéœ€è¦�æŠŠNSStringæ›¿æ�¢ä¸ºJAVA string class?
 	        String  s = s1;
 	        s1 = s2;
 	        s2 = s;

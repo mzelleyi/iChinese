@@ -43,6 +43,7 @@ public class RestService {
 	private static final String AUDIO_DOWNLOAD_URL = "http://ihuayu.gistxl.com/smc/";
 	
 	public int getNumberIfDownloads(String lastUpdateTime) throws ClientProtocolException, IOException, InvalidKeyException, ParseException {
+		long start = System.currentTimeMillis();
 		HttpClient client=new DefaultHttpClient();  
 		HttpPost httpPost=new HttpPost(GET_NUMBER_OF_DOWNLOADS_URL);  
 		StringEntity entity = new StringEntity(getRequestJsonString(lastUpdateTime), "UTF-8");
@@ -51,10 +52,13 @@ public class RestService {
 		httpPost.setEntity(entity);  
 		HttpResponse response=client.execute(httpPost); 
 //		System.out.println("Wangzai 1111 " + EntityUtils.toString(response.getEntity()));
+		long end = System.currentTimeMillis();
+		Log.i(TAG, "Get Numbers Time speed: " + (end -start)/1000);
 		return Integer.parseInt(EntityUtils.toString(response.getEntity()));
 	}
 	
 	public List<ContentValues> getDictionary(String lastUpdateTime) throws ClientProtocolException, IOException, ParseException, JSONException {
+		long start = System.currentTimeMillis();
 		HttpClient client=new DefaultHttpClient();  
 		HttpPost httpPost=new HttpPost(GET_DICTIONARY_UPDATE_URL);  
 		StringEntity entity = new StringEntity(getRequestJsonString(lastUpdateTime), "UTF-8");
@@ -64,24 +68,32 @@ public class RestService {
 		HttpResponse response=client.execute(httpPost); 
 		String result = EntityUtils.toString(response.getEntity()).replace("\\", "");
 		String finalResult = result.substring(1, result.length()-1);
+		if(finalResult ==null || finalResult.length() <= 0) return null;
+		Log.i(TAG, "GetDictionary Result: " + finalResult);
 		JSONArray resultArray = new JSONArray(finalResult);
+		long end = System.currentTimeMillis();
+		Log.i(TAG, "Get Directoray time speed: " + (end -start)/1000);
 		return OperationUtils.jsonTileToSqliteContentValuesDictionary(resultArray);
 	}
 	
 	public HashMap<ContentValues, HashMap<ContentValues, List<ContentValues>>> getScenario(String lastUpdateTime) throws ClientProtocolException, IOException, ParseException, JSONException {
+		long start = System.currentTimeMillis();
 		HttpClient client=new DefaultHttpClient();  
 		HttpPost httpPost=new HttpPost(GET_SCENARIO_UPDATE_URL);  
-		StringEntity entity = new StringEntity(getRequestJsonStringForTesting(lastUpdateTime), "UTF-8");
+		StringEntity entity = new StringEntity(getRequestJsonString(lastUpdateTime), "UTF-8");
 		entity.setContentEncoding("UTF-8");  
 		entity.setContentType("application/json"); 
 		httpPost.setEntity(entity);  
 		HttpResponse response=client.execute(httpPost); 
 		String result =  EntityUtils.toString(response.getEntity()).replace("\\", "");
-		Log.d(TAG,"Wangzai 2222 " + result);
-		Log.d(TAG,"respone:"+response);
+//		Log.d(TAG,"Wangzai 2222 " + result);
+//		Log.d(TAG,"respone:"+response);
 		String finalResult = result.substring(1, result.length()-1);
+		if(finalResult ==null || finalResult.length() <= 0) return null;
 		JSONArray resultArray = new JSONArray(finalResult);
-		
+		Log.i(TAG, "GetDictionary Result: " + finalResult);
+		long end = System.currentTimeMillis();
+		Log.i(TAG, "Scenariao time speed: " + (end -start)/1000);
 		HashMap<ContentValues, HashMap<ContentValues, List<ContentValues>>> scenariaoDialogKeyWords = OperationUtils.getScenarioFromJsonObject(resultArray);
 		return scenariaoDialogKeyWords;
 	}

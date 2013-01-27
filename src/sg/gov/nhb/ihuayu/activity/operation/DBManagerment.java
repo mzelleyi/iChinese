@@ -14,7 +14,7 @@ import sg.gov.nhb.ihuayu.activity.db.entity.Dictionary;
 import sg.gov.nhb.ihuayu.activity.db.entity.FuzzyResult;
 import sg.gov.nhb.ihuayu.activity.db.entity.QueryType;
 import sg.gov.nhb.ihuayu.activity.db.entity.Scenario;
-
+import android.content.ContentValues;
 import android.content.Context;
 import android.util.Log;
 
@@ -108,4 +108,22 @@ public class DBManagerment {
 		return dictionaryList.get(0);
 	}
 	
+	//For update
+	public void insertDictionary(List<ContentValues> params) {
+		operation.insertDictionary(params);
+	}
+	
+	//For update
+	public void insertScenario(HashMap<ContentValues, HashMap<ContentValues, List<ContentValues>>> scenarioDialogKeyword) {
+		operation.insertIntoScenarioDialogKeyWord(scenarioDialogKeyword);
+	}
+	
+	
+	public String getLastUpdateTime() {
+		return operation.getLastUpdateTime();
+	}
+	
+	public long uodateUpdateTime() {
+		return operation.updateUpdateTime();
+	}
 }

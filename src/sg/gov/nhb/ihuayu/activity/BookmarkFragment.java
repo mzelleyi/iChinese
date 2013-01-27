@@ -485,11 +485,11 @@ public class BookmarkFragment extends Fragment {
 			} else {
 				if (mAdapter.getItemViewType(position) == VIEW_TYPE_NORMAL) {
 					Dictionary dictionary = mAdapter.getItem(position);
-					int index = mOriginBookmarkList.indexOf(dictionary);
-					Log.d(TAG, "[BookmarkListFragment][onItemClick] dictionary index="+index);
+					//int index = mOriginBookmarkList.indexOf(dictionary);
+					//Log.d(TAG, "[BookmarkListFragment][onItemClick] dictionary index="+index);
 					
 					FragmentManager fm = parentActivity.getSupportFragmentManager();
-					Fragment newFragment = ResultDetailFragment.newInstance(mOriginBookmarkList,index);
+					Fragment newFragment = ResultDetailFragment.newInstance(dictionary);
 					FragmentTransaction ft = fm.beginTransaction();
 					ft.replace(R.id.tab_content_bookmark, newFragment);
 					ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);

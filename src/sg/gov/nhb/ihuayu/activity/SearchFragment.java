@@ -199,7 +199,7 @@ public class SearchFragment extends Fragment {
 				mInputMethodManager.hideSoftInputFromWindow(mEditText.getWindowToken(),0);
 				
 				FragmentManager fm = parentActivity.getSupportFragmentManager();
-				Fragment newFragment = ResultDetailFragment.newInstance(mDicList,arg2);
+				Fragment newFragment = ResultDetailFragment.newInstance(mAdapter.getItem(arg2));
 				FragmentTransaction ft = fm.beginTransaction();
 				ft.replace(R.id.tab_content_search, newFragment);
 				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);

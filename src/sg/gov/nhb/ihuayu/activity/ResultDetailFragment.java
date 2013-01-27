@@ -11,7 +11,6 @@ import sg.gov.nhb.ihuayu.view.MyDialogFragment;
 import sg.gov.nhb.ihuayu.R;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -27,10 +26,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.style.ForegroundColorSpan;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -51,12 +47,16 @@ public class ResultDetailFragment extends Fragment {
 
 	private static final String		TAG				= "iHuayu:ResultDetailFragment";
 	private static FragmentActivity	parentActivity	= null;
-	private static List<Dictionary>	mResultList		= new ArrayList<Dictionary>();
+	//private static List<Dictionary>	mResultList		= new ArrayList<Dictionary>();
 	private static Dictionary		mCurrentDic		= null;
-	private static int				mCurrentPos		= -1;
 	//private static int				mDialogType		= -1;
 	private static ImageView		mFavoriteImg	= null;
 	private static boolean			mBeFavorited	= false;
+	
+	private static final int		UPDATE_CURRENT		    = 1;
+	private static final int		UPDATE_NEXT	        	= 2;
+	private static final int		UPDATE_PREV	        	= 3;
+	private static int           	mUpdateType		        = UPDATE_CURRENT;
 
 	// Message Code
 	private static final int		CHECK_FAV_STATUS		= 501;
@@ -70,7 +70,7 @@ public class ResultDetailFragment extends Fragment {
 	private static final int        SHOW_DOWNLOAD_DIALOG    = 509;
 	private static final int        HIDE_DOWNLOAD_DIALOG    = 10;
 	
-	private static DialogFragment mCurrentDialog = null;
+	private static DialogFragment   mCurrentDialog = null;
 
 	
 	// Define Thread Name
@@ -84,16 +84,11 @@ public class ResultDetailFragment extends Fragment {
     /**
      * Create a new instance of ResultDetailFragment
      */
-    static ResultDetailFragment newInstance(List<Dictionary> list, int position) {
+    static ResultDetailFragment newInstance(Dictionary dictionary) {
     	Log.d(TAG, "[newInstance] + Begin");
     	ResultDetailFragment fragment = new ResultDetailFragment();
-    	mResultList = list;
-    	if (position < mResultList.size()) {
-    		mCurrentDic = mResultList.get(position);
-    	}
-    	mCurrentPos = position;
-    	Log.d(TAG, "[newInstance] List Size = "+mResultList.size());
-    	Log.d(TAG, "[newInstance] mCurrentPos = "+mCurrentPos);
+    	mCurrentDic = dictionary;
+    	Log.d(TAG, "[newInstance] mCurrentDic.info = "+mCurrentDic.getDestiontion());
         return fragment;
     }
     
@@ -114,12 +109,18 @@ public class ResultDetailFragment extends Fragment {
 		// TODO Auto-generated method stub
 		super.onViewCreated(view, savedInstanceState);
 		parentActivity = this.getActivity();
-		
-		//Init Thread
-		mHandlerThread = new HandlerThread(THREAD_NAME);
-		mHandlerThread.setPriority(Thread.NORM_PRIORITY);
-		mHandlerThread.start();
-		mNonUiHandler = new NonUiHandler(mHandlerThread.getLooper());
+		if (mCurrentDic != null) {
+			TextView TextView1 = (TextView) parentActivity.findViewById(R.id.result_detail_des_first_line);
+			TextView1.setText(mCurrentDic.getKeyword());
+			TextView TextView2 = (TextView) parentActivity.findViewById(R.id.result_detail_des_second_line_text);
+			TextView2.setText(mCurrentDic.getDestiontion());
+			TextView TextView3 = (TextView) parentActivity.findViewById(R.id.result_detail_des_third_line);
+			TextView3.setText(mCurrentDic.getChineser_tone_py());
+			TextView TextViewSourceLabel = (TextView) parentActivity.findViewById(R.id.result_detail_des_source_text);
+			TextViewSourceLabel.setText(R.string.dic_detail_source_text);
+			TextView TextView1SourceInfo = (TextView) parentActivity.findViewById(R.id.result_detail_des_source_info);
+			TextView1SourceInfo.setText(mCurrentDic.getDic_catagory());
+		}
 		
 		ImageView audioImg = (ImageView)parentActivity.findViewById(R.id.result_detail_des_second_line_icon);
 		audioImg.setOnClickListener(new View.OnClickListener() {
@@ -127,7 +128,15 @@ public class ResultDetailFragment extends Fragment {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				Log.d(TAG, "[onClick] audioImg + Begin");
-				sendHandlerMsg(PLAY_CHINESE_AUDIO);
+				String sentanceAudio = mCurrentDic.getChinese_audio();
+				Log.d(TAG, "[onClick] sentanceAudio = "+sentanceAudio);
+		   		if (mNonUiHandler != null) {
+					if (mNonUiHandler.hasMessages(PLAY_CHINESE_AUDIO)) {
+						mNonUiHandler.removeMessages(PLAY_CHINESE_AUDIO);
+					}
+					Message msg = Message.obtain(mNonUiHandler, PLAY_CHINESE_AUDIO,sentanceAudio);
+					mNonUiHandler.sendMessage(msg);
+				}
 			}
 		});
 		
@@ -136,21 +145,13 @@ public class ResultDetailFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				Log.d(TAG, "[onClick] btnPrev + mCurrentPos = "+mCurrentPos);
-				mCurrentPos = mCurrentPos - 1;
-				Log.d(TAG, "[onClick] btnPrev + mCurrentPos = "+mCurrentPos);
-				if (mCurrentPos > -1 && mCurrentPos < mResultList.size()) {
-					mCurrentDic = mResultList.get(mCurrentPos);
-					sendHandlerMsg(CHECK_FAV_STATUS);
-					updateDataFragment();
-				} else {
-					mCurrentPos = mCurrentPos + 1;
-//					btnPrev.setEnabled(false);
-//					btnPrev.setClickable(false);
-					Toast toast = Toast.makeText(parentActivity, "The First One!", Toast.LENGTH_SHORT);
-					toast.setGravity(Gravity.CENTER, 0, 0);
-					toast.show();
-				}
+				Log.d(TAG, "[onClick] btnPrev ");
+				//mCurrentDic = mResultList.get(mCurrentPos);
+				mUpdateType = UPDATE_PREV;
+				FragmentManager fm = parentActivity.getSupportFragmentManager();
+				ResultDemoFragment list = (ResultDemoFragment) fm.findFragmentById(R.id.result_detail_demo_listview);
+				list.getLoaderManager().restartLoader(0, null, list);
+				
 			}
 		});
 		
@@ -159,21 +160,12 @@ public class ResultDetailFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				Log.d(TAG, "[onClick] btnNext + mCurrentPos = "+mCurrentPos);
-				mCurrentPos = mCurrentPos + 1;
-				Log.d(TAG, "[onClick] btnNext + mCurrentPos = "+mCurrentPos);
-				if (mCurrentPos > -1 && mCurrentPos < mResultList.size()) {
-					mCurrentDic = mResultList.get(mCurrentPos);
-					sendHandlerMsg(CHECK_FAV_STATUS);
-					updateDataFragment();
-				} else {
-					mCurrentPos = mCurrentPos - 1;
-//					btnNext.setEnabled(false);
-//					btnNext.setClickable(false);
-					Toast toast = Toast.makeText(parentActivity, "The Last One!", Toast.LENGTH_SHORT);
-					toast.setGravity(Gravity.CENTER, 0, 0);
-					toast.show();
-				}
+				Log.d(TAG, "[onClick] btnNext ");
+				//mCurrentDic = mResultList.get(mCurrentPos);
+				mUpdateType = UPDATE_NEXT;
+				FragmentManager fm = parentActivity.getSupportFragmentManager();
+				ResultDemoFragment list = (ResultDemoFragment) fm.findFragmentById(R.id.result_detail_demo_listview);
+				list.getLoaderManager().restartLoader(0, null, list);
 			}
 		});
 		
@@ -198,88 +190,86 @@ public class ResultDetailFragment extends Fragment {
 				// TODO Auto-generated method stub
 				FragmentManager fm = parentActivity.getSupportFragmentManager();
 				fm.popBackStack();
-				
-//				Fragment currentFragment = fm.findFragmentById(R.id.tab_content_scenario);
-//				FragmentTransaction ft = fm.beginTransaction();
-//				ft.remove(currentFragment);
-//				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
-//				ft.commit();
 			}
 		});
 		
-		sendHandlerMsg(CHECK_FAV_STATUS);
-		//updateFavoriteImg();
+		//Init Thread
+		mHandlerThread = new HandlerThread(THREAD_NAME);
+		mHandlerThread.setPriority(Thread.NORM_PRIORITY);
+		mHandlerThread.start();
+		mNonUiHandler = new NonUiHandler(mHandlerThread.getLooper());
+		
 		updateDataFragment();
 	}
 	
-        private final Handler mUiHandler = new Handler() {
-             DialogFragment downloadDialog = null;
-            
-             @Override
-             public void handleMessage(Message msg) {
-                 switch (msg.what) {
-            	 case UPDATE_FAV_IMAGE: {
-            	     Log.d(TAG, "[mUihandler handleMessage] UPDATE_FAV_IMAGE");
-            	     updateFavoriteImg((Boolean) msg.obj);
-            	     break;
-            	 }
-            	 case UPDATE_ADD_RESULT: {
-            	     Log.d(TAG, "[mUihandler handleMessage] UPDATE_ADD_RESULT");
-            	     if (msg.arg1 > 0) {
-            		 // mDialogType =
-            		 // MyDialogFragment.ADD_RESULT;
-            		 BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED = true;
-            		 mBeFavorited = true;
-            		 showDialog(MyDialogFragment.ADD_RESULT, true);
-            		 updateFavoriteImg(true);
-            	     } else {
-            		 // mDialogType = -1;
-            		 BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED = false;
-            		 mBeFavorited = false;
-            		 showDialog(MyDialogFragment.ADD_RESULT, false);
-            		 updateFavoriteImg(false);
-            	     }
-            	     break;
-            	 }
-            	 case UPDATE_REMOVE_RESULT: {
-            	     Log.d(TAG, "[mUihandler handleMessage] UPDATE_REMOVE_RESULT");
-            	     if (msg.arg1 > 0) {
-            		 // mDialogType = -1;
-            		 mBeFavorited = false;
-            		 BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED = true;
-            		 showDialog(MyDialogFragment.REMOVE_RESULT, true);
-            		 updateFavoriteImg(false);
-            	     } else {
-            		 // mDialogType = -1;
-            		 mBeFavorited = true;
-            		 BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED = false;
-            		 showDialog(MyDialogFragment.REMOVE_RESULT, false);
-            		 updateFavoriteImg(true);
-            	     }
-            	     break;
-            	 }
-            	 case SHOW_DOWNLOAD_DIALOG: {
-            	     Log.d(TAG, "[mUihandler handleMessage] SHOW_DOWNLOAD_DIALOG");
-            	     downloadDialog = MyDialogFragment.newInstance(parentActivity,
-            		     MyDialogFragment.DIALOG_DOWNLOAD, false, null);
-            	     downloadDialog.show(parentActivity.getSupportFragmentManager(),
-            		     "dialog_download");
-            	     break;
-            	 }
-            	 case HIDE_DOWNLOAD_DIALOG: {
-            	     Log.d(TAG, "[mUihandler handleMessage] HIDE_DOWNLOAD_DIALOG");
-            	     if (downloadDialog != null) {
-            		 downloadDialog.dismiss();
-            	     }
-            	     break;
-            	 }
-            	 default: {
-            	     Log.e(TAG, "[mUihandler handleMessage] Something wrong!!!");
-            	     break;
-            	 }
-                 }
-             }
-         };
+	private final Handler mUiHandler = new Handler() {
+         DialogFragment downloadDialog = null;
+
+         @Override
+         public void handleMessage(Message msg) {
+             switch (msg.what) {
+				 case UPDATE_FAV_IMAGE: {
+					 Log.d(TAG, "[mUihandler handleMessage] UPDATE_FAV_IMAGE");
+					 updateFavoriteImg((Boolean) msg.obj);
+					 break;
+				 }
+				 case UPDATE_ADD_RESULT: {
+					 Log.d(TAG, "[mUihandler handleMessage] UPDATE_ADD_RESULT");
+					 if (msg.arg1 > 0) {
+						 // mDialogType =
+						 // MyDialogFragment.ADD_RESULT;
+						 BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED = true;
+						 mBeFavorited = true;
+						 showDialog(MyDialogFragment.ADD_RESULT, true);
+						 updateFavoriteImg(true);
+					 } else {
+						 // mDialogType = -1;
+						 BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED = false;
+						 mBeFavorited = false;
+						 showDialog(MyDialogFragment.ADD_RESULT, false);
+						 updateFavoriteImg(false);
+					 }
+					 break;
+				 }
+				 case UPDATE_REMOVE_RESULT: {
+					 Log.d(TAG, "[mUihandler handleMessage] UPDATE_REMOVE_RESULT");
+					 if (msg.arg1 > 0) {
+						 // mDialogType = -1;
+						 mBeFavorited = false;
+						 BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED = true;
+						 showDialog(MyDialogFragment.REMOVE_RESULT, true);
+						 updateFavoriteImg(false);
+					 } else {
+						 // mDialogType = -1;
+						 mBeFavorited = true;
+						 BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED = false;
+						 showDialog(MyDialogFragment.REMOVE_RESULT, false);
+						 updateFavoriteImg(true);
+					 }
+					 break;
+				 }
+				 case SHOW_DOWNLOAD_DIALOG: {
+					 Log.d(TAG, "[mUihandler handleMessage] SHOW_DOWNLOAD_DIALOG");
+					 downloadDialog = MyDialogFragment.newInstance(parentActivity,
+					         MyDialogFragment.DIALOG_DOWNLOAD, false, null);
+					 downloadDialog.show(parentActivity.getSupportFragmentManager(),
+					         "dialog_download");
+					 break;
+				 }
+				 case HIDE_DOWNLOAD_DIALOG: {
+					 Log.d(TAG, "[mUihandler handleMessage] HIDE_DOWNLOAD_DIALOG");
+					 if (downloadDialog != null) {
+						 downloadDialog.dismiss();
+					 }
+					 break;
+				 }
+				 default: {
+					 Log.e(TAG, "[mUihandler handleMessage] Something wrong!!!");
+					 break;
+				 }
+			 }
+		 }
+     };
 	
 	/**
 	 * The NonUiHandler to do DB action
@@ -313,7 +303,7 @@ public class ResultDetailFragment extends Fragment {
 					break;
 				case PLAY_CHINESE_AUDIO:
 					Log.d(TAG, "[NonUihandler][handleMessage] - PLAY_CHINESE_AUDIO");
-					doPlayAudio(null);
+					doPlayAudio((String) msg.obj);
 					break;
 				case PLAY_SENTANCE_AUDIO:
 					Log.d(TAG, "[NonUihandler][handleMessage] - PLAY_SENTANCE_AUDIO");
@@ -521,7 +511,7 @@ public class ResultDetailFragment extends Fragment {
 	}
 	
 	public static class ResultDemoFragment extends ListFragment implements 
-		LoaderManager.LoaderCallbacks<List<Dictionary>> {
+		LoaderManager.LoaderCallbacks<Dictionary> {
 		
 		// This is the Adapter being used to display the list's data.
 		ResultDemoAdapter mAdapter;
@@ -530,7 +520,7 @@ public class ResultDetailFragment extends Fragment {
 		public void onActivityCreated(Bundle savedInstanceState) {
 			Log.d(TAG, "[ResultDemoFragment][onActivityCreated] + Begin");
 			super.onActivityCreated(savedInstanceState);
-	
+			
 			// Give some text to display if there is no data. In a real
 			// application this would come from a resource.
 			this.setEmptyText("");
@@ -543,7 +533,7 @@ public class ResultDetailFragment extends Fragment {
 			this.setListAdapter(mAdapter);
 			
 			// Start out with a progress indicator.
-			this.setListShown(true);
+			this.setListShown(false);
 			
 			// Prepare the loader. Either re-connect with an existing one,
 			// or start a new one.
@@ -564,18 +554,18 @@ public class ResultDetailFragment extends Fragment {
 			
 		}
 	
-		public Loader<List<Dictionary>> onCreateLoader(int id, Bundle args) {
+		public Loader<Dictionary> onCreateLoader(int id, Bundle args) {
 			Log.d(TAG, "[ResultDemoFragment][onCreateLoader] + Begin");
 			// This is called when a new Loader needs to be created. This
 			// sample only has one Loader with no arguments, so it is simple.
 			return new ResultDemoLoader(this.getActivity());
 		}
 	
-		public void onLoadFinished(Loader<List<Dictionary>> loader, List<Dictionary> data) {
+		public void onLoadFinished(Loader<Dictionary> loader, Dictionary data) {
 			Log.d(TAG, "[ResultDemoFragment][onLoadFinished] + Begin");
 			// Set the new data in the adapter.
 			List<Dictionary> sample = new ArrayList<Dictionary>();
-			
+			mCurrentDic = data;
 			if (mCurrentDic != null) {
 				TextView TextView1 = (TextView) parentActivity.findViewById(R.id.result_detail_des_first_line);
 				TextView1.setText(mCurrentDic.getKeyword());
@@ -602,6 +592,8 @@ public class ResultDetailFragment extends Fragment {
 				}
 			}
 			
+			sendHandlerMsg(CHECK_FAV_STATUS);
+			
 			//Cancel default divider
 			ListView mListView = this.getListView();
 			mListView.setDivider(null);
@@ -616,7 +608,7 @@ public class ResultDetailFragment extends Fragment {
 			}
 		}
 	
-		public void onLoaderReset(Loader<List<Dictionary>> loader) {
+		public void onLoaderReset(Loader<Dictionary> loader) {
 			Log.d(TAG, "[ResultDemoFragment][onLoaderReset] + Begin");
 			// Clear the data in the adapter.
 			mAdapter.setData(null);
@@ -627,9 +619,9 @@ public class ResultDetailFragment extends Fragment {
 	/**
 	 * A custom Loader that loads all of the installed applications.
 	 */
-	public static class ResultDemoLoader extends AsyncTaskLoader<List<Dictionary>> {
+	public static class ResultDemoLoader extends AsyncTaskLoader<Dictionary> {
 
-		List<Dictionary> mDicList;
+		Dictionary mDictionary;
 		
 	    public ResultDemoLoader(Context context) {
 	        super(context);
@@ -641,13 +633,16 @@ public class ResultDetailFragment extends Fragment {
 	     * data to be published by the loader.
 	     */
 	    @Override 
-	    public List<Dictionary> loadInBackground() {
+	    public Dictionary loadInBackground() {
 	    	Log.d(TAG, "[ResultDemoLoader][loadInBackground] + Begin");
-	    	int size = mResultList.size();
-	    	List<Dictionary> entries = new ArrayList<Dictionary>(size);
-	    	for (int i=0; i<size; i++) {
-	            entries.add(mResultList.get(i));
-	        }
+	    	Dictionary entries = null;
+	    	if (mUpdateType == UPDATE_CURRENT) {
+	    		entries = mCurrentDic;
+	    	} else if (mUpdateType == UPDATE_NEXT) {
+	    		entries = MainActivity.dbManagerment.getNextDictionary(mCurrentDic.getId());
+	    	} else if (mUpdateType == UPDATE_PREV) {
+	    		entries = MainActivity.dbManagerment.getPreviousDictionary(mCurrentDic.getId());
+	    	}
 	        Log.d(TAG, "[ResultDemoLoader][loadInBackground] + End");
 	        // Done!
 	        return entries;
@@ -659,30 +654,30 @@ public class ResultDetailFragment extends Fragment {
 	     * here just adds a little more logic.
 	     */
 	    @Override 
-	    public void deliverResult(List<Dictionary> dicList) {
+	    public void deliverResult(Dictionary dic) {
 	    	Log.d(TAG, "[ResultDemoLoader][deliverResult] + Begin");
 	        if (this.isReset()) {
 	            // An async query came in while the loader is stopped.  We
 	            // don't need the result.
-	            if (dicList != null) {
-	                this.onReleaseResources(dicList);
+	            if (dic != null) {
+	                this.onReleaseResources(dic);
 	            }
 	        }
-	        Log.d(TAG, "[ResultDemoLoader][deliverResult] List Size="+dicList.size());
-	        List<Dictionary> oldDicList = dicList;
-	        mDicList = dicList;
+	        Log.d(TAG, "[ResultDemoLoader][deliverResult] Dictionary Info ="+dic.getDestiontion());
+	        Dictionary oldDictionary = dic;
+	        mDictionary = dic;
 
 	        if (this.isStarted()) {
 	            // If the Loader is currently started, we can immediately
 	            // deliver its results.
-	            super.deliverResult(dicList);
+	            super.deliverResult(dic);
 	        }
 
 	        // At this point we can release the resources associated with
 	        // 'oldScenarioList' if needed; now that the new result is delivered we
 	        // know that it is no longer in use.
-	        if (oldDicList != null) {
-	            this.onReleaseResources(oldDicList);
+	        if (oldDictionary != null) {
+	            this.onReleaseResources(oldDictionary);
 	        }
 	        Log.d(TAG, "[ResultDemoLoader][deliverResult] + End");
 	    }
@@ -693,14 +688,14 @@ public class ResultDetailFragment extends Fragment {
 	    @Override 
 	    protected void onStartLoading() {
 	    	Log.d(TAG, "[ScenarioListLoader][onStartLoading] + Begin");
-	        if (mDicList != null) {
+	        if (mDictionary != null) {
 	            // If we currently have a result available, deliver it
 	            // immediately.
-	            this.deliverResult(mDicList);
+	            this.deliverResult(mDictionary);
 	        }
 
 
-	        if (takeContentChanged() || mDicList == null) {
+	        if (takeContentChanged() || mDictionary == null) {
 	            // If the data has changed since the last time it was loaded
 	            // or is not currently available, start a load.
 	            this.forceLoad();
@@ -722,12 +717,12 @@ public class ResultDetailFragment extends Fragment {
 	     * Handles a request to cancel a load.
 	     */
 	    @Override 
-	    public void onCanceled(List<Dictionary> dicList) {
+	    public void onCanceled(Dictionary dic) {
 	    	Log.d(TAG, "[ResultDemoLoader][onCanceled] + Begin");
-	        super.onCanceled(dicList);
+	        super.onCanceled(dic);
 
 	        // At this point we can release the resources associated with 'scenarioList' if needed.
-	        this.onReleaseResources(dicList);
+	        this.onReleaseResources(dic);
 	    }
 
 	    /**
@@ -742,9 +737,9 @@ public class ResultDetailFragment extends Fragment {
 	        this.onStopLoading();
 
 	        // At this point we can release the resources associated with 'scenarioList' if needed.
-	        if (mDicList != null) {
-	            this.onReleaseResources(mDicList);
-	            mDicList = null;
+	        if (mDictionary != null) {
+	            this.onReleaseResources(mDictionary);
+	            mDictionary = null;
 	        }
 	    }
 
@@ -752,7 +747,7 @@ public class ResultDetailFragment extends Fragment {
 	     * Helper function to take care of releasing resources associated
 	     * with an actively loaded data set.
 	     */
-	    protected void onReleaseResources(List<Dictionary> data) {
+	    protected void onReleaseResources(Dictionary data) {
 	        // For a simple List<> there is nothing to do.  For something
 	        // like a Cursor, we would close it here.
 	    }
@@ -804,12 +799,11 @@ public class ResultDetailFragment extends Fragment {
 					case 0:
 					{
 						String sectenceStr = item.getSample_sentance_en();
-						SpannableString spanStr = new SpannableString(sectenceStr);
 			            String hightStr = item.getKeyword();
-		            	int firstIndex = sectenceStr.indexOf(hightStr);
-		            	int lastIndex = firstIndex + hightStr.length();
-		            	spanStr.setSpan(new ForegroundColorSpan(Color.RED), firstIndex, lastIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-						TextLine.setText(spanStr);
+			            SpannableString spanStr = Utils.getSpanableText(sectenceStr, hightStr);
+						if (spanStr != null) {
+							TextLine.setText(spanStr);
+						}
 						
 						speakIcon.setVisibility(View.INVISIBLE);
 						break;
@@ -832,24 +826,23 @@ public class ResultDetailFragment extends Fragment {
 								}
 							}
 						});
+						
 						String sectenceStr = item.getSample_sentence_ch();
-						SpannableString spanStr = new SpannableString(sectenceStr);
 			            String hightStr = item.getDestiontion();
-		            	int firstIndex = sectenceStr.indexOf(hightStr);
-		            	int lastIndex = firstIndex + hightStr.length();
-		            	spanStr.setSpan(new ForegroundColorSpan(Color.RED), firstIndex, lastIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-						TextLine.setText(spanStr);
+			            SpannableString spanStr = Utils.getSpanableText(sectenceStr, hightStr);
+						if (spanStr != null) {
+							TextLine.setText(spanStr);
+						}
 						break;
 					}
 					case 2:
 					{
 						String sectenceStr = item.getSample_sentance_py();
-						SpannableString spanStr = new SpannableString(sectenceStr);
 			            String hightStr = item.getChineser_tone_py();
-		            	int firstIndex = sectenceStr.indexOf(hightStr);
-		            	int lastIndex = firstIndex + hightStr.length();
-		            	spanStr.setSpan(new ForegroundColorSpan(Color.RED), firstIndex, lastIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-						TextLine.setText(spanStr);
+			            SpannableString spanStr = Utils.getSpanableText(sectenceStr, hightStr);
+						if (spanStr != null) {
+							TextLine.setText(spanStr);
+						}
 						
 						speakIcon.setVisibility(View.INVISIBLE);
 						break;

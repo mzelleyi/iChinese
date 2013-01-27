@@ -3,8 +3,18 @@ package sg.gov.nhb.ihuayu.activity;
 import sg.gov.nhb.ihuayu.R;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 
+/**
+ * 
+ * @author Kesen
+ *
+ */
 public class Utils {
 	
 	private static final String	TAG	= "iHuayu:Utils";
@@ -35,4 +45,30 @@ public class Utils {
 		}
 		Log.d(TAG, "[sendMailToFeedback] + End");
 	}
+	
+	public static SpannableString getSpanableText(String orginText, String hightlightText) {
+		Log.d(TAG, "[getSpanableText] + Begin");
+		if (TextUtils.isEmpty(orginText)) {
+			Log.w(TAG, "[getSpanableText] orginText is empty");
+			return null;
+		}  
+		SpannableString spannableString = new SpannableString(orginText);
+		
+		if (hightlightText.equals("")) {
+			Log.w(TAG, "[getSpanableText] hightlightText is empty");
+			return spannableString;
+		} 
+		
+		int startPos = orginText.toLowerCase().indexOf(hightlightText.toLowerCase());
+		if (startPos == -1) {
+			Log.w(TAG, "[getSpanableText] startPos is -1");
+			return spannableString;  
+		} 
+		
+		int endPos = startPos + hightlightText.length();
+		spannableString.setSpan(new ForegroundColorSpan(Color.RED),
+	    		startPos, endPos, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+	    Log.d(TAG, "[getSpanableText] + End");
+		return spannableString;  
+	} 
 }

@@ -349,7 +349,7 @@ public class MainActivity extends FragmentActivity implements
 				}
 				Message msg = new Message();
 				msg.what = SHOW_NUMBER_OF_UPDATES;
-				msg.obj = updateCount;
+				msg.obj = updateCount+"";
 	            mUiHandler.sendMessage(msg);
 //	            dbManagerment = new DBManagerment(MainActivity.this);
 			}
@@ -394,7 +394,8 @@ public class MainActivity extends FragmentActivity implements
 			}
 			case SHOW_NUMBER_OF_UPDATES: {
 				Log.d(TAG, "[mUihandler handleMessage] SHOW_DOWNLOAD_DIALOG");
-				int number = Integer.parseInt((String)msg.obj);
+				String numberS = (String)msg.obj;
+				int number = Integer.parseInt(numberS);
 				downloadDialog = MyDialogFragment.newInstance(MainActivity.this,
 						MyDialogFragment.UPDATE_COUNT, false, null, number);
 				downloadDialog.show(MainActivity.this.getSupportFragmentManager(),

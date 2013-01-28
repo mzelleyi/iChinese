@@ -154,7 +154,7 @@ public class MyDialogFragment extends DialogFragment {
 		}
 	    }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
 		public void onClick(DialogInterface dialog, int whichButton) {
-		   
+		   MainActivity.updateCancelTime();
 		}
 	    }).create();
 	} 

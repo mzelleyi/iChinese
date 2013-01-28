@@ -126,4 +126,12 @@ public class DBManagerment {
 	public long uodateUpdateTime() {
 		return operation.updateUpdateTime();
 	}
+	
+	public String getLastCancelUpdateTime() {
+		return operation.getCancelTime();
+	}
+	
+	public long updateCancelUpdateTime() {
+		return operation.updateCancelTime();
+	}
 }

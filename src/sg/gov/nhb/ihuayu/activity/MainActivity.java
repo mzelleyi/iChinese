@@ -4,7 +4,11 @@ package sg.gov.nhb.ihuayu.activity;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONException;
@@ -14,6 +18,7 @@ import sg.gov.nhb.ihuayu.activity.operation.DBManagerment;
 import sg.gov.nhb.ihuayu.activity.rest.FileUtils;
 import sg.gov.nhb.ihuayu.activity.rest.RestService;
 import sg.gov.nhb.ihuayu.view.MyDialogFragment;
+import android.annotation.SuppressLint;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
@@ -342,13 +347,16 @@ public class MainActivity extends FragmentActivity implements
 			RestService service = new RestService();
 			int updateCount = service.getNumberIfDownloads(dbManagerment.getLastUpdateTime());
 			if(updateCount > 0){
-				if (mUiHandler.hasMessages(SHOW_NUMBER_OF_UPDATES)) {
-					mUiHandler.removeMessages(SHOW_NUMBER_OF_UPDATES);
+				//If user has canceled the update then remind again after 24 hours.
+				if(canShowUpdate()) {
+					if (mUiHandler.hasMessages(SHOW_NUMBER_OF_UPDATES)) {
+						mUiHandler.removeMessages(SHOW_NUMBER_OF_UPDATES);
+					}
+					Message msg = new Message();
+					msg.what = SHOW_NUMBER_OF_UPDATES;
+					msg.obj = updateCount+"";
+		            mUiHandler.sendMessage(msg);
 				}
-				Message msg = new Message();
-				msg.what = SHOW_NUMBER_OF_UPDATES;
-				msg.obj = updateCount+"";
-	            mUiHandler.sendMessage(msg);
 //	            dbManagerment = new DBManagerment(MainActivity.this);
 			}
 		}
@@ -361,7 +369,8 @@ public class MainActivity extends FragmentActivity implements
             RestService service = new RestService();
             dbManagerment.insertDictionary(service.getDictionary(dbManagerment.getLastUpdateTime()));
 			dbManagerment.insertScenario(service.getScenario(dbManagerment.getLastUpdateTime()));
-//			if (mUiHandler.hasMessages(HIDE_DOWNLOAD_UPDATES)) {
+			dbManagerment.uodateUpdateTime();
+			//			if (mUiHandler.hasMessages(HIDE_DOWNLOAD_UPDATES)) {
 //				mUiHandler.removeMessages(HIDE_DOWNLOAD_UPDATES);
 //			}
 //            mUiHandler.sendEmptyMessage(HIDE_DOWNLOAD_UPDATES);
@@ -435,5 +444,22 @@ public class MainActivity extends FragmentActivity implements
 	
 	public static void updateDB() {
 		sendHandlerMsg(UPDATE_DB);
+	}
+	
+	public static void updateCancelTime() {
+		dbManagerment.updateCancelUpdateTime();
+	}
+	
+	@SuppressLint("SimpleDateFormat")
+	public boolean canShowUpdate() throws ParseException {
+		String cancelTime = dbManagerment.getLastCancelUpdateTime();
+		if(cancelTime == null || cancelTime.length() <= 0) return true;
+		DateFormat  format2 = new SimpleDateFormat("yyyyMMddHHmmss");
+		Date now = new Date(); 
+		Date date = format2.parse(cancelTime);
+		long diff = now.getTime() - date.getTime();
+		long day =  diff / (1000 * 60 * 60 * 24);
+		if(day >= 1) return true;
+		return false;
 	}
 }

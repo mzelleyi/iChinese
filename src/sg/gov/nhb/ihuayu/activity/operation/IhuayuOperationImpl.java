@@ -202,5 +202,28 @@ public class IhuayuOperationImpl {
 			return -1;
 		}
 	}
+	
+	public String getCancelTime() {
+		String dataTime = "";
+		Cursor result = this.db.rawQuery("select Last_Update from Information where version = 'cancel'", null);
+		if(result.moveToNext()) {
+			dataTime = result.getString(result.getColumnIndex("Last_Update"));
+		}
+		if(dataTime == null || dataTime.length() <= 0) {
+			dataTime = null;
+		}
+		return dataTime;
+	}
+	
+	public long updateCancelTime() {
+		try {
+			ContentValues contentValues = new ContentValues();
+			contentValues.put("Version", "cancel");
+			contentValues.put("Last_Update", getStandardTimeStr());
+			return this.db.insert("Information", null, contentValues);
+		} catch (Exception e) {
+			return -1;
+		}
+	}
 
 }

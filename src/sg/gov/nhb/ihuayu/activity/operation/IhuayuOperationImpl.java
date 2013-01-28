@@ -51,6 +51,10 @@ public class IhuayuOperationImpl {
 		}
 	} 
 	
+	public long insertDictionary(ContentValues param) {
+		return this.db.insert("dictionary", null, param);
+	} 
+	
 	public void insertIntoScenarioDialogKeyWord(HashMap<ContentValues, HashMap<ContentValues, List<ContentValues>>> scenarioDialogKeyword) {
 		if(scenarioDialogKeyword != null && scenarioDialogKeyword.size() > 0) {
 			Iterator<ContentValues> keyIter = scenarioDialogKeyword.keySet().iterator();
@@ -77,6 +81,32 @@ public class IhuayuOperationImpl {
 			}
 		}
 		
+	}
+	
+	public void insertIntoScenarioDialogKeyWord(ContentValues contentValues,
+			HashMap<ContentValues, List<ContentValues>> dialogKeywordsMap) {
+		if (contentValues != null && contentValues.size() > 0) {
+			insertTable("Scenario_Category", contentValues);
+		}
+		if (dialogKeywordsMap != null && dialogKeywordsMap.size() > 0) {
+			if (dialogKeywordsMap != null && dialogKeywordsMap.size() > 0) {
+				Iterator<ContentValues> dialogKeyIter = dialogKeywordsMap
+						.keySet().iterator();
+				while (dialogKeyIter.hasNext()) {
+					ContentValues dialogValues = dialogKeyIter.next();
+					insertTable("Dialog", dialogValues);
+
+					List<ContentValues> keyWordValues = dialogKeywordsMap
+							.get(dialogValues);
+					if (keyWordValues != null) {
+						for (ContentValues keywordValues : keyWordValues) {
+							insertTable("Dialog_Keyword", keywordValues);
+						}
+					}
+				}
+
+			}
+		}
 	}
 	
 	public long insertToBookmark(String dictionaryID) {

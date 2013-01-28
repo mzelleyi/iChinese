@@ -112,12 +112,19 @@ public class DBManagerment {
 	public void insertDictionary(List<ContentValues> params) {
 		operation.insertDictionary(params);
 	}
+	//For update
+	public void insertDictionary(ContentValues params) {
+		operation.insertDictionary(params);
+	}
 	
 	//For update
 	public void insertScenario(HashMap<ContentValues, HashMap<ContentValues, List<ContentValues>>> scenarioDialogKeyword) {
 		operation.insertIntoScenarioDialogKeyWord(scenarioDialogKeyword);
 	}
 	
+	public void insertScenario(ContentValues contentValues, HashMap<ContentValues, List<ContentValues>> scenarioDialogKeyword) {
+		operation.insertIntoScenarioDialogKeyWord(contentValues, scenarioDialogKeyword);
+	}
 	
 	public String getLastUpdateTime() {
 		return operation.getLastUpdateTime();

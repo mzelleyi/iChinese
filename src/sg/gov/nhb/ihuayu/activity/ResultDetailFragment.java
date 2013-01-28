@@ -664,21 +664,23 @@ public class ResultDetailFragment extends Fragment {
 	                this.onReleaseResources(dic);
 	            }
 	        }
-	        Log.d(TAG, "[ResultDemoLoader][deliverResult] Dictionary Info ="+dic.getDestiontion());
-	        Dictionary oldDictionary = dic;
-	        mDictionary = dic;
+	        
+	        if (dic != null) {
+		        Dictionary oldDictionary = dic;
+		        mDictionary = dic;
 
-	        if (this.isStarted()) {
-	            // If the Loader is currently started, we can immediately
-	            // deliver its results.
-	            super.deliverResult(dic);
-	        }
-
-	        // At this point we can release the resources associated with
-	        // 'oldScenarioList' if needed; now that the new result is delivered we
-	        // know that it is no longer in use.
-	        if (oldDictionary != null) {
-	            this.onReleaseResources(oldDictionary);
+		        if (this.isStarted()) {
+		            // If the Loader is currently started, we can immediately
+		            // deliver its results.
+		            super.deliverResult(dic);
+		        }
+		        
+		        // At this point we can release the resources associated with
+		        // 'oldScenarioList' if needed; now that the new result is delivered we
+		        // know that it is no longer in use.
+		        if (oldDictionary != null) {
+		            this.onReleaseResources(oldDictionary);
+		        }
 	        }
 	        Log.d(TAG, "[ResultDemoLoader][deliverResult] + End");
 	    }

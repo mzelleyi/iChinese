@@ -375,21 +375,24 @@ public class ScenarioDetailFragment extends Fragment {
 	                this.onReleaseResources(dialogList);
 	            }
 	        }
-	        Log.d(TAG, "[ScenarioDialogLoader][deliverResult] List Size="+dialogList.size());
-	        List<HashMap<Dialog, List<DialogKeywords>>> oldDialogList = dialogList;
-	        mDialogList = dialogList;
-
-	        if (this.isStarted()) {
-	            // If the Loader is currently started, we can immediately
-	            // deliver its results.
-	            super.deliverResult(dialogList);
-	        }
-
-	        // At this point we can release the resources associated with
-	        // 'oldDialogList' if needed; now that the new result is delivered we
-	        // know that it is no longer in use.
+	        
 	        if (dialogList != null) {
-	            this.onReleaseResources(oldDialogList);
+	        	Log.d(TAG, "[ScenarioDialogLoader][deliverResult] List Size="+dialogList.size());
+		        List<HashMap<Dialog, List<DialogKeywords>>> oldDialogList = dialogList;
+		        mDialogList = dialogList;
+
+		        if (this.isStarted()) {
+		            // If the Loader is currently started, we can immediately
+		            // deliver its results.
+		            super.deliverResult(dialogList);
+		        }
+
+		        // At this point we can release the resources associated with
+		        // 'oldDialogList' if needed; now that the new result is delivered we
+		        // know that it is no longer in use.
+		        if (dialogList != null) {
+		            this.onReleaseResources(oldDialogList);
+		        }
 	        }
 	        Log.d(TAG, "[ScenarioDialogLoader][deliverResult] + End");
 	    }

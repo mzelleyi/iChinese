@@ -42,69 +42,57 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/result_detail_title_bar"
-        android:background="@color/green_light"
         android:orientation="vertical" >
-        
         <LinearLayout
             android:id="@+id/result_detail_description"
 		    android:layout_width="match_parent"
-		    android:layout_height="wrap_content"
-		    android:layout_margin="@dimen/margin_h2"
+		    android:layout_height="@dimen/result_description_height"
+		    android:paddingLeft="@dimen/margin_h2"
+		    android:paddingTop="@dimen/margin_h1"
+		    android:paddingRight="@dimen/margin_h2"
+		    android:paddingBottom="@dimen/margin_h1"
 		    android:orientation="horizontal" >
-		    <LinearLayout
-		        android:layout_height="wrap_content"
+		    <ImageView 
+		        android:id="@+id/result_detail_des_second_line_icon"
+    			android:layout_width="wrap_content"
+   				android:layout_height="wrap_content"
+		        android:layout_gravity="center_vertical"
+		        android:src="@drawable/btn_speaker_black"
+		        android:contentDescription="@string/dummy_img_des" />
+		    <RelativeLayout
 		        android:layout_width="@dimen/result_description_left_width"
-		        android:paddingRight="@dimen/margin_h2"
+		        android:layout_height="match_parent"
+		        android:layout_marginLeft="@dimen/margin_h2"
+		        android:layout_marginRight="@dimen/margin_h2"
 		        android:orientation="vertical" >
-		        <TextView android:id="@+id/result_detail_des_first_line"
-			        android:layout_gravity="center_vertical"
+	        	<TextView 
+	        	    android:id="@+id/result_detail_des_second_line_text"
 			        android:layout_width="match_parent"
 			        android:layout_height="wrap_content"
-			        android:layout_margin="@dimen/margin_h2"
+			        android:layout_centerVertical="true"
 			        android:textSize="@dimen/listview_primary_text_size"
 			        android:hint="@string/dummy_text"
 			        android:textColor="@color/black_normal"
-			        android:singleLine="true"
-				    android:ellipsize="end"
-			        android:gravity="left" />
-		        <RelativeLayout
-		    		android:layout_width="match_parent"
-		   			android:layout_height="wrap_content" >
-		   			<ImageView 
-				        android:id="@+id/result_detail_des_second_line_icon"
-        				android:layout_width="wrap_content"
-       					android:layout_height="wrap_content"
-				        android:layout_centerVertical="true"
-				        android:src="@drawable/btn_speaker_black"
-				        android:layout_margin="@dimen/margin_h1"
-				        android:layout_alignParentRight="true"
-				        android:contentDescription="@string/dummy_img_des" />
-		        	<TextView android:id="@+id/result_detail_des_second_line_text"
-				        android:layout_centerVertical="true"
-				        android:layout_width="match_parent"
-				        android:layout_height="wrap_content"
-				        android:layout_toLeftOf="@id/result_detail_des_second_line_icon"
-				        android:layout_margin="@dimen/margin_h2"
-				        android:textSize="@dimen/listview_primary_text_size"
-				        android:hint="@string/dummy_text"
-				        android:textColor="@color/black_normal"
-			        	android:singleLine="true"
-				    	android:ellipsize="end"
-				        android:gravity="left" />
-		        </RelativeLayout>
+			        android:gravity="left|center_vertical" />
+		        <TextView 
+		            android:id="@+id/result_detail_des_first_line"
+			        android:layout_width="match_parent"
+			        android:layout_height="match_parent"
+			        android:textSize="@dimen/listview_primary_text_size"
+			        android:layout_above="@id/result_detail_des_second_line_text"
+			        android:hint="@string/dummy_text"
+			        android:textColor="@color/black_normal"
+			        android:gravity="left|center_vertical" />
 		        <TextView 
 		            android:id="@+id/result_detail_des_third_line"
-			        android:layout_gravity="center_vertical"
-			        android:layout_width="match_parent"
-			        android:layout_height="wrap_content"
-			        android:layout_margin="@dimen/margin_h2"
+		            android:layout_width="match_parent"
+			        android:layout_height="match_parent"
+			        android:layout_below="@id/result_detail_des_second_line_text"
 			        android:textSize="@dimen/listview_primary_text_size"
 			        android:textColor="@color/black_normal"
 			        android:hint="@string/dummy_text"
-			        android:singleLine="false"
-				    android:ellipsize="end"
-			        android:gravity="left" />
-		    </LinearLayout>
+			        android:gravity="left|center_vertical" />
+		    </RelativeLayout>
 		    <LinearLayout
 		        android:layout_width="match_parent"
 		        android:layout_height="wrap_content"
@@ -115,32 +103,33 @@
       				android:layout_height="wrap_content"
 			        android:layout_gravity="center_vertical"
 			        android:src="@drawable/btn_mark_off"
-			        android:layout_margin="@dimen/margin_h1"
+			        android:layout_marginLeft="@dimen/margin_h2"
+			        android:layout_marginTop="@dimen/margin_h1"
+			        android:layout_marginRight="@dimen/margin_h1"
+			        android:layout_marginBottom="@dimen/margin_h1"
 			        android:contentDescription="@string/dummy_img_des" />
-	        	<TextView android:id="@+id/result_detail_des_source_text"
-			        android:layout_gravity="center_vertical"
+	        	<TextView 
+	        	    android:id="@+id/result_detail_des_source_text"
 			        android:layout_width="match_parent"
 			        android:layout_height="wrap_content"
-			        android:layout_margin="@dimen/margin_h2"
+			        android:layout_marginTop="@dimen/margin_h1"
+			        android:layout_gravity="center_vertical"
 			        android:textSize="@dimen/listview_primary_text_size"
-			        android:hint="@string/dummy_text"
 			        android:textColor="@color/black_normal"
 			        android:singleLine="true"
-				    android:ellipsize="marquee"
-				    android:marqueeRepeatLimit="1"
+				    android:ellipsize="end"
 			        android:gravity="left" />
 		        <TextView 
 		            android:id="@+id/result_detail_des_source_info"
 			        android:layout_gravity="center_vertical"
 			        android:layout_width="match_parent"
 			        android:layout_height="wrap_content"
+			        android:layout_marginTop="@dimen/margin_h1"
+			        android:layout_marginBottom="@dimen/margin_h1"
 			        android:textSize="@dimen/listview_primary_text_size"
 			        android:textColor="@color/black_normal"
-			        android:layout_margin="@dimen/margin_h2"
-			        android:hint="@string/dummy_text"
 			        android:singleLine="false"
-				    android:ellipsize="marquee"
-				    android:marqueeRepeatLimit="1"
+				    android:ellipsize="end"
 			        android:gravity="left" />
 		    </LinearLayout>
 		</LinearLayout>

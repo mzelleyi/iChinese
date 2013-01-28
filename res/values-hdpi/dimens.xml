@@ -11,7 +11,6 @@
     
     <dimen name="tab_bar_textview_size">6sp</dimen>
 
-    
     <dimen name="scenario_dialog_text_size">20sp</dimen>
     
     <dimen name="bookmark_listitem_height">120dp</dimen>
@@ -19,7 +18,8 @@
     <dimen name="bookmark_speaker_height">40dp</dimen>
     <dimen name="bookmark_speaker_width">40dp</dimen>
     
-    <dimen name="result_description_left_width">460px</dimen>
+    <dimen name="result_description_left_width">210dp</dimen>
+    <dimen name="result_description_height">120dp</dimen>
     
     <dimen name="keywords_box_width">90dp</dimen>
     <dimen name="keywords_box_textsize">14sp</dimen>

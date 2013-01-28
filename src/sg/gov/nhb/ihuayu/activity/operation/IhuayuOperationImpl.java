@@ -153,10 +153,9 @@ public class IhuayuOperationImpl {
 		return OperationUtils.cursorToDialogKeywords(result);
 	}
 	
-	@SuppressWarnings("unchecked")
 	public List<Dictionary> searchDictionary(String language_dir, String keyword) {
 		db.execSQL("create index IF NOT EXISTS dictinaryIndex ON dictionary (language_dir, keyword)");
-		Cursor result = db.rawQuery("select * from dictionary where language_dir = ? and keyword like ?", new String[]{language_dir,  keyword + "%"});
+		Cursor result = db.rawQuery("select * from dictionary where language_dir = ? and keyword like ? limit 20", new String[]{language_dir,  keyword + "%"});
 		List<Dictionary> list = OperationUtils.cursorToDictionary(result);
 //		Collections.sort(list);
 		return list;

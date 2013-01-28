@@ -12,7 +12,7 @@
     
     <string name="searchbox_hint">Search</string>
     <string name="search_result_empty">No Result Found!</string>
-    <string name="search_result_fuzzy_no_match">No match found.Fuzzy search result</string>
+    <string name="search_result_fuzzy_no_match">No match found.Fuzzy search result.</string>
     <string name="search_result_suggest">Suggest</string>
     <string name="search_divider_dictionary_hint">Dictionaries</string>
     <string name="search_divider_scenario_hint">Scenarios</string>

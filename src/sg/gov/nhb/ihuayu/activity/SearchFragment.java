@@ -52,7 +52,7 @@ import android.widget.Toast;
 public class SearchFragment extends Fragment {
 
 	private static final String          TAG                          = "iHuayu:SearchFragment";
-	private static final int             DELAY_REFRESH_LIST_VIEW      = 300;
+	private static final int             DELAY_REFRESH_LIST_VIEW      = 200;
 	private static final int             MSG_DO_SUGGEST_SEARCH        = 101;
 	private static final int             MSG_REFRESH_SUGGEST_LISTVIEW = 102;
 	private static final int             MSG_DO_FUZZY_SEARCH          = 103;
@@ -79,7 +79,7 @@ public class SearchFragment extends Fragment {
 	private static ListView              mScenarioListView            = null;
 	private static LayoutInflater        mInflater                    = null;
 	private static DialogFragment        searchDialog                 = null;
-	private static QueryType             mSearchKeyType               = null;
+	private static QueryType             mSearchKeyType               = QueryType.EN;
 	private static EditText              mEditText                    = null;
 	private static LinearLayout          mFuzzyHintLayout             = null;
 	private static TextView              mFuzzySuggestHint            = null;
@@ -245,9 +245,17 @@ public class SearchFragment extends Fragment {
 					mClearImg.setVisibility(View.GONE);
 					mPromptImg.setVisibility(View.VISIBLE);
 				} else {
-					sendSuggentSearchMsg(text, DELAY_REFRESH_LIST_VIEW);
-					mClearImg.setVisibility(View.VISIBLE);
-					mPromptImg.setVisibility(View.GONE);
+					if (mSearchKeyType == QueryType.EN) {
+						if (text.length() > 2) {
+							sendSuggentSearchMsg(text, DELAY_REFRESH_LIST_VIEW);
+							mPromptImg.setVisibility(View.GONE);
+						}
+						mClearImg.setVisibility(View.VISIBLE);
+					} else {
+						sendSuggentSearchMsg(text, DELAY_REFRESH_LIST_VIEW);
+						mClearImg.setVisibility(View.VISIBLE);
+						mPromptImg.setVisibility(View.GONE);
+					}
 				}
 				Log.d(TAG, "[onTextChanged] + End");
 			}

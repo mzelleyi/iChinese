@@ -16,6 +16,7 @@ import sg.gov.nhb.ihuayu.view.MyDialogFragment;
 import sg.gov.nhb.ihuayu.R;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -81,6 +82,7 @@ public class SearchFragment extends Fragment {
 	private static DialogFragment        searchDialog                 = null;
 	private static QueryType             mSearchKeyType               = QueryType.EN;
 	private static EditText              mEditText                    = null;
+	private static Button                mBtnLanguage                 = null;
 	private static LinearLayout          mFuzzyHintLayout             = null;
 	private static TextView              mFuzzySuggestHint            = null;
 	private static TextView              mEmptySuggestHint            = null;
@@ -143,21 +145,20 @@ public class SearchFragment extends Fragment {
 		mHandlerThread.start();
 		mNonUiHandler = new NonUiHandler(mHandlerThread.getLooper());
 		
-		final Button btnLanguage = (Button)parentActivity.findViewById(R.id.search_bar_btn);
+		mBtnLanguage = (Button)parentActivity.findViewById(R.id.search_bar_btn);
 		//Tag "EN" represent input type is English while "CN" represent Chinese.
-		mSearchKeyType = QueryType.EN;
-		btnLanguage.setBackgroundResource(R.drawable.btn_english);
-		btnLanguage.setOnClickListener(new View.OnClickListener()
+		mBtnLanguage.setBackgroundResource(R.drawable.btn_english);
+		mBtnLanguage.setOnClickListener(new View.OnClickListener()
 		{
 			@Override
 			public void onClick(View v)
 			{
 				// TODO Auto-generated method stub
 				if (mSearchKeyType == QueryType.EN) {
-					btnLanguage.setBackgroundResource(R.drawable.btn_chinese);
+					mBtnLanguage.setBackgroundResource(R.drawable.btn_chinese);
 					mSearchKeyType = QueryType.CN;
 				} else {
-					btnLanguage.setBackgroundResource(R.drawable.btn_english);
+					mBtnLanguage.setBackgroundResource(R.drawable.btn_english);
 					mSearchKeyType = QueryType.EN;
 				}
 			}
@@ -307,6 +308,49 @@ public class SearchFragment extends Fragment {
 		});
 	}
 	
+    /**
+     * Upon being resumed we can retrieve the current state.  This allows us
+     * to update the state if it was changed at any time while paused.
+     */
+    @Override
+	public void onResume() {
+    	Log.d(TAG, "[onResume] + Begin");
+        super.onResume();
+        SharedPreferences prefs = this.getActivity().getPreferences(Context.MODE_PRIVATE); 
+        String restoredText = prefs.getString("currentSearchType", null);
+        Log.i(TAG, "[onResume] read preference is "+restoredText);
+        if (restoredText != null) {
+        	if (restoredText.equalsIgnoreCase("en2sc")) {
+        		mSearchKeyType = QueryType.EN;
+        		mBtnLanguage.setBackgroundResource(R.drawable.btn_english);
+        	} else {
+        		mSearchKeyType = QueryType.CN;
+        		mBtnLanguage.setBackgroundResource(R.drawable.btn_chinese);
+        	}
+        } else {
+        	//Set first launch query type
+        	Log.i(TAG, "[onResume] read preference is null, set default EN");
+        	mSearchKeyType = QueryType.EN;
+        	mBtnLanguage.setBackgroundResource(R.drawable.btn_english);
+        }
+        Log.d(TAG, "[onResume] + End");
+    }
+
+    /**
+     * Any time we are paused we need to save away the current state, so it
+     * will be restored correctly when we are resumed.
+     */
+    @Override
+	public void onPause() {
+    	Log.d(TAG, "[onPause] + Begin");
+        super.onPause();
+        SharedPreferences.Editor editor = this.getActivity().getPreferences(Context.MODE_PRIVATE).edit();
+        editor.putString("currentSearchType", mSearchKeyType.getName());
+        editor.apply();
+        Log.i(TAG, "[onPause] write preference is "+mSearchKeyType.getName());
+        Log.d(TAG, "[onPause] + End");
+    }
+	
 	@Override
     public void onSaveInstanceState(Bundle outState) {
 		Log.d(TAG, "[onSaveInstanceState] + Begin");
@@ -320,7 +364,7 @@ public class SearchFragment extends Fragment {
 	    // TODO Auto-generated method stub
 	    super.onViewStateRestored(savedInstanceState);
     }
-
+	
 	private void sendSuggentSearchMsg(String key, long delayTime) {
 		if (mNonUiHandler.hasMessages(MSG_DO_SUGGEST_SEARCH)) {
 			mNonUiHandler.removeMessages(MSG_DO_SUGGEST_SEARCH);

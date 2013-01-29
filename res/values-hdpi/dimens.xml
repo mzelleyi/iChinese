@@ -5,8 +5,6 @@
     <dimen name="title_bar_side_text_size">16sp</dimen>
     <dimen name="title_bar_side_button_width">52dp</dimen>
     
-    <dimen name="foot_bar_side_text_size">16sp</dimen>
-    
     <dimen name="search_bar_height">56dp</dimen>
     
     <dimen name="tab_bar_textview_size">6sp</dimen>
@@ -32,6 +30,11 @@
     <dimen name="listview_third_text_size">12sp</dimen>
     
     <dimen name="btn_dialog_text_size">26sp</dimen>
+    
+    <dimen name="btn_prev_next_width">60dp</dimen>
+    <dimen name="btn_prev_next_height">30dp</dimen>
+    
+    <dimen name="btn_prev_next_text_size">18sp</dimen>
     
     <dimen name="margin_h1">4dp</dimen>
     <dimen name="margin_h2">8dp</dimen>

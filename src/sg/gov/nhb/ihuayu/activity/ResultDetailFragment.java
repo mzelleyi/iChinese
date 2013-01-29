@@ -114,9 +114,16 @@ public class ResultDetailFragment extends Fragment {
 		parentActivity = this.getActivity();
 		if (mCurrentDic != null) {
 			TextView TextView1 = (TextView) parentActivity.findViewById(R.id.result_detail_des_first_line);
-			TextView1.setText(mCurrentDic.getKeyword());
 			TextView TextView2 = (TextView) parentActivity.findViewById(R.id.result_detail_des_second_line_text);
-			TextView2.setText(mCurrentDic.getDestiontion());
+			if (mCurrentDic.getLanguage_dir().equalsIgnoreCase("en2sc")) {
+				Log.i(TAG, "[onViewCreated] is english dictionary");
+				TextView1.setText(mCurrentDic.getKeyword());
+				TextView2.setText(mCurrentDic.getDestiontion());
+			} else {
+				Log.i(TAG, "[onViewCreated] is chinese dictionary");
+				TextView1.setText(mCurrentDic.getDestiontion());
+				TextView2.setText(mCurrentDic.getKeyword());
+			}
 			TextView TextView3 = (TextView) parentActivity.findViewById(R.id.result_detail_des_third_line);
 			TextView3.setText(mCurrentDic.getChineser_tone_py());
 			TextView TextViewSourceLabel = (TextView) parentActivity.findViewById(R.id.result_detail_des_source_text);
@@ -571,9 +578,16 @@ public class ResultDetailFragment extends Fragment {
 			mCurrentDic = data;
 			if (mCurrentDic != null) {
 				TextView TextView1 = (TextView) parentActivity.findViewById(R.id.result_detail_des_first_line);
-				TextView1.setText(mCurrentDic.getKeyword());
 				TextView TextView2 = (TextView) parentActivity.findViewById(R.id.result_detail_des_second_line_text);
-				TextView2.setText(mCurrentDic.getDestiontion());
+				if (mCurrentDic.getLanguage_dir().equalsIgnoreCase("en2sc")) {
+					Log.i(TAG, "[onLoadFinished] is english dictionary");
+					TextView1.setText(mCurrentDic.getKeyword());
+					TextView2.setText(mCurrentDic.getDestiontion());
+				} else {
+					Log.i(TAG, "[onLoadFinished] is chinese dictionary");
+					TextView1.setText(mCurrentDic.getDestiontion());
+					TextView2.setText(mCurrentDic.getKeyword());
+				}
 				TextView TextView3 = (TextView) parentActivity.findViewById(R.id.result_detail_des_third_line);
 				TextView3.setText(mCurrentDic.getChineser_tone_py());
 				TextView TextViewSourceLabel = (TextView) parentActivity.findViewById(R.id.result_detail_des_source_text);

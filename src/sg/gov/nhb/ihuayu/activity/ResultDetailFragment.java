@@ -575,7 +575,28 @@ public class ResultDetailFragment extends Fragment {
 			Log.d(TAG, "[ResultDemoFragment][onLoadFinished] + Begin");
 			// Set the new data in the adapter.
 			List<Dictionary> sample = new ArrayList<Dictionary>();
-			mCurrentDic = data;
+			if (data == null) {
+				if (mUpdateType == UPDATE_NEXT) {
+					Log.i(TAG, "[onLoadFinished] data is null, UpdataType is UPDATE_NEXT");
+					mBtnNext.setEnabled(false);
+					mBtnNext.setClickable(false);
+					mBtnPrev.setEnabled(true);
+					mBtnPrev.setClickable(true);
+				} else if (mUpdateType == UPDATE_PREV) {
+					Log.i(TAG, "[onLoadFinished] mCurrentDic is null, UpdataType is UPDATE_PREV");
+					mBtnPrev.setEnabled(false);
+					mBtnPrev.setClickable(false);
+					mBtnNext.setEnabled(true);
+					mBtnNext.setClickable(true);
+				}
+			} else {
+				mCurrentDic = data;
+				mBtnPrev.setEnabled(true);
+				mBtnPrev.setClickable(true);
+				mBtnNext.setEnabled(true);
+				mBtnNext.setClickable(true);
+			}
+			
 			if (mCurrentDic != null) {
 				TextView TextView1 = (TextView) parentActivity.findViewById(R.id.result_detail_des_first_line);
 				TextView TextView2 = (TextView) parentActivity.findViewById(R.id.result_detail_des_second_line_text);
@@ -607,23 +628,7 @@ public class ResultDetailFragment extends Fragment {
 				if (strPY != null && !strPY.equalsIgnoreCase(" ")) {
 					sample.add(mCurrentDic);
 				}
-			} else {
-				if (mUpdateType == UPDATE_NEXT) {
-					Log.i(TAG, "[onLoadFinished] mCurrentDic is null, UpdataType is UPDATE_NEXT");
-					mBtnNext.setEnabled(false);
-					mBtnNext.setClickable(false);
-					mBtnPrev.setEnabled(true);
-					mBtnPrev.setClickable(true);
-				} else if (mUpdateType == UPDATE_PREV) {
-					Log.i(TAG, "[onLoadFinished] mCurrentDic is null, UpdataType is UPDATE_PREV");
-					mBtnPrev.setEnabled(false);
-					mBtnPrev.setClickable(false);
-					mBtnNext.setEnabled(true);
-					mBtnNext.setClickable(true);
-				} else {
-					Log.i(TAG, "[onLoadFinished] mCurrentDic is null, UpdataType is UPDATE_CURRENT");
-				}
-			}
+			} 
 			
 			//Reset update type
 			mUpdateType = UPDATE_CURRENT;
@@ -701,22 +706,20 @@ public class ResultDetailFragment extends Fragment {
 	            }
 	        }
 	        
-	        if (dic != null) {
-		        Dictionary oldDictionary = dic;
-		        mDictionary = dic;
+	        Dictionary oldDictionary = dic;
+	        mDictionary = dic;
 
-		        if (this.isStarted()) {
-		            // If the Loader is currently started, we can immediately
-		            // deliver its results.
-		            super.deliverResult(dic);
-		        }
-		        
-		        // At this point we can release the resources associated with
-		        // 'oldScenarioList' if needed; now that the new result is delivered we
-		        // know that it is no longer in use.
-		        if (oldDictionary != null) {
-		            this.onReleaseResources(oldDictionary);
-		        }
+	        if (this.isStarted()) {
+	            // If the Loader is currently started, we can immediately
+	            // deliver its results.
+	            super.deliverResult(dic);
+	        }
+	        
+	        // At this point we can release the resources associated with
+	        // 'oldScenarioList' if needed; now that the new result is delivered we
+	        // know that it is no longer in use.
+	        if (oldDictionary != null) {
+	            this.onReleaseResources(oldDictionary);
 	        }
 	        Log.d(TAG, "[ResultDemoLoader][deliverResult] + End");
 	    }

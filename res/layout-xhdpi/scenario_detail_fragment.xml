@@ -111,8 +111,7 @@
 		<FrameLayout
 	        android:id="@+id/scenario_detail_dialog_listview"
 	        android:layout_width="match_parent"
-	        android:layout_height="match_parent"
-	        android:background="#BBFFFF" >
+	        android:layout_height="match_parent" >
     	</FrameLayout>
     </LinearLayout>
 </LinearLayout>

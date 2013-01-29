@@ -617,6 +617,7 @@ public class BookmarkFragment extends Fragment {
 			mListView = this.getListView();
 			if (null != mListView) {
 				//mListView.setBackgroundColor(R.color.listview_bg_color);
+				mListView.setScrollingCacheEnabled(false);
 				mListView.setOnScrollListener(new AbsListView.OnScrollListener()
 				{
 					@Override

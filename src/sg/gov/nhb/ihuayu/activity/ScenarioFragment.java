@@ -115,6 +115,12 @@ public class ScenarioFragment extends Fragment {
 			// Create an empty adapter we will use to display the loaded data.
 			mAdapter = new ScenarioListAdapter(this.getActivity());
 			this.setListAdapter(mAdapter);
+			
+			ListView list = this.getListView();
+			list.setScrollingCacheEnabled(false); 
+			//list.getDrawingCache(false); 
+			//list.setCacheColorHint(Color.TRANSPARENT);
+			//list.setCacheColorHint(android.R.color.black);
 
 			// Start out with a progress indicator.
 			this.setListShown(false);

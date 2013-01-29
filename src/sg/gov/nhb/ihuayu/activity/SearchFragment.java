@@ -193,6 +193,7 @@ public class SearchFragment extends Fragment {
 		
 	    mAdapter = new SearchListAdapter(parentActivity);
 		mListView = (ListView)parentActivity.findViewById(R.id.search_result_list);
+		mListView.setScrollingCacheEnabled(false);
 		mListView.setAdapter(mAdapter);
 		mListView.setEmptyView(parentActivity.findViewById(R.id.search_fragment_emptyview));
 		mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -215,7 +216,9 @@ public class SearchFragment extends Fragment {
 		
 		mScenarioListView = (ListView) parentActivity.findViewById(R.id.search_result_scenario);
 		mScenarioAdapter = new SearchScenarioAdapter(parentActivity);
+		mScenarioListView.setScrollingCacheEnabled(false);
 		mScenarioListView.setAdapter(mScenarioAdapter);
+		//mScenarioListView.setCacheColorHint(R.color.black_normal);
 		mScenarioListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {

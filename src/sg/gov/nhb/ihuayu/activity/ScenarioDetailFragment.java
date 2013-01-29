@@ -316,6 +316,7 @@ public class ScenarioDetailFragment extends Fragment {
 			//Cancel default divider
 			ListView mListView = this.getListView();
 			mListView.setDivider(null);
+			mListView.setScrollingCacheEnabled(false);
 	
 			// The list should now be shown.
 			if (this.isResumed()) {

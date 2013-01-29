@@ -597,6 +597,7 @@ public class ResultDetailFragment extends Fragment {
 			//Cancel default divider
 			ListView mListView = this.getListView();
 			mListView.setDivider(null);
+			mListView.setScrollingCacheEnabled(false);
 			
 		    mAdapter.setData(sample);
 	

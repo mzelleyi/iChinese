@@ -19,6 +19,7 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -199,7 +200,7 @@ public class MyDialogFragment extends DialogFragment {
 	    View dialogView = mInflater.inflate(R.layout.scenario_fragment_dialog, null);
 	    final Dialog dialog = new Dialog(parentActivity, R.style.custom_dialog);
 	    dialog.setContentView(dialogView);
-
+	    
 	    TextView firstLine = (TextView) dialogView.findViewById(R.id.dialog_text_firstline);
 	    TextView secondLine = (TextView) dialogView.findViewById(R.id.dialog_text_secondline);
 	    TextView thridLine = (TextView) dialogView.findViewById(R.id.dialog_text_thridline);
@@ -207,32 +208,72 @@ public class MyDialogFragment extends DialogFragment {
 	    secondLine.setText(dialogItem.getSentence_py());
 	    thridLine.setText(dialogItem.getSentence_en());
 
-	    LinearLayout wordslayout_0 = (LinearLayout) dialogView.findViewById(R.id.dialog_words_define_panel_0);
-	    LinearLayout wordslayout_1 = (LinearLayout) dialogView.findViewById(R.id.dialog_words_define_panel_1);
+	    final LinearLayout wordslayout_0 = (LinearLayout) dialogView.findViewById(R.id.dialog_words_define_panel_0);
+	    final LinearLayout wordslayout_1 = (LinearLayout) dialogView.findViewById(R.id.dialog_words_define_panel_1);
 	    for (int i = 0; i < keyWordList.size(); i++) {
-		View wordsView = mInflater.inflate(R.layout.scenario_fragment_dialog_words, null);
-		TextView textEn = (TextView) wordsView.findViewById(R.id.dialog_text_word_en);
-		TextView textPY = (TextView) wordsView.findViewById(R.id.dialog_text_word_py);
-		TextView textCN = (TextView) wordsView.findViewById(R.id.dialog_text_word_cn);
-		DialogKeywords words = keyWordList.get(i);
-		if (null != words) {
-		    String enStr = words.getSrc_keyword();
-		    String pyStr = words.getKeyword_py();
-		    String cnStr = words.getDest_keyword();
-		    Log.d(TAG, "[onCreateDialog] enStr = " + enStr);
-		    Log.d(TAG, "[onCreateDialog] pyStr = " + pyStr);
-		    Log.d(TAG, "[onCreateDialog] cnStr = " + cnStr);
-		    textEn.setText(enStr);
-		    textPY.setText(pyStr);
-		    textCN.setText(cnStr);
-		}
-		if (i < 3) {
-		    wordslayout_0.addView(wordsView);
-		} else if (i < 6) {
-		    wordslayout_1.addView(wordsView);
-		}
+			View wordsView = mInflater.inflate(R.layout.scenario_fragment_dialog_words, null);
+			TextView textEn = (TextView) wordsView.findViewById(R.id.dialog_text_word_en);
+			TextView textPY = (TextView) wordsView.findViewById(R.id.dialog_text_word_py);
+			TextView textCN = (TextView) wordsView.findViewById(R.id.dialog_text_word_cn);
+			DialogKeywords words = keyWordList.get(i);
+			if (null != words) {
+			    String enStr = words.getSrc_keyword();
+			    String pyStr = words.getKeyword_py();
+			    String cnStr = words.getDest_keyword();
+			    Log.d(TAG, "[onCreateDialog] enStr = " + enStr);
+			    Log.d(TAG, "[onCreateDialog] pyStr = " + pyStr);
+			    Log.d(TAG, "[onCreateDialog] cnStr = " + cnStr);
+			    textEn.setText(enStr);
+			    textPY.setText(pyStr);
+			    textCN.setText(cnStr);
+			}
+			if (i < 3) {
+			    wordslayout_0.addView(wordsView);
+			    wordslayout_0.getViewTreeObserver().addOnGlobalLayoutListener(
+	    		new ViewTreeObserver.OnGlobalLayoutListener()
+	    		{
+	    			@Override
+	    			public void onGlobalLayout()
+	    			{
+	    				// TODO Auto-generated method stub
+	    				int maxHeight =  wordslayout_0.getHeight();
+	    				Log.d(TAG, "[onCreateDialog] first line height = " + maxHeight);
+	    				int count = wordslayout_0.getChildCount();
+	    			    for (int i = 0; i < count; i++) {
+	    			    	View view = wordslayout_0.getChildAt(i);
+	    			    	view.setMinimumHeight(maxHeight);
+	    			    	//view.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,maxHeight));
+	    			    }
+	    			    
+	    			    ViewTreeObserver obs = wordslayout_0.getViewTreeObserver();
+	    		        obs.removeGlobalOnLayoutListener(this);
+	    			}
+	    		});
+			} else if (i < 6) {
+			    wordslayout_1.addView(wordsView);
+			    wordslayout_1.getViewTreeObserver().addOnGlobalLayoutListener(
+	    		new ViewTreeObserver.OnGlobalLayoutListener()
+	    		{
+	    			@Override
+	    			public void onGlobalLayout()
+	    			{
+	    				// TODO Auto-generated method stub
+	    				int maxHeight =  wordslayout_1.getHeight();
+	    				Log.d(TAG, "[onCreateDialog] second line height = " + maxHeight);
+	    				int count = wordslayout_1.getChildCount();
+	    			    for (int i = 0; i < count; i++) {
+	    			    	View view = wordslayout_1.getChildAt(i);
+	    			    	view.setMinimumHeight(maxHeight);
+	    			    	//setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,maxHeight));
+	    			    }
+	    			    
+	    			    ViewTreeObserver obs = wordslayout_1.getViewTreeObserver();
+	    		        obs.removeGlobalOnLayoutListener(this);
+	    			}
+	    		});
+			}
 	    }
-
+	    
 	    Button btnOK = (Button) dialogView.findViewById(R.id.scenario_fragment_dialog_btn);
 	    btnOK.setOnClickListener(new View.OnClickListener() {
 		@Override

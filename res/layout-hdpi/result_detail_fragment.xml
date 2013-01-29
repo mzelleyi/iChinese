@@ -149,10 +149,10 @@
         android:layout_margin="@dimen/margin_h2" >
         <Button
             android:id="@+id/result_detail_footbar_btn_prev"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/btn_prev_next_width"
+            android:layout_height="@dimen/btn_prev_next_height"
             android:layout_margin="@dimen/margin_h2"
-            android:paddingLeft="@dimen/margin_h1"
+            android:paddingLeft="@dimen/margin_h2"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:text="@string/foot_bar_btn_prev"
@@ -162,10 +162,10 @@
             android:background="@drawable/btn_prev_selector" />
         <Button
             android:id="@+id/result_detail_footbar_btn_next"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/btn_prev_next_width"
+            android:layout_height="@dimen/btn_prev_next_height"
             android:layout_margin="@dimen/margin_h2"
-            android:paddingRight="@dimen/margin_h1"
+            android:paddingRight="@dimen/margin_h2"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:text="@string/foot_bar_btn_next"

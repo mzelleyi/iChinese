@@ -159,7 +159,7 @@
             android:textColor="@color/white_normal"
             android:textStyle="bold"
             android:textSize="@dimen/foot_bar_side_text_size"
-            android:background="@drawable/btn_previous" />
+            android:background="@drawable/btn_prev_selector" />
         <Button
             android:id="@+id/result_detail_footbar_btn_next"
             android:layout_width="wrap_content"
@@ -172,6 +172,6 @@
             android:textColor="@color/white_normal"
             android:textStyle="bold"
             android:textSize="@dimen/foot_bar_side_text_size"
-            android:background="@drawable/btn_next" />
+            android:background="@drawable/btn_next_selector" />
     </RelativeLayout>
 </RelativeLayout>

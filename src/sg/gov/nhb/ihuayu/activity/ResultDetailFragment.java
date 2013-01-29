@@ -45,13 +45,16 @@ import android.widget.Toast;
  */
 public class ResultDetailFragment extends Fragment {
 
-	private static final String		TAG				= "iHuayu:ResultDetailFragment";
-	private static FragmentActivity	parentActivity	= null;
-	//private static List<Dictionary>	mResultList		= new ArrayList<Dictionary>();
-	private static Dictionary		mCurrentDic		= null;
-	//private static int				mDialogType		= -1;
-	private static ImageView		mFavoriteImg	= null;
-	private static boolean			mBeFavorited	= false;
+	private static final String		TAG						= "iHuayu:ResultDetailFragment";
+	private static FragmentActivity	parentActivity			= null;
+	// private static List<Dictionary> mResultList = new
+	// ArrayList<Dictionary>();
+	private static Dictionary		mCurrentDic				= null;
+	// private static int mDialogType = -1;
+	private static ImageView		mFavoriteImg			= null;
+	private static Button			mBtnPrev				= null;
+	private static Button			mBtnNext				= null;
+	private static boolean			mBeFavorited			= false;
 	
 	private static final int		UPDATE_CURRENT		    = 1;
 	private static final int		UPDATE_NEXT	        	= 2;
@@ -140,8 +143,8 @@ public class ResultDetailFragment extends Fragment {
 			}
 		});
 		
-		final Button btnPrev = (Button)parentActivity.findViewById(R.id.result_detail_footbar_btn_prev);
-		btnPrev.setOnClickListener(new View.OnClickListener() {
+		mBtnPrev = (Button)parentActivity.findViewById(R.id.result_detail_footbar_btn_prev);
+		mBtnPrev.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
@@ -155,8 +158,8 @@ public class ResultDetailFragment extends Fragment {
 			}
 		});
 		
-		final Button btnNext = (Button)parentActivity.findViewById(R.id.result_detail_footbar_btn_next);
-		btnNext.setOnClickListener(new View.OnClickListener() {
+		mBtnNext = (Button)parentActivity.findViewById(R.id.result_detail_footbar_btn_next);
+		mBtnNext.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
@@ -590,7 +593,26 @@ public class ResultDetailFragment extends Fragment {
 				if (strPY != null && !strPY.equalsIgnoreCase(" ")) {
 					sample.add(mCurrentDic);
 				}
+			} else {
+				if (mUpdateType == UPDATE_NEXT) {
+					Log.i(TAG, "[onLoadFinished] mCurrentDic is null, UpdataType is UPDATE_NEXT");
+					mBtnNext.setEnabled(false);
+					mBtnNext.setClickable(false);
+					mBtnPrev.setEnabled(true);
+					mBtnPrev.setClickable(true);
+				} else if (mUpdateType == UPDATE_PREV) {
+					Log.i(TAG, "[onLoadFinished] mCurrentDic is null, UpdataType is UPDATE_PREV");
+					mBtnPrev.setEnabled(false);
+					mBtnPrev.setClickable(false);
+					mBtnNext.setEnabled(true);
+					mBtnNext.setClickable(true);
+				} else {
+					Log.i(TAG, "[onLoadFinished] mCurrentDic is null, UpdataType is UPDATE_CURRENT");
+				}
 			}
+			
+			//Reset update type
+			mUpdateType = UPDATE_CURRENT;
 			
 			sendHandlerMsg(CHECK_FAV_STATUS);
 			
@@ -644,7 +666,6 @@ public class ResultDetailFragment extends Fragment {
 	    	} else if (mUpdateType == UPDATE_PREV) {
 	    		entries = MainActivity.dbManagerment.getPreviousDictionary(mCurrentDic.getId());
 	    	}
-	    	mUpdateType = UPDATE_CURRENT;
 	        Log.d(TAG, "[ResultDemoLoader][loadInBackground] + End");
 	        // Done!
 	        return entries;

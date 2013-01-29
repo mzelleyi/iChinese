@@ -9,8 +9,6 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-
-import android.content.Context;
 import android.media.MediaPlayer;
 import android.util.Log;
 
@@ -23,17 +21,18 @@ public class AudioPlayer {
 	private static final String	 TAG				   = "iHuayu:AudioPlayer";
 	private static final String  AUDIO_DOWNLOAD_URL    = "http://ihuayu.gistxl.com/smc";
 	private static final String  STORAGE_PATH          = "/audio/";
-	//private static Context mContext              = null;
-	
+	private static AudioPlayer player = null;
     /**
      * Create a new instance of AudioPlayer
      */
     public static AudioPlayer newInstance() {
     	Log.d(TAG, "[newInstance] + Begin");
-    	AudioPlayer audioplayer = new AudioPlayer();
-    	//mContext = context;
+    	if(player == null){
+        	player = new AudioPlayer();
+    	} 
     	Log.d(TAG, "[newInstance] + End");
-        return audioplayer;
+    	return player;
+
     }
 	
 	public boolean doCheckDownloaded(String audioURL) throws Exception {
@@ -61,6 +60,7 @@ public class AudioPlayer {
 	}
 	
 	public boolean doDownload(String audioURL) throws Exception {
+		
 		Log.d(TAG, "[doDownload] + Begin");
 		Log.d(TAG, "[doDownload] audioURL = "+audioURL);
 		String audioName = audioURL.split("/")[1];

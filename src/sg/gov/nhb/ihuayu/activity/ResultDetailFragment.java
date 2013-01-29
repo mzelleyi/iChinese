@@ -398,6 +398,7 @@ public class ResultDetailFragment extends Fragment {
 				if (bDownloaded) {
 					mAudioPlayer.doPlay(audioStr);
 				} else {
+					if(!Utils.hasNetwork(parentActivity)) return;
 					if (mUiHandler.hasMessages(SHOW_DOWNLOAD_DIALOG)) {
 	    				mUiHandler.removeMessages(SHOW_DOWNLOAD_DIALOG);
 	    			}

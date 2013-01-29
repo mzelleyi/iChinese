@@ -1,9 +1,11 @@
 package sg.gov.nhb.ihuayu.activity;
 
 import sg.gov.nhb.ihuayu.R;
+import sg.gov.nhb.ihuayu.view.MyDialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.support.v4.app.FragmentActivity;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextUtils;
@@ -71,4 +73,15 @@ public class Utils {
 	    Log.d(TAG, "[getSpanableText] + End");
 		return spannableString;  
 	} 
+	
+	public static boolean hasNetwork(FragmentActivity activity) {
+		if(!NetworkUtil.isNetworkAvailable(activity)) {
+			MyDialogFragment downloadDialog = MyDialogFragment.newInstance(activity,
+					MyDialogFragment.NO_INTERNET_CONNETION, false, null);
+			downloadDialog.show(activity.getSupportFragmentManager(),
+					"dialog_download");
+			return false;
+		}
+		return true;
+	}
 }

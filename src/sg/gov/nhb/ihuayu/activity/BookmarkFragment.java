@@ -9,12 +9,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import sg.gov.nhb.ihuayu.R;
 import sg.gov.nhb.ihuayu.activity.db.entity.Dictionary;
 import sg.gov.nhb.ihuayu.activity.rest.AudioPlayer;
 import sg.gov.nhb.ihuayu.view.MyDialogFragment;
-
-import sg.gov.nhb.ihuayu.R;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
@@ -318,6 +316,7 @@ public class BookmarkFragment extends Fragment {
 				if (bDownloaded) {
 					mAudioPlayer.doPlay(audioStr);
 				} else {
+					if(!Utils.hasNetwork(parentActivity)) return;
 					if (mUiHandler.hasMessages(SHOW_DOWNLOAD_DIALOG)) {
 	    				mUiHandler.removeMessages(SHOW_DOWNLOAD_DIALOG);
 	    			}

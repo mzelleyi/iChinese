@@ -37,7 +37,7 @@ public class MyDialogFragment extends DialogFragment {
     public static final int	   DIALOG_DOWNLOAD      = 6;
     public static final int	   PREPARE_DB      = 7;
     public static final int	   UPDATE_COUNT      = 8;
-    
+    public static final int	   NO_INTERNET_CONNETION      = 9;
     private static final String    TAG  = "iHuayu:MyDialogFragment";
 
     private static FragmentActivity parentActivity       = null;
@@ -131,7 +131,16 @@ public class MyDialogFragment extends DialogFragment {
 			    }
 			}).create();
 	    }
-	} else if (dialogType == REMOVE_FROM_BOOKMARK) {
+	} 
+	 else if (dialogType == NO_INTERNET_CONNETION) {
+			return new AlertDialog.Builder(parentActivity).setIcon(android.R.drawable.ic_dialog_alert)
+				.setTitle(R.string.dialog_msg_no_internet_connection)
+				.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+				    public void onClick(DialogInterface dialog, int whichButton) {
+				    	
+				    }
+				}).create();
+	}else if (dialogType == REMOVE_FROM_BOOKMARK) {
 	    return new AlertDialog.Builder(parentActivity).setIcon(android.R.drawable.ic_dialog_alert)
 		    .setTitle(R.string.dialog_msg_remove_from_bookmark)
 		    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {

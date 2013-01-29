@@ -1,9 +1,6 @@
 package sg.gov.nhb.ihuayu.activity;
 
 
-import java.util.ArrayList;
-import java.util.List;
-
 import sg.gov.nhb.ihuayu.activity.db.entity.Dictionary;
 import sg.gov.nhb.ihuayu.activity.rest.AudioPlayer;
 import sg.gov.nhb.ihuayu.view.MyDialogFragment;
@@ -20,22 +17,17 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.text.SpannableString;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,10 +35,12 @@ import android.widget.Toast;
  * @author Kesen
  *
  */
-public class ResultDetailFragment extends Fragment {
+public class ResultDetailFragment extends Fragment implements 
+	LoaderManager.LoaderCallbacks<Dictionary> {
 
 	private static final String		TAG						= "iHuayu:ResultDetailFragment";
 	private static FragmentActivity	parentActivity			= null;
+	private static View             mParentView             = null;
 	// private static List<Dictionary> mResultList = new
 	// ArrayList<Dictionary>();
 	private static Dictionary		mCurrentDic				= null;
@@ -83,13 +77,14 @@ public class ResultDetailFragment extends Fragment {
 	// The DB Operation Thread
 	private static NonUiHandler	    mNonUiHandler	= null;
 	
+	static ResultDetailFragment fragment = null;
 
     /**
      * Create a new instance of ResultDetailFragment
      */
     static ResultDetailFragment newInstance(Dictionary dictionary) {
     	Log.d(TAG, "[newInstance] + Begin");
-    	ResultDetailFragment fragment = new ResultDetailFragment();
+    	fragment = new ResultDetailFragment();
     	mCurrentDic = dictionary;
     	Log.d(TAG, "[newInstance] mCurrentDic.info = "+mCurrentDic.getDestiontion());
         return fragment;
@@ -103,6 +98,14 @@ public class ResultDetailFragment extends Fragment {
             Bundle savedInstanceState) {
     	Log.d(TAG, "[onCreateView] + Begin");
         View v = inflater.inflate(R.layout.result_detail_fragment, container, false);
+        mParentView = v;
+        
+		//Init Thread
+		mHandlerThread = new HandlerThread(THREAD_NAME);
+		mHandlerThread.setPriority(Thread.NORM_PRIORITY);
+		mHandlerThread.start();
+		mNonUiHandler = new NonUiHandler(mHandlerThread.getLooper());
+        
         return v;
     }
 
@@ -112,45 +115,35 @@ public class ResultDetailFragment extends Fragment {
 		// TODO Auto-generated method stub
 		super.onViewCreated(view, savedInstanceState);
 		parentActivity = this.getActivity();
-		if (mCurrentDic != null) {
-			TextView TextView1 = (TextView) parentActivity.findViewById(R.id.result_detail_des_first_line);
-			TextView TextView2 = (TextView) parentActivity.findViewById(R.id.result_detail_des_second_line_text);
-			if (mCurrentDic.getLanguage_dir().equalsIgnoreCase("en2sc")) {
-				Log.i(TAG, "[onViewCreated] is english dictionary");
-				TextView1.setText(mCurrentDic.getKeyword());
-				TextView2.setText(mCurrentDic.getDestiontion());
-			} else {
-				Log.i(TAG, "[onViewCreated] is chinese dictionary");
-				TextView1.setText(mCurrentDic.getDestiontion());
-				TextView2.setText(mCurrentDic.getKeyword());
-			}
-			TextView TextView3 = (TextView) parentActivity.findViewById(R.id.result_detail_des_third_line);
-			TextView3.setText(mCurrentDic.getChineser_tone_py());
-			TextView TextViewSourceLabel = (TextView) parentActivity.findViewById(R.id.result_detail_des_source_text);
-			TextViewSourceLabel.setText(R.string.dic_detail_source_text);
-			TextView TextView1SourceInfo = (TextView) parentActivity.findViewById(R.id.result_detail_des_source_info);
-			TextView1SourceInfo.setText(mCurrentDic.getDic_catagory());
-		}
 		
-		ImageView audioImg = (ImageView)parentActivity.findViewById(R.id.result_detail_des_second_line_icon);
-		audioImg.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				Log.d(TAG, "[onClick] audioImg + Begin");
-				String sentanceAudio = mCurrentDic.getChinese_audio();
-				Log.d(TAG, "[onClick] sentanceAudio = "+sentanceAudio);
-		   		if (mNonUiHandler != null) {
-					if (mNonUiHandler.hasMessages(PLAY_CHINESE_AUDIO)) {
-						mNonUiHandler.removeMessages(PLAY_CHINESE_AUDIO);
-					}
-					Message msg = Message.obtain(mNonUiHandler, PLAY_CHINESE_AUDIO,sentanceAudio);
-					mNonUiHandler.sendMessage(msg);
-				}
-			}
-		});
+		// Start out with a progress indicator.
+		// this.setListShown(false);
 		
-		mBtnPrev = (Button)parentActivity.findViewById(R.id.result_detail_footbar_btn_prev);
+		// Prepare the loader. Either re-connect with an existing one,
+		// or start a new one.
+		this.getLoaderManager().initLoader(0, null, this);
+		//updateDataFragment();
+	}
+	
+	
+	
+	@Override
+    public Loader<Dictionary> onCreateLoader(int arg0, Bundle arg1) {
+	    // TODO Auto-generated method stub
+		Log.d(TAG, "[ResultDemoFragment][onCreateLoader] + Begin");
+		// This is called when a new Loader needs to be created. This
+		// sample only has one Loader with no arguments, so it is simple.
+		return new ResultDemoLoader(this.getActivity());
+    }
+
+	@Override
+    public void onLoadFinished(Loader<Dictionary> loader, Dictionary data) {
+	    // TODO Auto-generated method stub
+		Log.d(TAG, "[ResultDemoFragment][onLoadFinished] + Begin");
+		// Set the new data in the adapter.
+		// List<Dictionary> sample = new ArrayList<Dictionary>();
+		
+		mBtnPrev = (Button)mParentView.findViewById(R.id.result_detail_footbar_btn_prev);
 		mBtnPrev.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -158,10 +151,10 @@ public class ResultDetailFragment extends Fragment {
 				Log.d(TAG, "[onClick] btnPrev ");
 				//mCurrentDic = mResultList.get(mCurrentPos);
 				mUpdateType = UPDATE_PREV;
-				FragmentManager fm = parentActivity.getSupportFragmentManager();
-				ResultDemoFragment list = (ResultDemoFragment) fm.findFragmentById(R.id.result_detail_demo_listview);
-				list.getLoaderManager().restartLoader(0, null, list);
-				
+				//FragmentManager fm = parentActivity.getSupportFragmentManager();
+				//ResultDetailFragment list = (ResultDetailFragment) fm.findFragmentById(R.id.result_detail_fragment);
+				//list.getLoaderManager().restartLoader(0, null, list);
+				getLoaderManager().restartLoader(0, null, fragment);
 			}
 		});
 		
@@ -173,28 +166,15 @@ public class ResultDetailFragment extends Fragment {
 				Log.d(TAG, "[onClick] btnNext ");
 				//mCurrentDic = mResultList.get(mCurrentPos);
 				mUpdateType = UPDATE_NEXT;
-				FragmentManager fm = parentActivity.getSupportFragmentManager();
-				ResultDemoFragment list = (ResultDemoFragment) fm.findFragmentById(R.id.result_detail_demo_listview);
-				list.getLoaderManager().restartLoader(0, null, list);
-			}
-		});
-		
-		mFavoriteImg = (ImageView)parentActivity.findViewById(R.id.result_detail_des_favorite_img);
-		mFavoriteImg.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				if (!mBeFavorited) {
-					//mDialogType = MyDialogFragment.ADD_TO_BOOKMARK;
-					showDialog(MyDialogFragment.ADD_TO_BOOKMARK,false);
-				} else {
-					showDialog(MyDialogFragment.REMOVE_FROM_BOOKMARK,false);
-				}
+				//FragmentManager fm = parentActivity.getSupportFragmentManager();
+				//ResultDetailFragment list = (ResultDetailFragment) fm.findFragmentById(R.id.result_detail_fragment);
+				getLoaderManager().restartLoader(0, null, fragment);
+				//list.getLoaderManager().restartLoader(0, null, list);
 			}
 		});
 		
 		//Set Back Button On Click Listener
-		Button backBtn = (Button)parentActivity.findViewById(R.id.result_detail_title_bar_backbtn);
+		Button backBtn = (Button)mParentView.findViewById(R.id.result_detail_title_bar_backbtn);
 		backBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
@@ -203,14 +183,169 @@ public class ResultDetailFragment extends Fragment {
 			}
 		});
 		
-		//Init Thread
-		mHandlerThread = new HandlerThread(THREAD_NAME);
-		mHandlerThread.setPriority(Thread.NORM_PRIORITY);
-		mHandlerThread.start();
-		mNonUiHandler = new NonUiHandler(mHandlerThread.getLooper());
+		if (data == null) {
+			if (mUpdateType == UPDATE_NEXT) {
+				Log.i(TAG, "[onLoadFinished] data is null, UpdataType is UPDATE_NEXT");
+				mBtnNext.setEnabled(false);
+				mBtnNext.setClickable(false);
+				mBtnPrev.setEnabled(true);
+				mBtnPrev.setClickable(true);
+			} else if (mUpdateType == UPDATE_PREV) {
+				Log.i(TAG, "[onLoadFinished] mCurrentDic is null, UpdataType is UPDATE_PREV");
+				mBtnPrev.setEnabled(false);
+				mBtnPrev.setClickable(false);
+				mBtnNext.setEnabled(true);
+				mBtnNext.setClickable(true);
+			}
+		} else {
+			mCurrentDic = data;
+			mBtnPrev.setEnabled(true);
+			mBtnPrev.setClickable(true);
+			mBtnNext.setEnabled(true);
+			mBtnNext.setClickable(true);
+		}
 		
-		updateDataFragment();
-	}
+		if (mCurrentDic != null) {
+			TextView TextView1 = (TextView) mParentView.findViewById(R.id.result_detail_des_first_line);
+			TextView TextView2 = (TextView) mParentView.findViewById(R.id.result_detail_des_second_line_text);
+			if (mCurrentDic.getLanguage_dir().equalsIgnoreCase("en2sc")) {
+				Log.i(TAG, "[onViewCreated] is english dictionary");
+				TextView1.setText(mCurrentDic.getKeyword());
+				TextView2.setText(mCurrentDic.getDestiontion());
+			} else {
+				Log.i(TAG, "[onViewCreated] is chinese dictionary");
+				TextView1.setText(mCurrentDic.getDestiontion());
+				TextView2.setText(mCurrentDic.getKeyword());
+			}
+			TextView TextView3 = (TextView) mParentView.findViewById(R.id.result_detail_des_third_line);
+			TextView3.setText(mCurrentDic.getChineser_tone_py());
+			TextView TextViewSourceLabel = (TextView) mParentView.findViewById(R.id.result_detail_des_source_text);
+			TextViewSourceLabel.setText(R.string.dic_detail_source_text);
+			TextView TextView1SourceInfo = (TextView) mParentView.findViewById(R.id.result_detail_des_source_info);
+			TextView1SourceInfo.setText(mCurrentDic.getDic_catagory());
+			
+			ImageView audioImg = (ImageView)mParentView.findViewById(R.id.result_detail_des_second_line_icon);
+			audioImg.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					Log.d(TAG, "[onClick] audioImg + Begin");
+					String sentanceAudio = mCurrentDic.getChinese_audio();
+					Log.d(TAG, "[onClick] sentanceAudio = "+sentanceAudio);
+			   		if (mNonUiHandler != null) {
+						if (mNonUiHandler.hasMessages(PLAY_CHINESE_AUDIO)) {
+							mNonUiHandler.removeMessages(PLAY_CHINESE_AUDIO);
+						}
+						Message msg = Message.obtain(mNonUiHandler, PLAY_CHINESE_AUDIO,sentanceAudio);
+						mNonUiHandler.sendMessage(msg);
+					}
+				}
+			});
+			
+			mFavoriteImg = (ImageView)mParentView.findViewById(R.id.result_detail_des_favorite_img);
+			mFavoriteImg.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					if (!mBeFavorited) {
+						//mDialogType = MyDialogFragment.ADD_TO_BOOKMARK;
+						showDialog(MyDialogFragment.ADD_TO_BOOKMARK,false);
+					} else {
+						showDialog(MyDialogFragment.REMOVE_FROM_BOOKMARK,false);
+					}
+				}
+			});
+			
+			String strEn = mCurrentDic.getSample_sentance_en();
+			String strCN = mCurrentDic.getSample_sentence_ch();
+			String strPY = mCurrentDic.getSample_sentance_py();
+			Log.i(TAG, "[onLoadFinished] strEn "+strEn);
+			Log.i(TAG, "[onLoadFinished] strCN "+strCN);
+			Log.i(TAG, "[onLoadFinished] strPY "+strPY);
+			LinearLayout line_en = (LinearLayout) mParentView.findViewById(R.id.result_detail_sample_en_layout);
+			LinearLayout line_cn = (LinearLayout) mParentView.findViewById(R.id.result_detail_sample_cn_layout);
+			LinearLayout line_py = (LinearLayout) mParentView.findViewById(R.id.result_detail_sample_py_layout);
+			if (strEn != null && strEn.trim().length() > 0) {
+				line_en.setVisibility(View.VISIBLE);
+				TextView TextLine = (TextView)mParentView.findViewById(R.id.result_detail_sample_en_text);
+	            String hightStr = mCurrentDic.getKeyword();
+	            SpannableString spanStr = Utils.getSpanableText(strEn, hightStr);
+				if (spanStr != null) {
+					TextLine.setText(spanStr);
+				}
+			} else {
+				line_en.setVisibility(View.GONE);
+			}
+			
+			if (strCN != null && strCN.trim().length() > 0) {
+				line_cn.setVisibility(View.VISIBLE);
+				ImageView speak_cn_icon = (ImageView)mParentView.findViewById(R.id.result_detail_sample_cn_icon);
+				TextView TextLine = (TextView)mParentView.findViewById(R.id.result_detail_sample_cn_text);
+				//speak_cn_icon.setVisibility(View.VISIBLE);
+				speak_cn_icon.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						// TODO Auto-generated method stub
+						String sentanceAudio = mCurrentDic.getSample_sentance_audio();
+						Log.d(TAG, "[onClick] sentanceAudio = "+sentanceAudio);
+				   		if (mNonUiHandler != null) {
+							if (mNonUiHandler.hasMessages(PLAY_SENTANCE_AUDIO)) {
+								mNonUiHandler.removeMessages(PLAY_SENTANCE_AUDIO);
+							}
+							Message msg = Message.obtain(mNonUiHandler, PLAY_SENTANCE_AUDIO,sentanceAudio);
+							mNonUiHandler.sendMessage(msg);
+						}
+					}
+				});
+	            String hightStr = mCurrentDic.getDestiontion();
+	            SpannableString spanStr = Utils.getSpanableText(strCN, hightStr);
+				if (spanStr != null) {
+					TextLine.setText(spanStr);
+				}
+			} else {
+				//speak_cn_icon.setVisibility(View.GONE);
+				line_cn.setVisibility(View.GONE);
+			}
+			if (strPY != null && strPY.trim().length() > 0) {
+				line_py.setVisibility(View.VISIBLE);
+				TextView TextLine = (TextView)mParentView.findViewById(R.id.result_detail_sample_py_text);
+	            String hightStr = mCurrentDic.getChineser_tone_py();
+	            SpannableString spanStr = Utils.getSpanableText(strPY, hightStr);
+				if (spanStr != null) {
+					TextLine.setText(spanStr);
+				}
+			} else {
+				line_py.setVisibility(View.GONE);
+			}
+		}
+		
+		//Reset update type
+		mUpdateType = UPDATE_CURRENT;
+		
+		sendHandlerMsg(CHECK_FAV_STATUS);
+		
+		//Cancel default divider
+//		ListView mListView = this.getListView();
+//		mListView.setDivider(null);
+//		mListView.setScrollingCacheEnabled(false);
+//		
+//	    mAdapter.setData(sample);
+//
+//		// The list should now be shown.
+//		if (this.isResumed()) {
+//			this.setListShown(true);
+//		} else {
+//			this.setListShownNoAnimation(true);
+//		}
+    }
+
+	@Override
+    public void onLoaderReset(Loader<Dictionary> arg0) {
+	    // TODO Auto-generated method stub
+		Log.d(TAG, "[ResultDemoFragment][onLoaderReset] + Begin");
+		// Clear the data in the adapter.
+		//mAdapter.setData(null);
+    }
 	
 	private final Handler mUiHandler = new Handler() {
          DialogFragment downloadDialog = null;
@@ -480,30 +615,7 @@ public class ResultDetailFragment extends Fragment {
         //mBeFavorited = false;
     }
 	
-	public static void updateDataFragment() {
-		//Add Detail Dialog Fragment
-		FragmentManager fm = parentActivity.getSupportFragmentManager();
-		FragmentTransaction ft = fm.beginTransaction();
-		ResultDemoFragment list = (ResultDemoFragment) fm.findFragmentById(R.id.result_detail_demo_listview);
-        // Create the list fragment and add it as our sole content.
-        if (list == null) {
-        	Log.d(TAG, "[onViewCreated] new ResultDemoFragment, do add");
-        	list = new ResultDemoFragment();
-			ft.add(R.id.result_detail_demo_listview, list);
-			ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-			//ft.addToBackStack(null);
-			ft.commit();
-        } else {
-        	Log.d(TAG, "[onViewCreated] used ResultDemoFragment, do replace");
-        	list = new ResultDemoFragment();
-			ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-			ft.replace(R.id.result_detail_demo_listview, list);
-			//ft.addToBackStack(null);
-			ft.commit();
-        }
-	}
-	
-	public static void updateFavoriteImg(boolean mFavorited) {
+	private static void updateFavoriteImg(boolean mFavorited) {
 		Log.d(TAG, "[updateFavoriteImg] This item has been bookmarked = "+mFavorited);
 		if (mFavorited) {
 			mFavoriteImg.setImageResource(R.drawable.btn_mark_on);
@@ -521,144 +633,6 @@ public class ResultDetailFragment extends Fragment {
 		}
 	}
 	
-	public static class ResultDemoFragment extends ListFragment implements 
-		LoaderManager.LoaderCallbacks<Dictionary> {
-		
-		// This is the Adapter being used to display the list's data.
-		ResultDemoAdapter mAdapter;
-		
-		@Override
-		public void onActivityCreated(Bundle savedInstanceState) {
-			Log.d(TAG, "[ResultDemoFragment][onActivityCreated] + Begin");
-			super.onActivityCreated(savedInstanceState);
-			
-			// Give some text to display if there is no data. In a real
-			// application this would come from a resource.
-			this.setEmptyText("");
-	
-			// We have a menu item to show in action bar.
-			this.setHasOptionsMenu(false);
-	
-			// Create an empty adapter we will use to display the loaded data.
-			mAdapter = new ResultDemoAdapter(this.getActivity());
-			this.setListAdapter(mAdapter);
-			
-			// Start out with a progress indicator.
-			this.setListShown(false);
-			
-			// Prepare the loader. Either re-connect with an existing one,
-			// or start a new one.
-			this.getLoaderManager().initLoader(0, null, this);
-		}
-	
-		@Override
-		public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-			Log.d(TAG, "[ResultDemoFragment][onCreateOptionsMenu] + Begin");
-			// Since we no need action bar and menu,Choose close
-			menu.close();
-		}
-	
-		@Override
-		public void onListItemClick(ListView l, View v, int position, long id) {
-			// Insert desired behavior here.
-			Log.i(TAG, "[ResultDemoAdapter][onListItemClick] Item clicked: " + id);
-			
-		}
-	
-		public Loader<Dictionary> onCreateLoader(int id, Bundle args) {
-			Log.d(TAG, "[ResultDemoFragment][onCreateLoader] + Begin");
-			// This is called when a new Loader needs to be created. This
-			// sample only has one Loader with no arguments, so it is simple.
-			return new ResultDemoLoader(this.getActivity());
-		}
-	
-		public void onLoadFinished(Loader<Dictionary> loader, Dictionary data) {
-			Log.d(TAG, "[ResultDemoFragment][onLoadFinished] + Begin");
-			// Set the new data in the adapter.
-			List<Dictionary> sample = new ArrayList<Dictionary>();
-			if (data == null) {
-				if (mUpdateType == UPDATE_NEXT) {
-					Log.i(TAG, "[onLoadFinished] data is null, UpdataType is UPDATE_NEXT");
-					mBtnNext.setEnabled(false);
-					mBtnNext.setClickable(false);
-					mBtnPrev.setEnabled(true);
-					mBtnPrev.setClickable(true);
-				} else if (mUpdateType == UPDATE_PREV) {
-					Log.i(TAG, "[onLoadFinished] mCurrentDic is null, UpdataType is UPDATE_PREV");
-					mBtnPrev.setEnabled(false);
-					mBtnPrev.setClickable(false);
-					mBtnNext.setEnabled(true);
-					mBtnNext.setClickable(true);
-				}
-			} else {
-				mCurrentDic = data;
-				mBtnPrev.setEnabled(true);
-				mBtnPrev.setClickable(true);
-				mBtnNext.setEnabled(true);
-				mBtnNext.setClickable(true);
-			}
-			
-			if (mCurrentDic != null) {
-				TextView TextView1 = (TextView) parentActivity.findViewById(R.id.result_detail_des_first_line);
-				TextView TextView2 = (TextView) parentActivity.findViewById(R.id.result_detail_des_second_line_text);
-				if (mCurrentDic.getLanguage_dir().equalsIgnoreCase("en2sc")) {
-					Log.i(TAG, "[onLoadFinished] is english dictionary");
-					TextView1.setText(mCurrentDic.getKeyword());
-					TextView2.setText(mCurrentDic.getDestiontion());
-				} else {
-					Log.i(TAG, "[onLoadFinished] is chinese dictionary");
-					TextView1.setText(mCurrentDic.getDestiontion());
-					TextView2.setText(mCurrentDic.getKeyword());
-				}
-				TextView TextView3 = (TextView) parentActivity.findViewById(R.id.result_detail_des_third_line);
-				TextView3.setText(mCurrentDic.getChineser_tone_py());
-				TextView TextViewSourceLabel = (TextView) parentActivity.findViewById(R.id.result_detail_des_source_text);
-				TextViewSourceLabel.setText(R.string.dic_detail_source_text);
-				TextView TextView1SourceInfo = (TextView) parentActivity.findViewById(R.id.result_detail_des_source_info);
-				TextView1SourceInfo.setText(mCurrentDic.getDic_catagory());
-				
-				String strEn = mCurrentDic.getSample_sentance_en();
-				String strCN = mCurrentDic.getSample_sentence_ch();
-				String strPY = mCurrentDic.getSample_sentance_py();
-				if (strEn != null && !strEn.equalsIgnoreCase(" ")) {
-					sample.add(mCurrentDic);
-				}
-				if (strCN != null && !strCN.equalsIgnoreCase(" ")) {
-					sample.add(mCurrentDic);
-				}
-				if (strPY != null && !strPY.equalsIgnoreCase(" ")) {
-					sample.add(mCurrentDic);
-				}
-			} 
-			
-			//Reset update type
-			mUpdateType = UPDATE_CURRENT;
-			
-			sendHandlerMsg(CHECK_FAV_STATUS);
-			
-			//Cancel default divider
-			ListView mListView = this.getListView();
-			mListView.setDivider(null);
-			mListView.setScrollingCacheEnabled(false);
-			
-		    mAdapter.setData(sample);
-	
-			// The list should now be shown.
-			if (this.isResumed()) {
-				this.setListShown(true);
-			} else {
-				this.setListShownNoAnimation(true);
-			}
-		}
-	
-		public void onLoaderReset(Loader<Dictionary> loader) {
-			Log.d(TAG, "[ResultDemoFragment][onLoaderReset] + Begin");
-			// Clear the data in the adapter.
-			mAdapter.setData(null);
-		}
-	}
-	
-
 	/**
 	 * A custom Loader that loads all of the installed applications.
 	 */
@@ -796,105 +770,265 @@ public class ResultDetailFragment extends Fragment {
 	    }
 	}
 	
-	public static class ResultDemoAdapter extends ArrayAdapter<Dictionary> {
-	    private final LayoutInflater mInflater;
+//	private static void updateDataFragment() {
+//	//Add Detail Dialog Fragment
+//	FragmentManager fm = parentActivity.getSupportFragmentManager();
+//	FragmentTransaction ft = fm.beginTransaction();
+//	ResultDemoFragment list = (ResultDemoFragment) fm.findFragmentById(R.id.result_detail_demo_listview);
+//    // Create the list fragment and add it as our sole content.
+//    if (list == null) {
+//    	Log.d(TAG, "[onViewCreated] new ResultDemoFragment, do add");
+//    	list = new ResultDemoFragment();
+//		ft.add(R.id.result_detail_demo_listview, list);
+//		ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+//		//ft.addToBackStack(null);
+//		ft.commit();
+//    } else {
+//    	Log.d(TAG, "[onViewCreated] used ResultDemoFragment, do replace");
+//    	list = new ResultDemoFragment();
+//		ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+//		ft.replace(R.id.result_detail_demo_listview, list);
+//		//ft.addToBackStack(null);
+//		ft.commit();
+//    }
+//}
+	
+//	public static class ResultDemoFragment extends ListFragment implements 
+//		LoaderManager.LoaderCallbacks<Dictionary> {
+//		
+//		// This is the Adapter being used to display the list's data.
+//		ResultDemoAdapter mAdapter;
+//		
+//		@Override
+//		public void onActivityCreated(Bundle savedInstanceState) {
+//			Log.d(TAG, "[ResultDemoFragment][onActivityCreated] + Begin");
+//			super.onActivityCreated(savedInstanceState);
+//			
+//			// Give some text to display if there is no data. In a real
+//			// application this would come from a resource.
+//			this.setEmptyText("");
+//	
+//			// We have a menu item to show in action bar.
+//			this.setHasOptionsMenu(false);
+//	
+//			// Create an empty adapter we will use to display the loaded data.
+//			mAdapter = new ResultDemoAdapter(this.getActivity());
+//			this.setListAdapter(mAdapter);
+//			
+//			// Start out with a progress indicator.
+//			this.setListShown(false);
+//			
+//			// Prepare the loader. Either re-connect with an existing one,
+//			// or start a new one.
+//			this.getLoaderManager().initLoader(0, null, this);
+//		}
+//	
+//		@Override
+//		public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+//			Log.d(TAG, "[ResultDemoFragment][onCreateOptionsMenu] + Begin");
+//			// Since we no need action bar and menu,Choose close
+//			menu.close();
+//		}
+//	
+//		@Override
+//		public void onListItemClick(ListView l, View v, int position, long id) {
+//			// Insert desired behavior here.
+//			Log.i(TAG, "[ResultDemoAdapter][onListItemClick] Item clicked: " + id);
+//			
+//		}
+//	
+//		public Loader<Dictionary> onCreateLoader(int id, Bundle args) {
+//			Log.d(TAG, "[ResultDemoFragment][onCreateLoader] + Begin");
+//			// This is called when a new Loader needs to be created. This
+//			// sample only has one Loader with no arguments, so it is simple.
+//			return new ResultDemoLoader(this.getActivity());
+//		}
+//	
+//		public void onLoadFinished(Loader<Dictionary> loader, Dictionary data) {
+//			Log.d(TAG, "[ResultDemoFragment][onLoadFinished] + Begin");
+//			// Set the new data in the adapter.
+//			List<Dictionary> sample = new ArrayList<Dictionary>();
+//			if (data == null) {
+//				if (mUpdateType == UPDATE_NEXT) {
+//					Log.i(TAG, "[onLoadFinished] data is null, UpdataType is UPDATE_NEXT");
+//					mBtnNext.setEnabled(false);
+//					mBtnNext.setClickable(false);
+//					mBtnPrev.setEnabled(true);
+//					mBtnPrev.setClickable(true);
+//				} else if (mUpdateType == UPDATE_PREV) {
+//					Log.i(TAG, "[onLoadFinished] mCurrentDic is null, UpdataType is UPDATE_PREV");
+//					mBtnPrev.setEnabled(false);
+//					mBtnPrev.setClickable(false);
+//					mBtnNext.setEnabled(true);
+//					mBtnNext.setClickable(true);
+//				}
+//			} else {
+//				mCurrentDic = data;
+//				mBtnPrev.setEnabled(true);
+//				mBtnPrev.setClickable(true);
+//				mBtnNext.setEnabled(true);
+//				mBtnNext.setClickable(true);
+//			}
+//			
+//			if (mCurrentDic != null) {
+//				TextView TextView1 = (TextView) parentActivity.findViewById(R.id.result_detail_des_first_line);
+//				TextView TextView2 = (TextView) parentActivity.findViewById(R.id.result_detail_des_second_line_text);
+//				if (mCurrentDic.getLanguage_dir().equalsIgnoreCase("en2sc")) {
+//					Log.i(TAG, "[onLoadFinished] is english dictionary");
+//					TextView1.setText(mCurrentDic.getKeyword());
+//					TextView2.setText(mCurrentDic.getDestiontion());
+//				} else {
+//					Log.i(TAG, "[onLoadFinished] is chinese dictionary");
+//					TextView1.setText(mCurrentDic.getDestiontion());
+//					TextView2.setText(mCurrentDic.getKeyword());
+//				}
+//				TextView TextView3 = (TextView) parentActivity.findViewById(R.id.result_detail_des_third_line);
+//				TextView3.setText(mCurrentDic.getChineser_tone_py());
+//				TextView TextViewSourceLabel = (TextView) parentActivity.findViewById(R.id.result_detail_des_source_text);
+//				TextViewSourceLabel.setText(R.string.dic_detail_source_text);
+//				TextView TextView1SourceInfo = (TextView) parentActivity.findViewById(R.id.result_detail_des_source_info);
+//				TextView1SourceInfo.setText(mCurrentDic.getDic_catagory());
+//				
+//				String strEn = mCurrentDic.getSample_sentance_en();
+//				String strCN = mCurrentDic.getSample_sentence_ch();
+//				String strPY = mCurrentDic.getSample_sentance_py();
+//				if (strEn != null && !strEn.equalsIgnoreCase(" ")) {
+//					sample.add(mCurrentDic);
+//				}
+//				if (strCN != null && !strCN.equalsIgnoreCase(" ")) {
+//					sample.add(mCurrentDic);
+//				}
+//				if (strPY != null && !strPY.equalsIgnoreCase(" ")) {
+//					sample.add(mCurrentDic);
+//				}
+//			} 
+//			
+//			//Reset update type
+//			mUpdateType = UPDATE_CURRENT;
+//			
+//			sendHandlerMsg(CHECK_FAV_STATUS);
+//			
+//			//Cancel default divider
+//			ListView mListView = this.getListView();
+//			mListView.setDivider(null);
+//			mListView.setScrollingCacheEnabled(false);
+//			
+//		    mAdapter.setData(sample);
+//	
+//			// The list should now be shown.
+//			if (this.isResumed()) {
+//				this.setListShown(true);
+//			} else {
+//				this.setListShownNoAnimation(true);
+//			}
+//		}
+//	
+//		public void onLoaderReset(Loader<Dictionary> loader) {
+//			Log.d(TAG, "[ResultDemoFragment][onLoaderReset] + Begin");
+//			// Clear the data in the adapter.
+//			mAdapter.setData(null);
+//		}
+//	}
 
-	    public ResultDemoAdapter(Context context) {
-	        //super(context, android.R.layout.simple_list_item_2);
-	    	super(context, R.layout.result_detail_list_item);
-	        mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-	    }
-
-	    public void setData(List<Dictionary> data) {
-	    	Log.d(TAG, "[ResultDemoAdapter][setData] + Begin");
-	        this.clear();
-	        if (data != null) {
-	        	Log.d(TAG, "[ResultDemoAdapter][setData] Size = "+data.size());
-	            for (Dictionary dicEntry : data) {
-	                this.add(dicEntry);
-	            }
-	        }
-	        Log.d(TAG, "[ResultDemoAdapter][setData] + End");
-	    }
-	    
-	    /**
-		 * Populate new items in the list.
-		 */
-	    @Override 
-	    public View getView(int position, View convertView, ViewGroup parent) {
-	    	Log.d(TAG, "[ResultDemoAdapter][getView] + pos="+position);
-	        View view;
-			
-	        if (convertView == null) {
-        		Log.d(TAG, "convertView == null, new result_detail_list_item");
-        		view = mInflater.inflate(R.layout.result_detail_list_item, parent, false);
-	        } else {
-	            view = convertView;
-	        }
-	        
-	        TextView TextLine = (TextView)view.findViewById(R.id.result_detail_listitem_text);
-	        ImageView speakIcon = (ImageView)view.findViewById(R.id.result_detail_listitem_icon);
-
-	        final Dictionary item = this.getItem(position);
-			if (item != null) {
-				switch(position) 
-				{
-					case 0:
-					{
-						String sectenceStr = item.getSample_sentance_en();
-			            String hightStr = item.getKeyword();
-			            SpannableString spanStr = Utils.getSpanableText(sectenceStr, hightStr);
-						if (spanStr != null) {
-							TextLine.setText(spanStr);
-						}
-						
-						speakIcon.setVisibility(View.INVISIBLE);
-						break;
-					}
-					case 1:
-					{
-						speakIcon.setVisibility(View.VISIBLE);
-						speakIcon.setOnClickListener(new View.OnClickListener() {
-							@Override
-							public void onClick(View v) {
-								// TODO Auto-generated method stub
-								String sentanceAudio = item.getSample_sentance_audio();
-								Log.d(TAG, "[onClick] sentanceAudio = "+sentanceAudio);
-						   		if (mNonUiHandler != null) {
-									if (mNonUiHandler.hasMessages(PLAY_SENTANCE_AUDIO)) {
-										mNonUiHandler.removeMessages(PLAY_SENTANCE_AUDIO);
-									}
-									Message msg = Message.obtain(mNonUiHandler, PLAY_SENTANCE_AUDIO,sentanceAudio);
-									mNonUiHandler.sendMessage(msg);
-								}
-							}
-						});
-						
-						String sectenceStr = item.getSample_sentence_ch();
-			            String hightStr = item.getDestiontion();
-			            SpannableString spanStr = Utils.getSpanableText(sectenceStr, hightStr);
-						if (spanStr != null) {
-							TextLine.setText(spanStr);
-						}
-						break;
-					}
-					case 2:
-					{
-						String sectenceStr = item.getSample_sentance_py();
-			            String hightStr = item.getChineser_tone_py();
-			            SpannableString spanStr = Utils.getSpanableText(sectenceStr, hightStr);
-						if (spanStr != null) {
-							TextLine.setText(spanStr);
-						}
-						
-						speakIcon.setVisibility(View.INVISIBLE);
-						break;
-					}
-				}
-			}
-			return view;
-	    }
-	}
+//	public static class ResultDemoAdapter extends ArrayAdapter<Dictionary> {
+//	    private final LayoutInflater mInflater;
+//
+//	    public ResultDemoAdapter(Context context) {
+//	        //super(context, android.R.layout.simple_list_item_2);
+//	    	super(context, R.layout.result_detail_list_item);
+//	        mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//	    }
+//
+//	    public void setData(List<Dictionary> data) {
+//	    	Log.d(TAG, "[ResultDemoAdapter][setData] + Begin");
+//	        this.clear();
+//	        if (data != null) {
+//	        	Log.d(TAG, "[ResultDemoAdapter][setData] Size = "+data.size());
+//	            for (Dictionary dicEntry : data) {
+//	                this.add(dicEntry);
+//	            }
+//	        }
+//	        Log.d(TAG, "[ResultDemoAdapter][setData] + End");
+//	    }
+//	    
+//	    /**
+//		 * Populate new items in the list.
+//		 */
+//	    @Override 
+//	    public View getView(int position, View convertView, ViewGroup parent) {
+//	    	Log.d(TAG, "[ResultDemoAdapter][getView] + pos="+position);
+//	        View view;
+//			
+//	        if (convertView == null) {
+//        		Log.d(TAG, "convertView == null, new result_detail_list_item");
+//        		view = mInflater.inflate(R.layout.result_detail_list_item, parent, false);
+//	        } else {
+//	            view = convertView;
+//	        }
+//	        
+//	        TextView TextLine = (TextView)view.findViewById(R.id.result_detail_listitem_text);
+//	        ImageView speakIcon = (ImageView)view.findViewById(R.id.result_detail_listitem_icon);
+//
+//	        final Dictionary item = this.getItem(position);
+//			if (item != null) {
+//				switch(position) 
+//				{
+//					case 0:
+//					{
+//						String sectenceStr = item.getSample_sentance_en();
+//			            String hightStr = item.getKeyword();
+//			            SpannableString spanStr = Utils.getSpanableText(sectenceStr, hightStr);
+//						if (spanStr != null) {
+//							TextLine.setText(spanStr);
+//						}
+//						
+//						speakIcon.setVisibility(View.INVISIBLE);
+//						break;
+//					}
+//					case 1:
+//					{
+//						speakIcon.setVisibility(View.VISIBLE);
+//						speakIcon.setOnClickListener(new View.OnClickListener() {
+//							@Override
+//							public void onClick(View v) {
+//								// TODO Auto-generated method stub
+//								String sentanceAudio = item.getSample_sentance_audio();
+//								Log.d(TAG, "[onClick] sentanceAudio = "+sentanceAudio);
+//						   		if (mNonUiHandler != null) {
+//									if (mNonUiHandler.hasMessages(PLAY_SENTANCE_AUDIO)) {
+//										mNonUiHandler.removeMessages(PLAY_SENTANCE_AUDIO);
+//									}
+//									Message msg = Message.obtain(mNonUiHandler, PLAY_SENTANCE_AUDIO,sentanceAudio);
+//									mNonUiHandler.sendMessage(msg);
+//								}
+//							}
+//						});
+//						
+//						String sectenceStr = item.getSample_sentence_ch();
+//			            String hightStr = item.getDestiontion();
+//			            SpannableString spanStr = Utils.getSpanableText(sectenceStr, hightStr);
+//						if (spanStr != null) {
+//							TextLine.setText(spanStr);
+//						}
+//						break;
+//					}
+//					case 2:
+//					{
+//						String sectenceStr = item.getSample_sentance_py();
+//			            String hightStr = item.getChineser_tone_py();
+//			            SpannableString spanStr = Utils.getSpanableText(sectenceStr, hightStr);
+//						if (spanStr != null) {
+//							TextLine.setText(spanStr);
+//						}
+//						
+//						speakIcon.setVisibility(View.INVISIBLE);
+//						break;
+//					}
+//				}
+//			}
+//			return view;
+//	    }
+//	}
 }
 
 

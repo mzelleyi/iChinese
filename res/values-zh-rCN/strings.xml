@@ -51,6 +51,7 @@
     <string name="dialog_msg_prepare_db_hint">Checking updates</string>
     <string name="dialog_msg_search_hint">Please wait while searching!</string>
     <string name="dialog_msg_download_hint">Downloading!</string>
+    <string name="dialog_msg_no_internet_connection">No Connection,Please check your internet!</string>
     
     <string name="dialog_btn_ok">OK</string>
     <string name="dialog_words_define_hint">Words definition:</string>

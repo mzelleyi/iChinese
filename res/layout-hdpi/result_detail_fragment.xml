@@ -134,11 +134,95 @@
 		    </LinearLayout>
 		</LinearLayout>
 		
-		<FrameLayout
-	        android:id="@+id/result_detail_demo_listview"
+		<LinearLayout
+	        android:id="@+id/result_detail_sample"
 	        android:layout_width="match_parent"
-	        android:layout_height="match_parent" >
-    	</FrameLayout>
+	        android:layout_height="wrap_content"
+	        android:orientation="vertical" >
+		    <LinearLayout
+		        android:id="@+id/result_detail_sample_en_layout"
+			    android:layout_width="match_parent"
+			    android:layout_height="wrap_content"
+			    android:layout_margin="@dimen/margin_h1"
+			    android:orientation="horizontal"
+			    android:padding="@dimen/margin_h2"
+			    android:background="@drawable/bg_result_detail_tab" >
+			    <ImageView
+			        android:id="@+id/result_detail_sample_en_icon"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_gravity="center_vertical"
+			        android:layout_margin="@dimen/margin_h1"
+			        android:src="@drawable/btn_speaker_black"
+			        android:visibility="invisible"
+			        android:contentDescription="@string/dummy_img_des" />
+			    <TextView
+			        android:id="@+id/result_detail_sample_en_text"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_gravity="center_vertical"
+			        android:layout_margin="@dimen/margin_h1"
+			        android:gravity="left"
+			        android:hint="@string/dummy_text"
+			        android:textColor="@color/black_normal"
+			        android:textSize="@dimen/listview_primary_text_size" />
+			</LinearLayout>
+			<LinearLayout
+			    android:id="@+id/result_detail_sample_cn_layout"
+			    android:layout_width="match_parent"
+			    android:layout_height="wrap_content"
+			    android:layout_margin="@dimen/margin_h1"
+			    android:orientation="horizontal"
+			    android:padding="@dimen/margin_h2"
+			    android:background="@drawable/bg_result_detail_tab" >
+			    <ImageView
+			        android:id="@+id/result_detail_sample_cn_icon"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_gravity="center_vertical"
+			        android:layout_margin="@dimen/margin_h1"
+			        android:src="@drawable/btn_speaker_black"
+			        android:contentDescription="@string/dummy_img_des" />
+			    <TextView
+			        android:id="@+id/result_detail_sample_cn_text"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_gravity="center_vertical"
+			        android:layout_margin="@dimen/margin_h1"
+			        android:gravity="left"
+			        android:hint="@string/dummy_text"
+			        android:textColor="@color/black_normal"
+			        android:textSize="@dimen/listview_primary_text_size" />
+			</LinearLayout>
+		    <LinearLayout
+		        android:id="@+id/result_detail_sample_py_layout"
+			    android:layout_width="match_parent"
+			    android:layout_height="wrap_content"
+			    android:layout_margin="@dimen/margin_h1"
+			    android:orientation="horizontal"
+			    android:padding="@dimen/margin_h2"
+			    android:background="@drawable/bg_result_detail_tab" >
+			    <ImageView
+			        android:id="@+id/result_detail_sample_py_icon"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_gravity="center_vertical"
+			        android:layout_margin="@dimen/margin_h1"
+			        android:src="@drawable/btn_speaker_black"
+			        android:visibility="invisible"
+			        android:contentDescription="@string/dummy_img_des" />
+			    <TextView
+			        android:id="@+id/result_detail_sample_py_text"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_gravity="center_vertical"
+			        android:layout_margin="@dimen/margin_h1"
+			        android:gravity="left"
+			        android:hint="@string/dummy_text"
+			        android:textColor="@color/black_normal"
+			        android:textSize="@dimen/listview_primary_text_size" />
+			</LinearLayout>
+		</LinearLayout>
     </LinearLayout>
         
     <RelativeLayout

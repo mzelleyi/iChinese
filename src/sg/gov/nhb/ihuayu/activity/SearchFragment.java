@@ -54,13 +54,13 @@ public class SearchFragment extends Fragment {
 
 	private static final String          TAG                          = "iHuayu:SearchFragment";
 	private static final int             DELAY_REFRESH_LIST_VIEW      = 200;
-	private static final int             MSG_DO_SUGGEST_SEARCH        = 101;
-	private static final int             MSG_REFRESH_SUGGEST_LISTVIEW = 102;
-	private static final int             MSG_DO_FUZZY_SEARCH          = 103;
-	private static final int             MSG_REFRESH_FUZZY_RESULT     = 104;
-	private static final int             MSG_PLAY_AUDIO               = 105;
-	private static final int             SHOW_DOWNLOAD_DIALOG         = 106;
-	private static final int             HIDE_DOWNLOAD_DIALOG         = 107;
+	private static final int             MSG_DO_SUGGEST_SEARCH        = 201;
+	private static final int             MSG_REFRESH_SUGGEST_LISTVIEW = 202;
+	private static final int             MSG_DO_FUZZY_SEARCH          = 203;
+	private static final int             MSG_REFRESH_FUZZY_RESULT     = 204;
+	private static final int             MSG_PLAY_AUDIO               = 205;
+	private static final int             SHOW_DOWNLOAD_DIALOG         = 206;
+	private static final int             HIDE_DOWNLOAD_DIALOG         = 207;
 
 	private static final int             VIEW_TYPE_SUGGEST            = 0;
 	private static final int             VIEW_TYPE_FUZZY              = 1;
@@ -206,9 +206,9 @@ public class SearchFragment extends Fragment {
 				mInputMethodManager.hideSoftInputFromWindow(mEditText.getWindowToken(),0);
 				
 				FragmentManager fm = parentActivity.getSupportFragmentManager();
-				Fragment newFragment = ResultDetailFragment.newInstance(mAdapter.getItem(arg2));
+				Fragment newFragment = SearchDetailFragment.newInstance(mAdapter.getItem(arg2));
 				FragmentTransaction ft = fm.beginTransaction();
-				ft.replace(R.id.tab_content_search, newFragment);
+				ft.replace(R.id.tab_content_search, newFragment, MainActivity.fragment_tag_search_detail);
 				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 				ft.addToBackStack(null);
 				ft.commit();
@@ -471,7 +471,7 @@ public class SearchFragment extends Fragment {
 			   case SHOW_DOWNLOAD_DIALOG: {
 				   Log.d(TAG, "[mUihandler handleMessage] SHOW_DOWNLOAD_DIALOG");
 				   downloadDialog = MyDialogFragment.newInstance(parentActivity,
-				           MyDialogFragment.DIALOG_DOWNLOAD, false, null);
+				           MyDialogFragment.DIALOG_DOWNLOAD);
 				   downloadDialog.show(parentActivity.getSupportFragmentManager(),
 				           "dialog_download");
 				   break;
@@ -515,7 +515,7 @@ public class SearchFragment extends Fragment {
 				Log.d(TAG, "[NonUiHandler] handle msg [MSG_DO_FUZZY_SEARCH]");
 				mInputMethodManager.hideSoftInputFromWindow(mEditText.getWindowToken(),0);
 				searchDialog = MyDialogFragment.newInstance(parentActivity,
-						MyDialogFragment.DO_SEARCH_DB, false, null);
+						MyDialogFragment.DO_SEARCH_DB);
 				searchDialog.show(parentActivity.getSupportFragmentManager(),
 						"dialog_search_db");
 				

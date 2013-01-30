@@ -13,7 +13,6 @@ import sg.gov.nhb.ihuayu.R;
 import sg.gov.nhb.ihuayu.activity.db.entity.Dictionary;
 import sg.gov.nhb.ihuayu.activity.rest.AudioPlayer;
 import sg.gov.nhb.ihuayu.view.MyDialogFragment;
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.PixelFormat;
@@ -70,14 +69,14 @@ public class BookmarkFragment extends Fragment {
 	private static final int		VIEW_TYPE_NORMAL			= 0;
 	private static final int		VIEW_TYPE_DIVIDER			= 1;
 	// Message Code
-	private static final int		REMOVE_FROM_BOOKMARK		= 1;
-	private static final int		PLAY_AUDIO					= 2;
-	private static final int		REMOVE_SUCCESS				= 3;
-	private static final int		REMOVE_FAILED				= 4;
-	private static final int		INDICATE_ADD				= 5;
-	private static final int		INDICATE_HIDE				= 6;
-	private static final int        SHOW_DOWNLOAD_DIALOG        = 7;
-	private static final int        HIDE_DOWNLOAD_DIALOG        = 8;
+	private static final int		REMOVE_FROM_BOOKMARK		= 501;
+	private static final int		PLAY_AUDIO					= 502;
+	private static final int		REMOVE_SUCCESS				= 503;
+	private static final int		REMOVE_FAILED				= 504;
+	private static final int		INDICATE_ADD				= 505;
+	private static final int		INDICATE_HIDE				= 506;
+	private static final int        SHOW_DOWNLOAD_DIALOG        = 507;
+	private static final int        HIDE_DOWNLOAD_DIALOG        = 508;
 
 	// Define Thread Name
 	private static final String		THREAD_NAME					= "BookmarkFragmentThread";
@@ -158,8 +157,8 @@ public class BookmarkFragment extends Fragment {
         } else {
         	Log.d(TAG, "[onViewCreated] used BookmarkListFragment, do replace");
         	mBookmarkListFragment = new BookmarkListFragment();
-			ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 			ft.replace(R.id.fragment_bookmark_listview, mBookmarkListFragment);
+			ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 			//ft.addToBackStack(null);
 			ft.commit();
         }
@@ -216,7 +215,7 @@ public class BookmarkFragment extends Fragment {
 				case SHOW_DOWNLOAD_DIALOG: {
 					Log.d(TAG, "[mUihandler handleMessage] SHOW_DOWNLOAD_DIALOG");
 					downloadDialog = MyDialogFragment.newInstance(parentActivity,
-							MyDialogFragment.DIALOG_DOWNLOAD, false, null);
+							MyDialogFragment.DIALOG_DOWNLOAD);
 					downloadDialog.show(parentActivity.getSupportFragmentManager(),
 							"dialog_download");
 					break;
@@ -470,11 +469,11 @@ public class BookmarkFragment extends Fragment {
 					Log.d(TAG, "[BookmarkListFragment][onItemClick] dictionary info = "+dictionary.getDestiontion());
 					
 					FragmentManager fm = parentActivity.getSupportFragmentManager();
-					Fragment newFragment = ResultDetailFragment.newInstance(dictionary);
+					Fragment newFragment = BookmarkDetailFragment.newInstance(dictionary);
 					FragmentTransaction ft = fm.beginTransaction();
-					ft.replace(R.id.tab_content_bookmark, newFragment);
+					ft.replace(R.id.tab_content_bookmark, newFragment, MainActivity.fragment_tag_bookmark_detail);
 					ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-					ft.addToBackStack(null);
+					//ft.addToBackStack(null);
 					ft.commit();
 				} else {
 					Log.w(TAG, "[BookmarkListFragment][onItemClick] Item Type is Divider,do return");

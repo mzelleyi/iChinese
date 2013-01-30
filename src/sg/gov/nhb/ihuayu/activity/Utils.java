@@ -78,10 +78,10 @@ public class Utils {
 	
 	public static boolean hasNetwork(FragmentActivity activity) {
 		if(!isNetworkAvailable(activity)) {
-			MyDialogFragment downloadDialog = MyDialogFragment.newInstance(activity,
-					MyDialogFragment.NO_INTERNET_CONNETION, false, null);
-			downloadDialog.show(activity.getSupportFragmentManager(),
-					"dialog_download");
+			MyDialogFragment dialog = MyDialogFragment.newInstance(activity,
+					MyDialogFragment.NO_INTERNET_CONNETION);
+			dialog.show(activity.getSupportFragmentManager(),
+					"dialog_internet");
 			return false;
 		}
 		return true;

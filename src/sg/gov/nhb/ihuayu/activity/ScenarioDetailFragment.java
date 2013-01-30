@@ -56,9 +56,9 @@ public class ScenarioDetailFragment extends Fragment {
 	private static LayoutInflater   mInflater            = null;
 	private static Scenario         mScenario            = null;
 
-	private static final int        PLAY_DIALOG_AUDIO    = 201;
-	private static final int        SHOW_DOWNLOAD_DIALOG = 202;
-	private static final int        HIDE_DOWNLOAD_DIALOG = 203;
+	private static final int        PLAY_DIALOG_AUDIO    = 401;
+	private static final int        SHOW_DOWNLOAD_DIALOG = 402;
+	private static final int        HIDE_DOWNLOAD_DIALOG = 403;
 
 	// Define Thread Name
 	private static final String     THREAD_NAME          = "ScenarioDetailFragmentThread";
@@ -122,12 +122,15 @@ public class ScenarioDetailFragment extends Fragment {
 				// TODO Auto-generated method stub
 				FragmentManager fm = parentActivity.getSupportFragmentManager();
 				fm.popBackStack();
-				
-//				Fragment currentFragment = fm.findFragmentById(R.id.tab_content_scenario);
-//				FragmentTransaction ft = fm.beginTransaction();
-//				ft.remove(currentFragment);
-//				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
-//				ft.commit();
+//				Fragment currentFragment = fm.findFragmentByTag(MainActivity.fragment_tag_scenario);
+//				if (currentFragment == null) {
+//					Log.i(TAG, "[onClick] backBtn : new BookmarkFragment to replace");
+//					Fragment newFragment = ScenarioFragment.newInstance();
+//					FragmentTransaction ft = fm.beginTransaction();
+//					ft.replace(R.id.tab_content_scenario, newFragment, MainActivity.fragment_tag_scenario);
+//					ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+//					ft.commit();
+//				}
 			}
 		});
 		
@@ -144,8 +147,8 @@ public class ScenarioDetailFragment extends Fragment {
 			//ft.addToBackStack(null);
 			ft.commit();
         } else {
-        	Log.d(TAG, "[onViewCreated] used ScenarioDialogFragment, do replace");
         	list = new ScenarioDialogFragment();
+        	Log.d(TAG, "[onViewCreated] used ScenarioDialogFragment, do replace");
 			ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 			ft.replace(R.id.scenario_detail_dialog_listview, list);
 			//ft.addToBackStack(null);
@@ -161,7 +164,7 @@ public class ScenarioDetailFragment extends Fragment {
   			   case SHOW_DOWNLOAD_DIALOG: {
 				   Log.d(TAG, "[mUihandler handleMessage] SHOW_DOWNLOAD_DIALOG");
 				   downloadDialog = MyDialogFragment.newInstance(parentActivity,
-				           MyDialogFragment.DIALOG_DOWNLOAD, false, null);
+				           MyDialogFragment.DIALOG_DOWNLOAD);
 				   downloadDialog.show(parentActivity.getSupportFragmentManager(),
 				           "dialog_download");
 				   break;
@@ -297,7 +300,7 @@ public class ScenarioDetailFragment extends Fragment {
 			HashMap<Dialog, List<DialogKeywords>> mapItem = mAdapter.getItem(position);
 	        
 			DialogFragment newFragment = MyDialogFragment.newInstance(parentActivity, 
-					MyDialogFragment.SCENARIO_DIALOG, false, mapItem);
+					MyDialogFragment.SCENARIO_DIALOG, mapItem);
             newFragment.show(parentActivity.getSupportFragmentManager(), "scenario_dialog");
 		}
 	

@@ -47,39 +47,48 @@ import android.widget.TextView;
  */
 public class MainActivity extends FragmentActivity implements
 		OnTabChangeListener {
-
-	public static DBManagerment dbManagerment          = null;
-	// public static Context mContext = null;
-	public static Resources     mRes                   = null;
-
-	private static final int    COPY_DB_TO_PHONE       = 1;
-	private static final int    CHECK_UPDATE_COUNT     = 2;
-	private static final int    UPDATE_DB              = 3;
-	private static final int    SHOW_DOWNLOAD_DIALOG   = 509;
-	private static final int    HIDE_DOWNLOAD_DIALOG   = 10;
-	private static final int    SHOW_NUMBER_OF_UPDATES = 666;
-	private static final int    HIDE_NUMBER_OF_UPDATES = 665;
-	private static final int    DOWNLOAD_UPDATES       = 668;
-	private static final int    HIDE_DOWNLOAD_UPDATES  = 667;
-	private static final int    SHOW_DOWNLOAD_UPDATES_DB       = 811;
-	private static final int    HIDE_DOWNLOAD_UPDATES_DB  = 812;
-	private static final int    UPDATE_DOWNLOAD_UPDATES_DB  = 813;
+	private static final int	COPY_DB_TO_PHONE			= 101;
+	private static final int	CHECK_UPDATE_COUNT			= 102;
+	private static final int	UPDATE_DB					= 103;
+	private static final int	SHOW_DOWNLOAD_DIALOG		= 104;
+	private static final int	HIDE_DOWNLOAD_DIALOG		= 105;
+	private static final int	SHOW_NUMBER_OF_UPDATES		= 106;
+	private static final int	HIDE_NUMBER_OF_UPDATES		= 107;
+	private static final int	DOWNLOAD_UPDATES			= 108;
+	private static final int	HIDE_DOWNLOAD_UPDATES		= 109;
+	private static final int	SHOW_DOWNLOAD_UPDATES_DB	= 110;
+	private static final int	HIDE_DOWNLOAD_UPDATES_DB	= 112;
+	private static final int	UPDATE_DOWNLOAD_UPDATES_DB	= 113;
 
 	private static final String TAG                    = "iHuayu:MainActivity";
 	private static final String TAB_SEARCH             = "Search";
 	private static final String TAB_SCENARIO           = "Scenario";
 	private static final String TAB_BOOKMARK           = "Bookmark";
 	private static final String TAB_INFO               = "Info";
-	private TabHost             mTabHost               = null;
 	private static final String THREAD_NAME            = "MainActivity";
 	
+	public static final String	fragment_tag_search				= "tag_Search";
+	public static final String	fragment_tag_scenario			= "tag_Scenario";
+	public static final String	fragment_tag_bookmark			= "tag_Bookmark";
+	public static final String	fragment_tag_info				= "tag_Info";
+	public static final String	fragment_tag_help				= "tag_Help";
+	public static final String	fragment_tag_bookmark_detail	= "tag_bookmark_detail";
+	public static final String	fragment_tag_search_detail	    = "tag_search_detail";
+	public static final String	fragment_tag_scenario_detail	= "tag_scenario_detail";
+	
+	
 	// The update/copyDB Handler Thread
-	private HandlerThread			mHandlerThread	= null;
+	private HandlerThread		mHandlerThread				= null;
 	// The DB Operation Thread
-	private static NonUiHandler	    mNonUiHandler	= null;
+	private static NonUiHandler	mNonUiHandler				= null;
 
-	private boolean isDBReady = false;
-	private ProgressDialog pg;
+	public static DBManagerment	dbManagerment				= null;
+	public static Resources		mRes						= null;
+	private TabHost				mTabHost					= null;
+	private boolean				isDBReady					= false;
+	private ProgressDialog		pg							= null;
+	
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		Log.d(TAG, "[onCreate] + Begin");
@@ -249,40 +258,46 @@ public class MainActivity extends FragmentActivity implements
 		Log.d(TAG,"[updateTab] + Begin, tabTag=" + tabTag + ",viewHolderId="	+ String.valueOf(viewHolderId));
 		
 		FragmentManager fm = this.getSupportFragmentManager();
+		Log.i(TAG, "[updateTab] getBackStackEntryCount "+fm.getBackStackEntryCount());
 		FragmentTransaction ft = fm.beginTransaction();
 		Fragment newFragment = fm.findFragmentById(viewHolderId);
 		if (newFragment == null) {
 			Log.d(TAG,"[updateTab] find fragment == null, do add");
+			String fragmentTag = null;
 			if (TAB_SEARCH.equals(tabTag)) {
 				newFragment = SearchFragment.newInstance();
+				fragmentTag = MainActivity.fragment_tag_search; 
 			} else if (TAB_SCENARIO.equals(tabTag)) {
 				newFragment = ScenarioFragment.newInstance();
+				fragmentTag = MainActivity.fragment_tag_scenario; 
 			} else if (TAB_BOOKMARK.equals(tabTag)) {
 				newFragment = BookmarkFragment.newInstance();
+				fragmentTag = MainActivity.fragment_tag_bookmark; 
 			} else if (TAB_INFO.equals(tabTag)) {
 				newFragment = InfoFragment.newInstance();
+				fragmentTag = MainActivity.fragment_tag_info; 
 			} else {
 				Log.e(TAG, "Error Tab Type");
 			}
 			BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED = false;
 			// Add the fragment
-			ft.add(viewHolderId, newFragment);
+			ft.add(viewHolderId, newFragment, fragmentTag);
 			ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 			ft.commit();
 		} else {
 			if (BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED && TAB_BOOKMARK.equals(tabTag)) {
-				//Log.i(TAG,"[updateTab] new BookmarkFragment, do replace");
-				Log.i(TAG,"[updateTab] BookmarkFragment do removeIndicateWindow");
-				BookmarkFragment.removeIndicateWindow();
-				Log.i(TAG,"[updateTab] BookmarkFragment do restartLoader");
-				BookmarkFragment mBookmarkFragment = (BookmarkFragment)newFragment;
-				mBookmarkFragment.getLoaderManager().restartLoader(0, null, mBookmarkFragment.mBookmarkListFragment);
-				BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED = false;
-
-				//newFragment = BookmarkFragment.newInstance();
-				//ft.replace(viewHolderId, newFragment);
-				//ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-				//ft.commit();
+				
+				Fragment fragment = fm.findFragmentByTag(MainActivity.fragment_tag_bookmark_detail);
+				if (fragment != null) {
+					Log.i(TAG,"[updateTab] BookmarkFragment show detail view");
+					mTabHost.setCurrentTabByTag(tabTag);
+				} else {
+					BookmarkFragment.removeIndicateWindow();
+					Log.i(TAG,"[updateTab] BookmarkFragment do restartLoader");
+					BookmarkFragment mBookmarkFragment = (BookmarkFragment)newFragment;
+					mBookmarkFragment.getLoaderManager().restartLoader(0, null, mBookmarkFragment.mBookmarkListFragment);
+					BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED = false;
+				}
 			} else {
 				Log.d(TAG,"[updateTab] find fragment != null, do setCurrentTabByTag");
 				mTabHost.setCurrentTabByTag(tabTag);
@@ -433,7 +448,7 @@ public class MainActivity extends FragmentActivity implements
 			case SHOW_DOWNLOAD_DIALOG: {
 				Log.d(TAG, "[mUihandler handleMessage] SHOW_DOWNLOAD_DIALOG");
 				downloadDialog = MyDialogFragment.newInstance(MainActivity.this,
-						MyDialogFragment.PREPARE_DB, false, null);
+						MyDialogFragment.PREPARE_DB);
 				downloadDialog.show(MainActivity.this.getSupportFragmentManager(),
 						"dialog_download");
 				break;
@@ -450,9 +465,9 @@ public class MainActivity extends FragmentActivity implements
 				Log.d(TAG, "[mUihandler handleMessage] SHOW THE NUMBERS OF UPDATE ");
 				updateCount =  msg.arg1;
 				downloadDialog = MyDialogFragment.newInstance(MainActivity.this,
-						MyDialogFragment.UPDATE_COUNT, false, null,updateCount);
+						MyDialogFragment.UPDATE_COUNT, updateCount);
 				downloadDialog.show(MainActivity.this.getSupportFragmentManager(),
-						"dialog_download");
+						"dialog_update_count");
 				break;
 			}
 			case HIDE_NUMBER_OF_UPDATES: {
@@ -466,9 +481,9 @@ public class MainActivity extends FragmentActivity implements
 			case DOWNLOAD_UPDATES: {
 				Log.d(TAG, "[mUihandler handleMessage] DOWNLOAD_UPDATES");
 				downloadDialog = MyDialogFragment.newInstance(MainActivity.this,
-						MyDialogFragment.PREPARE_DB, false, null);
+						MyDialogFragment.PREPARE_DB);
 				downloadDialog.show(MainActivity.this.getSupportFragmentManager(),
-						"dialog_download");
+						"dialog_download_update");
 				break;
 			}
 			case HIDE_DOWNLOAD_UPDATES: {

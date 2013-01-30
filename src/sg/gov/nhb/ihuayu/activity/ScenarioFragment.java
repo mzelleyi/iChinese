@@ -144,7 +144,7 @@ public class ScenarioFragment extends Fragment {
 			FragmentManager fm = parentActivity.getSupportFragmentManager();
 			Fragment newFragment = ScenarioDetailFragment.newInstance(mAdapter.getItem(position));
 			FragmentTransaction ft = fm.beginTransaction();
-			ft.replace(R.id.tab_content_scenario, newFragment);
+			ft.replace(R.id.tab_content_scenario, newFragment, MainActivity.fragment_tag_scenario_detail);
 			ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 			ft.addToBackStack(null);
 			ft.commit();

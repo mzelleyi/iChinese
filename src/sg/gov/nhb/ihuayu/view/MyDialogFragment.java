@@ -5,7 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import sg.gov.nhb.ihuayu.activity.MainActivity;
-import sg.gov.nhb.ihuayu.activity.ResultDetailFragment;
+import sg.gov.nhb.ihuayu.activity.BookmarkDetailFragment;
+import sg.gov.nhb.ihuayu.activity.SearchDetailFragment;
 import sg.gov.nhb.ihuayu.activity.db.entity.DialogKeywords;
 
 import android.app.AlertDialog;
@@ -47,70 +48,101 @@ public class MyDialogFragment extends DialogFragment {
     private static sg.gov.nhb.ihuayu.activity.db.entity.Dialog	dialogItem	   = null;
     private static List<DialogKeywords>        		        keyWordList	   = null;
 
-    /**
-     * 
-     * @param context
-     * @param dialogType
-     * @param succuss
-     *            : The flag to indicate add or remove action result
-     * @param param
-     *            : For Show Dialog Detail Page
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-    public static MyDialogFragment newInstance(Context context, int dialogType, boolean succuss, Object param, int numberOfUpdates) {
-	Log.d(TAG, "[newInstance] + Begin");
-	MyDialogFragment frag = new MyDialogFragment();
-
-	parentActivity = (FragmentActivity) context;
-	mInflater = parentActivity.getLayoutInflater();
-
-	if (null != param) {
-	    dialogKeyMap = (HashMap<sg.gov.nhb.ihuayu.activity.db.entity.Dialog, List<DialogKeywords>>) param;
-	    Iterator<sg.gov.nhb.ihuayu.activity.db.entity.Dialog> iterator = dialogKeyMap.keySet().iterator();
-	    while (iterator.hasNext()) {
-		dialogItem = (sg.gov.nhb.ihuayu.activity.db.entity.Dialog) iterator.next();
-	    }
-	    keyWordList = dialogKeyMap.get(dialogItem);
-	    Log.d(TAG, "[newInstance] keyWordList size = " + keyWordList.size());
-	    for (int i = 0; i < keyWordList.size(); i++) {
-		DialogKeywords words = keyWordList.get(i);
-		String enStr = words.getSrc_keyword();
-		String pyStr = words.getKeyword_py();
-		String cnStr = words.getDest_keyword();
-		Log.d(TAG, "[newInstance] enStr = " + enStr);
-		Log.d(TAG, "[newInstance] pyStr = " + pyStr);
-		Log.d(TAG, "[newInstance] cnStr = " + cnStr);
-	    }
-	}
-
-	Bundle args = new Bundle();
-	args.putInt("dialogType", dialogType);
-	args.putBoolean("actionResult", succuss);
-	args.putInt("numberOfUpdates", numberOfUpdates);
-	frag.setArguments(args);
-	Log.d(TAG, "[newInstance] + End");
-	return frag;
+    public static MyDialogFragment newInstance(Context context, int dialogType) {
+    	return newInstance(context, dialogType, false, null, 0, false);
+    }
+    
+    public static MyDialogFragment newInstance(Context context, int dialogType, Object param) {
+    	return newInstance(context, dialogType, false, param, 0, false);
     }
     
     public static MyDialogFragment newInstance(Context context, int dialogType, boolean succuss, Object param) {
-    	return newInstance(context, dialogType, succuss, param, 0);
+    	return newInstance(context, dialogType, succuss, param, 0, false);
     }
+    
+    public static MyDialogFragment newInstance(Context context, int dialogType, boolean succuss, boolean isSearchDetail) {
+    	return newInstance(context, dialogType, succuss, null, 0, isSearchDetail);
+    }
+    
+    public static MyDialogFragment newInstance(Context context, int dialogType, int numberOfUpdates) {
+    	return newInstance(context, dialogType, false, null, numberOfUpdates, false);
+    }
+    
+	/**
+	 * 
+	 * @param context
+	 * @param dialogType
+	 * @param succuss
+	 *            : The flag to indicate add or remove action result
+	 * @param param
+	 *            : For Show Dialog Detail Page
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public static MyDialogFragment newInstance(Context context, int dialogType, boolean succuss, Object param,
+			int numberOfUpdates, boolean isSearchDetail)
+	{
+		Log.d(TAG, "[newInstance] + Begin");
+		MyDialogFragment frag = new MyDialogFragment();
+
+		parentActivity = (FragmentActivity) context;
+		mInflater = parentActivity.getLayoutInflater();
+
+		if (null != param)
+		{
+			dialogKeyMap = (HashMap<sg.gov.nhb.ihuayu.activity.db.entity.Dialog, List<DialogKeywords>>) param;
+			Iterator<sg.gov.nhb.ihuayu.activity.db.entity.Dialog> iterator = dialogKeyMap.keySet().iterator();
+			while (iterator.hasNext())
+			{
+				dialogItem = (sg.gov.nhb.ihuayu.activity.db.entity.Dialog) iterator.next();
+			}
+			keyWordList = dialogKeyMap.get(dialogItem);
+			Log.d(TAG, "[newInstance] keyWordList size = " + keyWordList.size());
+			for (int i = 0; i < keyWordList.size(); i++)
+			{
+				DialogKeywords words = keyWordList.get(i);
+				String enStr = words.getSrc_keyword();
+				String pyStr = words.getKeyword_py();
+				String cnStr = words.getDest_keyword();
+				Log.d(TAG, "[newInstance] enStr = " + enStr);
+				Log.d(TAG, "[newInstance] pyStr = " + pyStr);
+				Log.d(TAG, "[newInstance] cnStr = " + cnStr);
+			}
+		}
+
+		Bundle args = new Bundle();
+		args.putInt("dialogType", dialogType);
+		args.putBoolean("actionResult", succuss);
+		args.putInt("numberOfUpdates", numberOfUpdates);
+		args.putBoolean("isSearchDetail", isSearchDetail);
+		frag.setArguments(args);
+		Log.d(TAG, "[newInstance] + End");
+		return frag;
+	}
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 	int dialogType = getArguments().getInt("dialogType");
 	boolean actionResult = getArguments().getBoolean("actionResult", false);
+	final boolean isSearchDetail = getArguments().getBoolean("isSearchDetail", false);
 	if (dialogType == ADD_TO_BOOKMARK) {
 	    return new AlertDialog.Builder(parentActivity).setIcon(android.R.drawable.ic_dialog_alert)
 		    .setTitle(R.string.dialog_msg_add_to_bookmark)
 		    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
-			    ResultDetailFragment.doPositiveClick(ADD_TO_BOOKMARK);
+				if (isSearchDetail) {
+					SearchDetailFragment.doPositiveClick(ADD_TO_BOOKMARK);
+				} else {
+					BookmarkDetailFragment.doPositiveClick(ADD_TO_BOOKMARK);
+				}
 			}
 		    }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
-			    ResultDetailFragment.doNegativeClick();
+				if (isSearchDetail) {
+					SearchDetailFragment.doNegativeClick();
+				} else {
+					BookmarkDetailFragment.doNegativeClick();
+				}
 			}
 		    }).create();
 	} else if (dialogType == ADD_RESULT) {
@@ -119,7 +151,11 @@ public class MyDialogFragment extends DialogFragment {
 			.setTitle(R.string.dialog_msg_add_success)
 			.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 			    public void onClick(DialogInterface dialog, int whichButton) {
-				ResultDetailFragment.doPositiveClick(ADD_RESULT);
+			    	if (isSearchDetail) {
+			    		SearchDetailFragment.doPositiveClick(ADD_RESULT);
+			    	} else {
+			    		BookmarkDetailFragment.doPositiveClick(ADD_RESULT);
+			    	}
 			    }
 			}).create();
 	    } else {
@@ -127,7 +163,11 @@ public class MyDialogFragment extends DialogFragment {
 			.setTitle(R.string.dialog_msg_add_failed)
 			.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 			    public void onClick(DialogInterface dialog, int whichButton) {
-				ResultDetailFragment.doPositiveClick(ADD_RESULT);
+			    	if (isSearchDetail) {
+						SearchDetailFragment.doPositiveClick(ADD_RESULT);
+					} else {
+						BookmarkDetailFragment.doPositiveClick(ADD_RESULT);
+					}
 			    }
 			}).create();
 	    }
@@ -145,11 +185,19 @@ public class MyDialogFragment extends DialogFragment {
 		    .setTitle(R.string.dialog_msg_remove_from_bookmark)
 		    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
-			    ResultDetailFragment.doPositiveClick(REMOVE_FROM_BOOKMARK);
+				if (isSearchDetail) {
+					SearchDetailFragment.doPositiveClick(REMOVE_FROM_BOOKMARK);
+				} else {
+					BookmarkDetailFragment.doPositiveClick(REMOVE_FROM_BOOKMARK);
+				}
 			}
 		    }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
-			    ResultDetailFragment.doNegativeClick();
+				if (isSearchDetail) {
+					SearchDetailFragment.doNegativeClick();
+				} else {
+					BookmarkDetailFragment.doNegativeClick();
+				}
 			}
 		    }).create();
 	}else if (dialogType == UPDATE_COUNT) {
@@ -174,7 +222,11 @@ public class MyDialogFragment extends DialogFragment {
 			.setTitle(R.string.dialog_msg_remove_success)
 			.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 			    public void onClick(DialogInterface dialog, int whichButton) {
-				ResultDetailFragment.doPositiveClick(REMOVE_RESULT);
+			    	if (isSearchDetail) {
+						SearchDetailFragment.doPositiveClick(REMOVE_RESULT);
+					} else {
+						BookmarkDetailFragment.doPositiveClick(REMOVE_RESULT);
+					}
 			    }
 			}).create();
 	    } else {
@@ -182,7 +234,11 @@ public class MyDialogFragment extends DialogFragment {
 			.setTitle(R.string.dialog_msg_remove_failed)
 			.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 			    public void onClick(DialogInterface dialog, int whichButton) {
-				ResultDetailFragment.doPositiveClick(REMOVE_RESULT);
+			    	if (isSearchDetail) {
+						SearchDetailFragment.doPositiveClick(REMOVE_RESULT);
+					} else {
+						BookmarkDetailFragment.doPositiveClick(REMOVE_RESULT);
+					}
 			    }
 			}).create();
 	    }

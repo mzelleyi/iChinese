@@ -35,16 +35,12 @@ import android.widget.Toast;
  * @author Kesen
  *
  */
-public class ResultDetailFragment extends Fragment implements 
+public class SearchDetailFragment extends Fragment implements 
 	LoaderManager.LoaderCallbacks<Dictionary> {
 
-	private static final String		TAG						= "iHuayu:ResultDetailFragment";
+	private static final String		TAG						= "iHuayu:SearchDetailFragment";
 	private static FragmentActivity	parentActivity			= null;
 	private static View             mParentView             = null;
-	// private static List<Dictionary> mResultList = new
-	// ArrayList<Dictionary>();
-	private static Dictionary		mCurrentDic				= null;
-	// private static int mDialogType = -1;
 	private static ImageView		mFavoriteImg			= null;
 	private static Button			mBtnPrev				= null;
 	private static Button			mBtnNext				= null;
@@ -56,37 +52,38 @@ public class ResultDetailFragment extends Fragment implements
 	private static int           	mUpdateType		        = UPDATE_CURRENT;
 
 	// Message Code
-	private static final int		CHECK_FAV_STATUS		= 501;
-	private static final int		UPDATE_FAV_IMAGE		= 502;
-	private static final int		ADD_TO_BOOKMARK	    	= 503;
-	private static final int        UPDATE_ADD_RESULT       = 504;
-	private static final int		REMOVE_FROM_BOOKMARK	= 505;
-	private static final int		UPDATE_REMOVE_RESULT	= 506;
-	private static final int        PLAY_CHINESE_AUDIO      = 507;
-	private static final int        PLAY_SENTANCE_AUDIO     = 508;
-	private static final int        SHOW_DOWNLOAD_DIALOG    = 509;
-	private static final int        HIDE_DOWNLOAD_DIALOG    = 10;
+	private static final int		CHECK_FAV_STATUS		= 301;
+	private static final int		UPDATE_FAV_IMAGE		= 302;
+	private static final int		ADD_TO_BOOKMARK	    	= 303;
+	private static final int        UPDATE_ADD_RESULT       = 304;
+	private static final int		REMOVE_FROM_BOOKMARK	= 305;
+	private static final int		UPDATE_REMOVE_RESULT	= 306;
+	private static final int        PLAY_CHINESE_AUDIO      = 307;
+	private static final int        PLAY_SENTANCE_AUDIO     = 308;
+	private static final int        SHOW_DOWNLOAD_DIALOG    = 309;
+	private static final int        HIDE_DOWNLOAD_DIALOG    = 310;
 	
-	private static DialogFragment   mCurrentDialog = null;
+	private static DialogFragment		mCurrentDialog			= null;
 
-	
 	// Define Thread Name
-	private static final String		THREAD_NAME		= "ResultDetailFragmentThread";
+	private static final String			THREAD_NAME				= "SearchDetailFragmentThread";
 	// The DB Handler Thread
-	private HandlerThread			mHandlerThread	= null;
+	private HandlerThread				mHandlerThread			= null;
 	// The DB Operation Thread
-	private static NonUiHandler	    mNonUiHandler	= null;
-	
-	static ResultDetailFragment fragment = null;
+	private static NonUiHandler			mNonUiHandler			= null;
 
-    /**
-     * Create a new instance of ResultDetailFragment
-     */
-    static ResultDetailFragment newInstance(Dictionary dictionary) {
+	private static Dictionary			mCurrentDic				= null;
+
+	/**
+	 * Create a new instance of SearchDetailFragment
+	 * @param dictionary
+	 * @return
+	 */
+    static SearchDetailFragment newInstance(Dictionary dictionary) {
     	Log.d(TAG, "[newInstance] + Begin");
-    	fragment = new ResultDetailFragment();
+    	SearchDetailFragment fragment = new SearchDetailFragment();
     	mCurrentDic = dictionary;
-    	Log.d(TAG, "[newInstance] mCurrentDic.info = "+mCurrentDic.getDestiontion());
+    	Log.i(TAG, "[newInstance] mCurrentDic.info = "+mCurrentDic.getDestiontion());
         return fragment;
     }
     
@@ -151,10 +148,12 @@ public class ResultDetailFragment extends Fragment implements
 				Log.d(TAG, "[onClick] btnPrev ");
 				//mCurrentDic = mResultList.get(mCurrentPos);
 				mUpdateType = UPDATE_PREV;
-				//FragmentManager fm = parentActivity.getSupportFragmentManager();
-				//ResultDetailFragment list = (ResultDetailFragment) fm.findFragmentById(R.id.result_detail_fragment);
-				//list.getLoaderManager().restartLoader(0, null, list);
-				getLoaderManager().restartLoader(0, null, fragment);
+				FragmentManager fm = parentActivity.getSupportFragmentManager();
+				Log.i(TAG, "[onClick] restartLoader fragment_tag_search_detail");
+				SearchDetailFragment fragment = (SearchDetailFragment) fm.findFragmentByTag(MainActivity.fragment_tag_search_detail);
+				if (null != fragment) {
+					getLoaderManager().restartLoader(0, null, fragment);
+				}
 			}
 		});
 		
@@ -166,10 +165,12 @@ public class ResultDetailFragment extends Fragment implements
 				Log.d(TAG, "[onClick] btnNext ");
 				//mCurrentDic = mResultList.get(mCurrentPos);
 				mUpdateType = UPDATE_NEXT;
-				//FragmentManager fm = parentActivity.getSupportFragmentManager();
-				//ResultDetailFragment list = (ResultDetailFragment) fm.findFragmentById(R.id.result_detail_fragment);
-				getLoaderManager().restartLoader(0, null, fragment);
-				//list.getLoaderManager().restartLoader(0, null, list);
+				FragmentManager fm = parentActivity.getSupportFragmentManager();
+				Log.i(TAG, "[onClick] restartLoader fragment_tag_search_detail");
+				SearchDetailFragment fragment = (SearchDetailFragment) fm.findFragmentByTag(MainActivity.fragment_tag_search_detail);
+				if (null != fragment) {
+					getLoaderManager().restartLoader(0, null, fragment);
+				}
 			}
 		});
 		
@@ -396,7 +397,7 @@ public class ResultDetailFragment extends Fragment implements
 				 case SHOW_DOWNLOAD_DIALOG: {
 					 Log.d(TAG, "[mUihandler handleMessage] SHOW_DOWNLOAD_DIALOG");
 					 downloadDialog = MyDialogFragment.newInstance(parentActivity,
-					         MyDialogFragment.DIALOG_DOWNLOAD, false, null);
+					         MyDialogFragment.DIALOG_DOWNLOAD);
 					 downloadDialog.show(parentActivity.getSupportFragmentManager(),
 					         "dialog_download");
 					 break;
@@ -562,22 +563,22 @@ public class ResultDetailFragment extends Fragment implements
 		{
 			case MyDialogFragment.ADD_TO_BOOKMARK:
 				Log.d(TAG, "[showDialog] - ADD_TO_BOOKMARK");
-				mCurrentDialog = MyDialogFragment.newInstance(parentActivity, MyDialogFragment.ADD_TO_BOOKMARK, false, null);
+				mCurrentDialog = MyDialogFragment.newInstance(parentActivity, MyDialogFragment.ADD_TO_BOOKMARK, false, true);
 				mCurrentDialog.show(parentActivity.getSupportFragmentManager(), "dialog_add");
 				break;
 			case MyDialogFragment.ADD_RESULT:
 				Log.d(TAG, "[showDialog] - ADD_RESULT");
-				mCurrentDialog = MyDialogFragment.newInstance(parentActivity, MyDialogFragment.ADD_RESULT, bSusscuss, null);
+				mCurrentDialog = MyDialogFragment.newInstance(parentActivity, MyDialogFragment.ADD_RESULT, bSusscuss, true);
 				mCurrentDialog.show(parentActivity.getSupportFragmentManager(), "dialog_add_result");
 				break;
 			case MyDialogFragment.REMOVE_FROM_BOOKMARK:
 				Log.d(TAG, "[showDialog] - REMOVE_FROM_BOOKMARK");
-				mCurrentDialog = MyDialogFragment.newInstance(parentActivity, MyDialogFragment.REMOVE_FROM_BOOKMARK, false, null);
+				mCurrentDialog = MyDialogFragment.newInstance(parentActivity, MyDialogFragment.REMOVE_FROM_BOOKMARK, false, true);
 				mCurrentDialog.show(parentActivity.getSupportFragmentManager(), "dialog_remove");
 				break;
 			case MyDialogFragment.REMOVE_RESULT:
 				Log.d(TAG, "[showDialog] - REMOVE_RESULT");
-				mCurrentDialog = MyDialogFragment.newInstance(parentActivity, MyDialogFragment.REMOVE_RESULT, bSusscuss, null);
+				mCurrentDialog = MyDialogFragment.newInstance(parentActivity, MyDialogFragment.REMOVE_RESULT, bSusscuss, true);
 				mCurrentDialog.show(parentActivity.getSupportFragmentManager(), "dialog_remove_result");
 				break;
 			default:

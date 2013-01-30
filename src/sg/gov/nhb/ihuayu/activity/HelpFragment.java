@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -68,14 +69,15 @@ public class HelpFragment extends Fragment {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				FragmentManager fm = activity.getSupportFragmentManager();
-				fm.popBackStack();
-//				Fragment currentFragment = fm.findFragmentById(R.id.tab_content_info);
-//				if (currentFragment != null) {
-//					FragmentTransaction ft = fm.beginTransaction();
-//					ft.remove(currentFragment);
-//					ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
-//					ft.commit();
-//				}
+//				fm.popBackStack();
+				//Fragment currentFragment = fm.findFragmentById(R.id.tab_content_info);
+				Fragment currentFragment = fm.findFragmentByTag(MainActivity.fragment_tag_info);
+				if (currentFragment == null) {
+					FragmentTransaction ft = fm.beginTransaction();
+					ft.replace(R.id.tab_content_info, currentFragment, MainActivity.fragment_tag_info);
+					ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+					ft.commit();
+				}
 			}
 		});
 	}

@@ -158,7 +158,7 @@ public class ResultDetailFragment extends Fragment implements
 			}
 		});
 		
-		mBtnNext = (Button)parentActivity.findViewById(R.id.result_detail_footbar_btn_next);
+		mBtnNext = (Button)mParentView.findViewById(R.id.result_detail_footbar_btn_next);
 		mBtnNext.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -638,7 +638,7 @@ public class ResultDetailFragment extends Fragment implements
 	 */
 	public static class ResultDemoLoader extends AsyncTaskLoader<Dictionary> {
 
-		Dictionary mDictionary;
+		Dictionary mDictionary = null;
 		
 	    public ResultDemoLoader(Context context) {
 	        super(context);
@@ -654,10 +654,13 @@ public class ResultDetailFragment extends Fragment implements
 	    	Log.d(TAG, "[ResultDemoLoader][loadInBackground] + Begin");
 	    	Dictionary entries = null;
 	    	if (mUpdateType == UPDATE_CURRENT) {
+	    		Log.i(TAG, "[ResultDemoLoader][loadInBackground] Set Current");
 	    		entries = mCurrentDic;
 	    	} else if (mUpdateType == UPDATE_NEXT) {
+	    		Log.i(TAG, "[ResultDemoLoader][loadInBackground] Get Next");
 	    		entries = MainActivity.dbManagerment.getNextDictionary(mCurrentDic.getId());
 	    	} else if (mUpdateType == UPDATE_PREV) {
+	    		Log.i(TAG, "[ResultDemoLoader][loadInBackground] Set Prev");
 	    		entries = MainActivity.dbManagerment.getPreviousDictionary(mCurrentDic.getId());
 	    	}
 	        Log.d(TAG, "[ResultDemoLoader][loadInBackground] + End");
@@ -687,7 +690,7 @@ public class ResultDetailFragment extends Fragment implements
 	        if (this.isStarted()) {
 	            // If the Loader is currently started, we can immediately
 	            // deliver its results.
-	            super.deliverResult(dic);
+	            super.deliverResult(mDictionary);
 	        }
 	        
 	        // At this point we can release the resources associated with
@@ -704,7 +707,7 @@ public class ResultDetailFragment extends Fragment implements
 	     */
 	    @Override 
 	    protected void onStartLoading() {
-	    	Log.d(TAG, "[ScenarioListLoader][onStartLoading] + Begin");
+	    	Log.d(TAG, "[ResultDemoLoader][onStartLoading] + Begin");
 	        if (mDictionary != null) {
 	            // If we currently have a result available, deliver it
 	            // immediately.
@@ -717,7 +720,7 @@ public class ResultDetailFragment extends Fragment implements
 	            // or is not currently available, start a load.
 	            this.forceLoad();
 	        }
-	        Log.d(TAG, "[ScenarioListLoader][onStartLoading] + End");
+	        Log.d(TAG, "[ResultDemoLoader][onStartLoading] + End");
 	    }
 
 	    /**
@@ -725,7 +728,7 @@ public class ResultDetailFragment extends Fragment implements
 	     */
 	    @Override 
 	    protected void onStopLoading() {
-	    	Log.d(TAG, "[ScenarioListLoader][onStopLoading] + Begin");
+	    	Log.d(TAG, "[ResultDemoLoader][onStopLoading] + Begin");
 	        // Attempt to cancel the current load task if possible.
 	        this.cancelLoad();
 	    }
@@ -747,7 +750,7 @@ public class ResultDetailFragment extends Fragment implements
 	     */
 	    @Override 
 	    protected void onReset() {
-	    	Log.d(TAG, "[ScenarioListLoader][onReset] + Begin");
+	    	Log.d(TAG, "[ResultDemoLoader][onReset] + Begin");
 	        super.onReset();
 
 	        // Ensure the loader is stopped

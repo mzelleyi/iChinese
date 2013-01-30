@@ -5,6 +5,8 @@ import sg.gov.nhb.ihuayu.view.MyDialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v4.app.FragmentActivity;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -75,7 +77,7 @@ public class Utils {
 	} 
 	
 	public static boolean hasNetwork(FragmentActivity activity) {
-		if(!NetworkUtil.isNetworkAvailable(activity)) {
+		if(!isNetworkAvailable(activity)) {
 			MyDialogFragment downloadDialog = MyDialogFragment.newInstance(activity,
 					MyDialogFragment.NO_INTERNET_CONNETION, false, null);
 			downloadDialog.show(activity.getSupportFragmentManager(),
@@ -84,4 +86,25 @@ public class Utils {
 		}
 		return true;
 	}
+	
+	/**
+	 * Judge whether the current mobile network is available
+	 * @param context
+	 * @return
+	 */
+	public static boolean isNetworkAvailable(Context context)  
+	{  
+	    ConnectivityManager mConnMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);  
+	    NetworkInfo mWifi = mConnMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);  
+	    NetworkInfo mMobile = mConnMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);  
+	    boolean flag = false;  
+	    if((mWifi != null)  && ((mWifi.isAvailable())))  
+	    {  
+	        if((mWifi.isConnected()) || (mMobile.isConnected()))  
+	        {  
+	            flag = true;  
+	        }  
+	    }  
+	    return flag;  
+	}  
 }

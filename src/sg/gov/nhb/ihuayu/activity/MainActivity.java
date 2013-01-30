@@ -302,10 +302,11 @@ public class MainActivity extends FragmentActivity implements
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 			case COPY_DB_TO_PHONE:
-				Log.d(TAG, "[NonUihandler][handleMessage] - CHECK_FAV_STATUS");
+				Log.d(TAG, "[NonUihandler][handleMessage] - COPY_DB_TO_PHONE");
 				copyDB2Phone();
 				break;
 			case CHECK_UPDATE_COUNT:
+				Log.d(TAG, "[NonUihandler][handleMessage] - CHECK_UPDATE_COUNT");
 				try {
 					while(!isDBReady) {
 						Thread.sleep(500);	
@@ -316,11 +317,10 @@ public class MainActivity extends FragmentActivity implements
 					//Ignore the exception since it's in another thread.
 					Log.i(TAG, e.getMessage());
 				}
-				Log.d(TAG, "[NonUihandler][handleMessage] - ADD_TO_BOOKMARK");
 				break;
 			case UPDATE_DB:
 				Log.d(TAG,
-						"[NonUihandler][handleMessage] - Update Database");
+						"[NonUihandler][handleMessage] - UPDATE_DB");
 				try { 
 					updateDB();
 				} catch (Exception e) {
@@ -329,8 +329,7 @@ public class MainActivity extends FragmentActivity implements
 				}
 				break;
 			default:
-				Log.d(TAG,
-						"[NonUihandler][handleMessage] Something wrong in handleMessage()");
+				Log.d(TAG,"[NonUihandler][handleMessage] Something wrong in handleMessage()");
 				break;
 			}
 		}

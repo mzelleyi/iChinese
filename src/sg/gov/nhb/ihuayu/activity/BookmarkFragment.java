@@ -380,7 +380,7 @@ public class BookmarkFragment extends Fragment {
 		LoaderManager.LoaderCallbacks<List<Dictionary>> {
 		
 		// This is the Adapter being used to display the list's data.
-		BookmarkListAdapter			mAdapter;
+		BookmarkListAdapter			mAdapter = null;
 
 		// Handle indicate case.
 		private ListView			mListView			= null;
@@ -441,24 +441,6 @@ public class BookmarkFragment extends Fragment {
 
 
 		@Override
-		public void onAttach(Activity activity)
-		{
-			Log.d(TAG, "[onAttach] + Begin");
-			// TODO Auto-generated method stub
-			super.onAttach(activity);
-		}
-
-
-		@Override
-		public void onHiddenChanged(boolean hidden)
-		{
-			Log.d(TAG, "[onHiddenChanged] + Begin");
-			// TODO Auto-generated method stub
-			super.onHiddenChanged(hidden);
-		}
-
-
-		@Override
 		public void onDestroyView()
 		{
 			Log.d(TAG, "[onDestroyView] + Begin");
@@ -485,7 +467,7 @@ public class BookmarkFragment extends Fragment {
 				if (mAdapter.getItemViewType(position) == VIEW_TYPE_NORMAL) {
 					Dictionary dictionary = mAdapter.getItem(position);
 					//int index = mOriginBookmarkList.indexOf(dictionary);
-					//Log.d(TAG, "[BookmarkListFragment][onItemClick] dictionary index="+index);
+					Log.d(TAG, "[BookmarkListFragment][onItemClick] dictionary info = "+dictionary.getDestiontion());
 					
 					FragmentManager fm = parentActivity.getSupportFragmentManager();
 					Fragment newFragment = ResultDetailFragment.newInstance(dictionary);
@@ -773,7 +755,7 @@ public class BookmarkFragment extends Fragment {
 	 * A custom Loader that loads all of the installed applications.
 	 */
 	public static class BookmarkListLoader extends AsyncTaskLoader<List<Dictionary>> {
-	    List<Dictionary> mBookmarkList;
+	    List<Dictionary> mBookmarkList = null;
 
 	    public BookmarkListLoader(Context context) {
 	        super(context);

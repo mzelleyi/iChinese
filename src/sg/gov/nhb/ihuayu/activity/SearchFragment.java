@@ -409,6 +409,7 @@ public class SearchFragment extends Fragment {
 				   mFuzzyHintLayout.setVisibility(View.GONE);
 				   mDicDivider.setVisibility(View.GONE);
 				   mSceDivider.setVisibility(View.GONE);
+				   mScenarioListView.setVisibility(View.GONE);
 
 				   bFuzzyMode = false;
 				   mAdapter.setData(mDicList);
@@ -654,6 +655,7 @@ public class SearchFragment extends Fragment {
             if (convertView == null) {
             	if (getItemViewType(position) == VIEW_TYPE_FUZZY) {
             		view = mInflater.inflate(R.layout.bookmark_list_item, parent, false);
+            		view.setBackgroundColor(parentActivity.getResources().getColor(R.color.green_dark));
             	} else {
             		view = mInflater.inflate(R.layout.search_suggest_item, parent, false);
             	}

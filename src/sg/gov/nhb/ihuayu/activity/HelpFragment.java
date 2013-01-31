@@ -73,8 +73,9 @@ public class HelpFragment extends Fragment {
 				//Fragment currentFragment = fm.findFragmentById(R.id.tab_content_info);
 				Fragment currentFragment = fm.findFragmentByTag(MainActivity.fragment_tag_info);
 				if (currentFragment == null) {
+					Fragment newFragment = InfoFragment.newInstance();
 					FragmentTransaction ft = fm.beginTransaction();
-					ft.replace(R.id.tab_content_info, currentFragment, MainActivity.fragment_tag_info);
+					ft.replace(R.id.tab_content_info, newFragment, MainActivity.fragment_tag_info);
 					ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
 					ft.commit();
 				}

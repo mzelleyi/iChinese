@@ -10,6 +10,7 @@ import java.util.Comparator;
  *
  */
 public class Dictionary implements Comparable{
+	private int rowid;
 	private int id;
 	private String language_dir;
 	private String keyword;
@@ -38,6 +39,12 @@ public class Dictionary implements Comparable{
 	
 	public int getDistance() {
 		return distance;
+	}
+	public int getRowid() {
+		return rowid;
+	}
+	public void setRowid(int rowid) {
+		this.rowid = rowid;
 	}
 	public void setDistance(int distance) {
 		this.distance = distance;

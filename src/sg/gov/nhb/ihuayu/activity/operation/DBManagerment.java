@@ -91,19 +91,19 @@ public class DBManagerment {
 	
 	public Dictionary getDictinary(int dicId){
 		//Should return only one record.
-		List<Dictionary> dictionaryList = operation.queryDictionary("select * from dictionary where id = ? ", new String[]{dicId+""});
+		List<Dictionary> dictionaryList = operation.queryDictionary("select rowid, * from dictionary where id = ? ", new String[]{dicId+""});
 		if(dictionaryList == null || dictionaryList.size() == 0) return null;
 		return dictionaryList.get(0);
 	}
 	
 	public Dictionary getNextDictionary(int currentDictionaryId) {
-		List<Dictionary> dictionaryList = operation.queryDictionary("select * from dictionary where id = ? ", new String[]{(currentDictionaryId + 1)+""});
+		List<Dictionary> dictionaryList = operation.queryDictionary("select rowid, * from dictionary where rowid = ? ", new String[]{(currentDictionaryId + 1)+""});
 		if(dictionaryList == null || dictionaryList.size() == 0) return null;
 		return dictionaryList.get(0);
 	}
 	
 	public Dictionary getPreviousDictionary(int currentDictionaryId) {
-		List<Dictionary> dictionaryList = operation.queryDictionary("select * from dictionary where id = ? ", new String[]{(currentDictionaryId - 1 )+""});
+		List<Dictionary> dictionaryList = operation.queryDictionary("select rowid, * from dictionary where rowid = ? ", new String[]{(currentDictionaryId - 1 )+""});
 		if(dictionaryList == null || dictionaryList.size() == 0) return null;
 		return dictionaryList.get(0);
 	}

@@ -69,6 +69,8 @@ public class OperationUtils {
 		for(String name : cursor.getColumnNames()) {
 			if("id".equalsIgnoreCase(name)) {
 				dictionary.setId(Integer.parseInt(cursor.getString(cursor.getColumnIndex(name))));
+			}else if("rowid".equalsIgnoreCase(name)) {
+				dictionary.setRowid(Integer.parseInt(cursor.getString(cursor.getColumnIndex(name))));
 			}else if("language_dir".equalsIgnoreCase(name)) {
 				dictionary.setLanguage_dir(cursor.getString(cursor.getColumnIndex(name)));
 			}else if("keyword".equalsIgnoreCase(name)) {

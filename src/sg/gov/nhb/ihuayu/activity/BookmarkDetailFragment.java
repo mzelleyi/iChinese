@@ -668,10 +668,10 @@ public class BookmarkDetailFragment extends Fragment implements
 	    		entries = mCurrentDic;
 	    	} else if (mUpdateType == UPDATE_NEXT) {
 	    		Log.i(TAG, "[ResultDemoLoader][loadInBackground] Get Next");
-	    		entries = MainActivity.dbManagerment.getNextDictionary(mCurrentDic.getId());
+	    		entries = MainActivity.dbManagerment.getNextDictionary(mCurrentDic.getRowid());
 	    	} else if (mUpdateType == UPDATE_PREV) {
 	    		Log.i(TAG, "[ResultDemoLoader][loadInBackground] Set Prev");
-	    		entries = MainActivity.dbManagerment.getPreviousDictionary(mCurrentDic.getId());
+	    		entries = MainActivity.dbManagerment.getPreviousDictionary(mCurrentDic.getRowid());
 	    	}
 	        Log.d(TAG, "[ResultDemoLoader][loadInBackground] + End");
 	        // Done!

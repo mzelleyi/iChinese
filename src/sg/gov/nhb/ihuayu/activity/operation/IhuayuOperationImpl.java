@@ -123,7 +123,7 @@ public class IhuayuOperationImpl {
 	public List<Dictionary> getAllBookmarks() {
 		try {
 			//TODO. maybe have performance issue.
-			Cursor result = this.db.rawQuery("select * from dictionary where id in (select Dictionary_ID from Favorites)", null);
+			Cursor result = this.db.rawQuery("select rowid, * from dictionary where id in (select Dictionary_ID from Favorites)", null);
 			return OperationUtils.cursorToDictionary(result);
 		} catch (Exception e) {
 			return null;
@@ -185,7 +185,7 @@ public class IhuayuOperationImpl {
 	
 	public List<Dictionary> searchDictionary(String language_dir, String keyword) {
 		db.execSQL("create index IF NOT EXISTS dictinaryIndex ON dictionary (language_dir, keyword)");
-		Cursor result = db.rawQuery("select * from dictionary where language_dir = ? and keyword like ? limit 20", new String[]{language_dir,  keyword + "%"});
+		Cursor result = db.rawQuery("select rowid, * from dictionary where language_dir = ? and keyword like ? order by rowid limit 20", new String[]{language_dir,  keyword + "%"});
 		List<Dictionary> list = OperationUtils.cursorToDictionary(result);
 //		Collections.sort(list);
 		return list;
@@ -193,7 +193,7 @@ public class IhuayuOperationImpl {
 	
 	public FuzzyResult fuzzySearch(String language_dir, String keyword) {
 		FuzzyResult result = new FuzzyResult();
-		List<Dictionary> exactResult = queryDictionary("select * from dictionary where keyword = ? ", new String[]{keyword});
+		List<Dictionary> exactResult = queryDictionary("select rowid, * from dictionary where keyword like ? ", new String[]{keyword});
 		if(exactResult != null && exactResult.size() > 0) {
 			result.setDictionaryList(exactResult);
 			result.setExactResult(true);

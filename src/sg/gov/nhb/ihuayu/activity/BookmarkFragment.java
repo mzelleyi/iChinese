@@ -405,7 +405,7 @@ public class BookmarkFragment extends Fragment {
 	        
 	        // Give some text to display if there is no data. In a real
 			// application this would come from a resource.
-			this.setEmptyText("No Bookmarks");
+			this.setEmptyText("");
 	
 			// We have a menu item to show in action bar.
 			this.setHasOptionsMenu(false);

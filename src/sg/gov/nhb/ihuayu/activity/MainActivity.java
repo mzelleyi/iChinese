@@ -368,11 +368,16 @@ public class MainActivity extends FragmentActivity implements
 		}
 		
 		public void checkForUpdate() throws InvalidKeyException, ClientProtocolException, IOException, ParseException {
-			if(!Utils.isNetworkAvailable(getApplicationContext())) {
-				MyDialogFragment dialog = MyDialogFragment.newInstance(getApplicationContext(),
+			if(!Utils.isNetworkAvailable(MainActivity.this)) {
+				if (mUiHandler.hasMessages(HIDE_DOWNLOAD_DIALOG)) {
+					mUiHandler.removeMessages(HIDE_DOWNLOAD_DIALOG);
+				}
+				mUiHandler.sendEmptyMessage(HIDE_DOWNLOAD_DIALOG);
+				
+				MyDialogFragment dialog = MyDialogFragment.newInstance(MainActivity.this,
 						MyDialogFragment.NO_INTERNET_CONNETION);
 				dialog.show(MainActivity.this.getSupportFragmentManager(),
-						"dialog_internet");
+						"dialog_internet_connection");
 				return;
 			}
 			RestService service = new RestService();

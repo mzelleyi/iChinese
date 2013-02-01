@@ -38,6 +38,15 @@ public class IhuayuOperationImpl {
 		this.db = manager.getSqlDB();
 		this.manager = manager;
 	}
+	public void close() {
+		if(this.db != null) {
+			try{
+			this.db.close();
+			}catch (Exception e) {
+				Log.i(TAG, e.getLocalizedMessage());
+			}
+		}
+	}
 
 	public List<Scenario> queryScenario(String condition, String[] params) {
 		Cursor result = this.db.rawQuery(condition, params);

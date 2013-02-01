@@ -48,7 +48,7 @@
     <string name="dialog_msg_add_failed">Add Failed</string>
     <string name="dialog_msg_remove_success">Remove Success</string>
     <string name="dialog_msg_remove_failed">Remove Failed</string>
-    <string name="dialog_msg_prepare_db_hint">Preparing DB</string>
+    <string name="dialog_msg_prepare_db_hint">Checking updates</string>
     <string name="dialog_msg_search_hint">Please wait while searching!</string>
     <string name="dialog_msg_download_hint">Downloading!</string>
     <string name="dialog_msg_no_internet_connection">No network available!</string>

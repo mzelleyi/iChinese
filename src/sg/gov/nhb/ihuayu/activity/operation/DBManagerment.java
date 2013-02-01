@@ -33,6 +33,10 @@ public class DBManagerment {
 		operation = new IhuayuOperationImpl(dbManager);
 	}
 	
+	public void close() {
+		operation.close();
+	}
+	
 	public List<Dictionary> searchDictionary(QueryType type, String keyword) {
 		return operation.searchDictionary(type.getName(), keyword);
 	}

@@ -7,7 +7,7 @@ package sg.gov.nhb.ihuayu.activity.db.entity;
  * @author lixingwang
  *
  */
-public class Dialog {
+public class ScenarioDialog {
 	private String id;
 	private String title_id;
 	private String sentence_sequence_id;

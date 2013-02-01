@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import sg.gov.nhb.ihuayu.activity.db.DBSqlite;
-import sg.gov.nhb.ihuayu.activity.db.entity.Dialog;
+import sg.gov.nhb.ihuayu.activity.db.entity.ScenarioDialog;
 import sg.gov.nhb.ihuayu.activity.db.entity.DialogKeywords;
 import sg.gov.nhb.ihuayu.activity.db.entity.Dictionary;
 import sg.gov.nhb.ihuayu.activity.db.entity.FuzzyResult;
@@ -49,11 +49,11 @@ public class DBManagerment {
 		return operation.queryScenario("select * from Scenario_Category", null);
 	}
 	
-	public List<HashMap<Dialog, List<DialogKeywords>>> getDialogList(String titleId) {
-		List<HashMap<Dialog, List<DialogKeywords>>> dialogKeywordList = new ArrayList<HashMap<Dialog,List<DialogKeywords>>>();
-		List<Dialog> dialogList = operation.queryDialog("select * from Dialog where title_id = ? ", new String[]{titleId});
-		for(Dialog dialog : dialogList) {
-			HashMap<Dialog, List<DialogKeywords>> dialogKeyword = new HashMap<Dialog, List<DialogKeywords>>();
+	public List<HashMap<ScenarioDialog, List<DialogKeywords>>> getDialogList(String titleId) {
+		List<HashMap<ScenarioDialog, List<DialogKeywords>>> dialogKeywordList = new ArrayList<HashMap<ScenarioDialog,List<DialogKeywords>>>();
+		List<ScenarioDialog> dialogList = operation.queryDialog("select * from Dialog where title_id = ? ", new String[]{titleId});
+		for(ScenarioDialog dialog : dialogList) {
+			HashMap<ScenarioDialog, List<DialogKeywords>> dialogKeyword = new HashMap<ScenarioDialog, List<DialogKeywords>>();
 			List<DialogKeywords> keywards = operation.queryDialogKeywords("select * from Dialog_Keyword where Dialog_ID = ? ", new String[]{dialog.getId()});
 			dialogKeyword.put(dialog, keywards);
 			dialogKeywordList.add(dialogKeyword);
@@ -134,7 +134,7 @@ public class DBManagerment {
 		return operation.getLastUpdateTime();
 	}
 	
-	public long uodateUpdateTime() {
+	public long updateUpdateTime() {
 		return operation.updateUpdateTime();
 	}
 	

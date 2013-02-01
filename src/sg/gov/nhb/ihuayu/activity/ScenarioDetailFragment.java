@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import sg.gov.nhb.ihuayu.activity.db.entity.Dialog;
+import sg.gov.nhb.ihuayu.activity.db.entity.ScenarioDialog;
 import sg.gov.nhb.ihuayu.activity.db.entity.DialogKeywords;
 import sg.gov.nhb.ihuayu.activity.db.entity.Scenario;
 import sg.gov.nhb.ihuayu.activity.rest.AudioPlayer;
@@ -257,7 +257,7 @@ public class ScenarioDetailFragment extends Fragment {
 	}
 	
 	public static class ScenarioDialogFragment extends ListFragment implements 
-		LoaderManager.LoaderCallbacks<List<HashMap<Dialog, List<DialogKeywords>>>> {
+		LoaderManager.LoaderCallbacks<List<HashMap<ScenarioDialog, List<DialogKeywords>>>> {
 		
 		// This is the Adapter being used to display the list's data.
 		ScenarioDialogAdapter mAdapter;
@@ -297,22 +297,22 @@ public class ScenarioDetailFragment extends Fragment {
 		public void onListItemClick(ListView l, View v, int position, long id) {
 			// Insert desired behavior here.
 			Log.i(TAG, "[ScenarioDialogFragment][onListItemClick] Item clicked: " + id);
-			HashMap<Dialog, List<DialogKeywords>> mapItem = mAdapter.getItem(position);
+			HashMap<ScenarioDialog, List<DialogKeywords>> mapItem = mAdapter.getItem(position);
 	        
 			DialogFragment newFragment = MyDialogFragment.newInstance(parentActivity, 
 					MyDialogFragment.SCENARIO_DIALOG, mapItem);
             newFragment.show(parentActivity.getSupportFragmentManager(), "scenario_dialog");
 		}
 	
-		public Loader<List<HashMap<Dialog, List<DialogKeywords>>>> onCreateLoader(int id, Bundle args) {
+		public Loader<List<HashMap<ScenarioDialog, List<DialogKeywords>>>> onCreateLoader(int id, Bundle args) {
 			Log.d(TAG, "[ScenarioDialogFragment][onCreateLoader] + Begin");
 			// This is called when a new Loader needs to be created. This
 			// sample only has one Loader with no arguments, so it is simple.
 			return new ScenarioDialogLoader(this.getActivity());
 		}
 	
-		public void onLoadFinished(Loader<List<HashMap<Dialog, List<DialogKeywords>>>> loader, 
-				List<HashMap<Dialog, List<DialogKeywords>>> data) {
+		public void onLoadFinished(Loader<List<HashMap<ScenarioDialog, List<DialogKeywords>>>> loader, 
+				List<HashMap<ScenarioDialog, List<DialogKeywords>>> data) {
 			Log.d(TAG, "[ScenarioDialogFragment][onLoadFinished] + Begin");
 			// Set the new data in the adapter.
 			mAdapter.setData(data);
@@ -330,7 +330,7 @@ public class ScenarioDetailFragment extends Fragment {
 			}
 		}
 	
-		public void onLoaderReset(Loader<List<HashMap<Dialog, List<DialogKeywords>>>> loader) {
+		public void onLoaderReset(Loader<List<HashMap<ScenarioDialog, List<DialogKeywords>>>> loader) {
 			Log.d(TAG, "[ScenarioDialogFragment][onLoaderReset] + Begin");
 			// Clear the data in the adapter.
 			mAdapter.setData(null);
@@ -341,9 +341,9 @@ public class ScenarioDetailFragment extends Fragment {
 	/**
 	 * A custom Loader that loads all of the installed applications.
 	 */
-	public static class ScenarioDialogLoader extends AsyncTaskLoader<List<HashMap<Dialog, List<DialogKeywords>>>> {
+	public static class ScenarioDialogLoader extends AsyncTaskLoader<List<HashMap<ScenarioDialog, List<DialogKeywords>>>> {
 
-		List<HashMap<Dialog, List<DialogKeywords>>> mDialogList = null;
+		List<HashMap<ScenarioDialog, List<DialogKeywords>>> mDialogList = null;
 		
 	    public ScenarioDialogLoader(Context context) {
 	        super(context);
@@ -355,7 +355,7 @@ public class ScenarioDetailFragment extends Fragment {
 	     * data to be published by the loader.
 	     */
 	    @Override 
-	    public List<HashMap<Dialog, List<DialogKeywords>>> loadInBackground() {
+	    public List<HashMap<ScenarioDialog, List<DialogKeywords>>> loadInBackground() {
 	    	Log.d(TAG, "[ScenarioDialogLoader][loadInBackground] + Begin");
 	    	
 	    	mDialogList = MainActivity.dbManagerment.getDialogList(mScenario.getTitle_id());
@@ -371,7 +371,7 @@ public class ScenarioDetailFragment extends Fragment {
 	     * here just adds a little more logic.
 	     */
 	    @Override 
-	    public void deliverResult(List<HashMap<Dialog, List<DialogKeywords>>> dialogList) {
+	    public void deliverResult(List<HashMap<ScenarioDialog, List<DialogKeywords>>> dialogList) {
 	    	Log.d(TAG, "[ScenarioDialogLoader][deliverResult] + Begin");
 	        if (this.isReset()) {
 	            // An async query came in while the loader is stopped.  We
@@ -383,7 +383,7 @@ public class ScenarioDetailFragment extends Fragment {
 	        
 	        if (dialogList != null) {
 	        	Log.d(TAG, "[ScenarioDialogLoader][deliverResult] List Size="+dialogList.size());
-		        List<HashMap<Dialog, List<DialogKeywords>>> oldDialogList = dialogList;
+		        List<HashMap<ScenarioDialog, List<DialogKeywords>>> oldDialogList = dialogList;
 		        mDialogList = dialogList;
 
 		        if (this.isStarted()) {
@@ -437,7 +437,7 @@ public class ScenarioDetailFragment extends Fragment {
 	     * Handles a request to cancel a load.
 	     */
 	    @Override 
-	    public void onCanceled(List<HashMap<Dialog, List<DialogKeywords>>> scenarioList) {
+	    public void onCanceled(List<HashMap<ScenarioDialog, List<DialogKeywords>>> scenarioList) {
 	    	Log.d(TAG, "[ScenarioDialogLoader][onCanceled] + Begin");
 	        super.onCanceled(scenarioList);
 
@@ -467,14 +467,14 @@ public class ScenarioDetailFragment extends Fragment {
 	     * Helper function to take care of releasing resources associated
 	     * with an actively loaded data set.
 	     */
-	    protected void onReleaseResources(List<HashMap<Dialog, List<DialogKeywords>>> scenario) {
+	    protected void onReleaseResources(List<HashMap<ScenarioDialog, List<DialogKeywords>>> scenario) {
 	        // For a simple List<> there is nothing to do.  For something
 	        // like a Cursor, we would close it here.
 	    }
 	}
 	
-	public static class ScenarioDialogAdapter extends ArrayAdapter<HashMap<Dialog, List<DialogKeywords>>> {
-        private Dialog dialogItem = null;
+	public static class ScenarioDialogAdapter extends ArrayAdapter<HashMap<ScenarioDialog, List<DialogKeywords>>> {
+        private ScenarioDialog dialogItem = null;
         private List<DialogKeywords> keyWordList = null;
 
 	    public ScenarioDialogAdapter(Context context) {
@@ -483,13 +483,13 @@ public class ScenarioDetailFragment extends Fragment {
 	        //mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	    }
 
-	    public void setData(List<HashMap<Dialog, List<DialogKeywords>>> data) {
+	    public void setData(List<HashMap<ScenarioDialog, List<DialogKeywords>>> data) {
 	    	Log.d(TAG, "[ScenarioDialogAdapter][setData] + Begin");
 	        this.clear();
 	        
 	        if (data != null) {
 	        	Log.d(TAG, "[ScenarioDialogAdapter][setData] Size"+data.size());
-	            for (HashMap<Dialog, List<DialogKeywords>> dialog : data) {
+	            for (HashMap<ScenarioDialog, List<DialogKeywords>> dialog : data) {
 	                this.add(dialog);
 	            }
 	        }
@@ -530,10 +530,10 @@ public class ScenarioDetailFragment extends Fragment {
 	    	Log.d(TAG, "[ScenarioDetailAdapter][getView] + pos="+position);
 	        final int pos = position;
 	    	
-	    	final HashMap<Dialog, List<DialogKeywords>> mapItem = this.getItem(position);
-	        Iterator<Dialog> iterator = mapItem.keySet().iterator();
+	    	final HashMap<ScenarioDialog, List<DialogKeywords>> mapItem = this.getItem(position);
+	        Iterator<ScenarioDialog> iterator = mapItem.keySet().iterator();
 	        while(iterator.hasNext()) {
-	        	dialogItem = (Dialog) iterator.next();
+	        	dialogItem = (ScenarioDialog) iterator.next();
 	        }
 	        keyWordList = mapItem.get(dialogItem);
 	    	
@@ -581,10 +581,10 @@ public class ScenarioDetailFragment extends Fragment {
 						public void onClick(View v)
 						{
 							// TODO Auto-generated method stub
-					    	final HashMap<Dialog, List<DialogKeywords>> mapItem = getItem(pos);
-					        Iterator<Dialog> iterator = mapItem.keySet().iterator();
+					    	final HashMap<ScenarioDialog, List<DialogKeywords>> mapItem = getItem(pos);
+					        Iterator<ScenarioDialog> iterator = mapItem.keySet().iterator();
 					        while(iterator.hasNext()) {
-					        	dialogItem = (Dialog) iterator.next();
+					        	dialogItem = (ScenarioDialog) iterator.next();
 					        }
 					        String strAudio = dialogItem.getAudio();
 							Log.d(TAG, "[onClick] dialogAudio = "+strAudio);

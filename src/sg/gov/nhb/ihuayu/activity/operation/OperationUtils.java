@@ -12,7 +12,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import sg.gov.nhb.ihuayu.activity.db.entity.Dialog;
+import sg.gov.nhb.ihuayu.activity.db.entity.ScenarioDialog;
 import sg.gov.nhb.ihuayu.activity.db.entity.DialogKeywords;
 import sg.gov.nhb.ihuayu.activity.db.entity.Dictionary;
 import sg.gov.nhb.ihuayu.activity.db.entity.Scenario;
@@ -40,8 +40,8 @@ public class OperationUtils {
 		return list;
 	}
 	
-	public static List<Dialog> cursorToDialog(Cursor cursor) {
-		List<Dialog> list = new ArrayList<Dialog>();
+	public static List<ScenarioDialog> cursorToDialog(Cursor cursor) {
+		List<ScenarioDialog> list = new ArrayList<ScenarioDialog>();
 		while (cursor.moveToNext()) {  
            list.add(cursorToOneDialog(cursor));
         }
@@ -118,8 +118,8 @@ public class OperationUtils {
 		return dialog;
 	}
 	
-	private static Dialog cursorToOneDialog(Cursor cursor) {
-		Dialog dialog = new Dialog();
+	private static ScenarioDialog cursorToOneDialog(Cursor cursor) {
+		ScenarioDialog dialog = new ScenarioDialog();
 		for(String name : cursor.getColumnNames()) {
 			if("Dialog_ID".equalsIgnoreCase(name)) {
 				dialog.setId(cursor.getString(cursor.getColumnIndex(name)));

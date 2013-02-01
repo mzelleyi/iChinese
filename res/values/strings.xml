@@ -48,10 +48,11 @@
     <string name="dialog_msg_add_failed">Add Failed</string>
     <string name="dialog_msg_remove_success">Remove Success</string>
     <string name="dialog_msg_remove_failed">Remove Failed</string>
-    <string name="dialog_msg_prepare_db_hint">Checking updates</string>
+    <string name="dialog_msg_checking_update_hint">Checking updates</string>
     <string name="dialog_msg_search_hint">Please wait while searching!</string>
     <string name="dialog_msg_download_hint">Downloading!</string>
     <string name="dialog_msg_no_internet_connection">No network available!</string>
+    <string name="dialog_msg_update_count_remind">new items available! Do you want to update?</string>
     
     <string name="dialog_btn_ok">OK</string>
     <string name="dialog_words_define_hint">Words definition:</string>

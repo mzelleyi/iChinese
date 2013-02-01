@@ -5,7 +5,7 @@ package sg.gov.nhb.ihuayu.activity.db;
 
 import java.util.List;
 
-import sg.gov.nhb.ihuayu.activity.db.entity.Dialog;
+import sg.gov.nhb.ihuayu.activity.db.entity.ScenarioDialog;
 import sg.gov.nhb.ihuayu.activity.db.entity.DialogKeywords;
 import sg.gov.nhb.ihuayu.activity.db.entity.Scenario;
 import sg.gov.nhb.ihuayu.activity.operation.IhuayuOperationImpl;
@@ -34,8 +34,8 @@ public class DBDemo {
 		//Query from scenarios
 		List<Scenario> scenarios = operation.queryScenario("select * from Scenario_Category where title_id = ?", new String[]{"1"});
 		for(Scenario scenario : scenarios) {
-			List<Dialog> dialogList = operation.queryDialog("select * from Dialog where title_id = ? ", new String[]{scenario.getTitle_id()});
-			for(Dialog dialog : dialogList) {
+			List<ScenarioDialog> dialogList = operation.queryDialog("select * from Dialog where title_id = ? ", new String[]{scenario.getTitle_id()});
+			for(ScenarioDialog dialog : dialogList) {
 				Log.d(TAG,"Dialog ==========" + dialog.getSentence());
 				List<DialogKeywords> keywards = operation.queryDialogKeywords("select * from Dialog_Keyword where Dialog_ID = ? ", new String[]{dialog.getId()});
 				for(DialogKeywords keyword : keywards) {

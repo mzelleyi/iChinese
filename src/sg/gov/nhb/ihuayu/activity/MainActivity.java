@@ -20,7 +20,6 @@ import sg.gov.nhb.ihuayu.activity.operation.DBManagerment;
 import sg.gov.nhb.ihuayu.activity.rest.FileUtils;
 import sg.gov.nhb.ihuayu.activity.rest.RestService;
 import sg.gov.nhb.ihuayu.view.MyDialogFragment;
-import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.res.Resources;
@@ -49,16 +48,17 @@ public class MainActivity extends FragmentActivity implements
 		OnTabChangeListener {
 	private static final int	COPY_DB_TO_PHONE			= 101;
 	private static final int	CHECK_UPDATE_COUNT			= 102;
-	private static final int	UPDATE_DB					= 103;
-	private static final int	SHOW_DOWNLOAD_DIALOG		= 104;
-	private static final int	HIDE_DOWNLOAD_DIALOG		= 105;
-	private static final int	SHOW_NUMBER_OF_UPDATES		= 106;
-	private static final int	HIDE_NUMBER_OF_UPDATES		= 107;
-	private static final int	DOWNLOAD_UPDATES			= 108;
-	private static final int	HIDE_DOWNLOAD_UPDATES		= 109;
-	private static final int	SHOW_DOWNLOAD_UPDATES_DB	= 110;
-	private static final int	HIDE_DOWNLOAD_UPDATES_DB	= 112;
-	private static final int	UPDATE_DOWNLOAD_UPDATES_DB	= 113;
+	private static final int	UPDATE_DATA_TO_DB   		= 103;
+	private static final int	UPDATE_TIME_STAMP   		= 104;
+	private static final int    UPDATE_CANCEL_TIME          = 105;
+	
+	private static final int	SHOW_CHECKING_DIALOG		= 106;
+	private static final int	HIDE_CHECKING_DIALOG		= 107;
+	private static final int	SHOW_NUMBER_OF_UPDATES		= 108;
+	private static final int	HIDE_NUMBER_OF_UPDATES		= 109;
+	private static final int	UPDATE_DOWNLOAD_PROCESS	    = 110;
+	private static final int	SHOW_DOWNLOAD_PROCESS	    = 111;
+	private static final int	HIDE_DOWNLOAD_PROCESS	    = 112;
 
 	private static final String TAG                    = "iHuayu:MainActivity";
 	private static final String TAB_SEARCH             = "Search";
@@ -78,14 +78,22 @@ public class MainActivity extends FragmentActivity implements
 	
 	
 	// The update/copyDB Handler Thread
-	private HandlerThread		mHandlerThread				= null;
+	private HandlerThread			mHandlerThread					= null;
 	// The DB Operation Thread
-	private static NonUiHandler	mNonUiHandler				= null;
+	private static NonUiHandler		mNonUiHandler					= null;
 
-	public static DBManagerment	dbManagerment				= null;
-	public static Resources		mRes						= null;
-	private TabHost				mTabHost					= null;
-	private ProgressDialog		pg							= null;
+	public static DBManagerment		dbManagerment					= null;
+	public static Resources			mRes							= null;
+	private TabHost					mTabHost						= null;
+	private static DialogFragment	mCheckUpdateDialog				= null;
+	private static DialogFragment	mUpdateCountDialog				= null;
+	private static ProgressDialog	mProgressDialog					= null;
+	
+
+	public static int			mMax_Progress					= 0;
+	private static int          mProgress                        = 0;
+
+	// private ProgressDialog pg = null;
 	
 	
 	@Override
@@ -94,11 +102,14 @@ public class MainActivity extends FragmentActivity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
+		//mContext = this.getApplicationContext();
+		//mActivity = (FragmentActivity) this.getParent();
 		mRes = this.getResources();
-        pg = new ProgressDialog(this); 
-        pg.setMessage("Updating ..."); 
-        pg.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL); 
-        pg.setCancelable(false); 
+		
+//        pg = new ProgressDialog(this); 
+//        pg.setMessage("Updating ..."); 
+//        pg.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL); 
+//        pg.setCancelable(false); 
 		//mContext = this.getApplication();		
 		mTabHost = (TabHost) findViewById(android.R.id.tabhost);
 		mTabHost.setup();
@@ -130,33 +141,32 @@ public class MainActivity extends FragmentActivity implements
 		mTabHost.setCurrentTabByTag(TAB_SEARCH);
 		
 		this.updateTab(TAB_SEARCH, R.id.tab_content_search);
-		//TODO maybe we need async to handle this
+		
 		mHandlerThread = new HandlerThread(THREAD_NAME);
 		mHandlerThread.setPriority(Thread.NORM_PRIORITY);
 		mHandlerThread.start();
 		mNonUiHandler = new NonUiHandler(mHandlerThread.getLooper());
+		
 		if (!FileUtils.hasDBFileInPhone()) {
-			sendHandlerMsg(COPY_DB_TO_PHONE);
+			sendNonUIHandlerMsg(COPY_DB_TO_PHONE, 500);
 		} else {
-			if (mUiHandler.hasMessages(SHOW_DOWNLOAD_DIALOG)) {
-				mUiHandler.removeMessages(SHOW_DOWNLOAD_DIALOG);
-			}
-			mUiHandler.sendEmptyMessage(SHOW_DOWNLOAD_DIALOG);
 			dbManagerment = new DBManagerment(MainActivity.this);
-			sendHandlerMsg(CHECK_UPDATE_COUNT);
+			try
+			{
+				if (canShowUpdate()) {
+					sendNonUIHandlerMsg(CHECK_UPDATE_COUNT, 500);
+				}
+			}
+			catch (ParseException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		Log.d(TAG, "[onCreate] + End");
 	}
 
-	private static void sendHandlerMsg(int msgCode) {
-   		if (mNonUiHandler != null) {
-			if (mNonUiHandler.hasMessages(msgCode)) {
-				mNonUiHandler.removeMessages(msgCode);
-			}
-			mNonUiHandler.sendEmptyMessage(msgCode);
-		}
-	}
 	@Override
 	protected void onStart() {
 		Log.d(TAG, "[onStart] + Begin");
@@ -325,114 +335,89 @@ public class MainActivity extends FragmentActivity implements
 					copyDB2Phone();
 				} catch (Exception e) {
 					//Ignore the exception since it's in another thread.
-					Log.i(TAG, e.getMessage());
+					Log.e(TAG, e.getMessage());
 				}
 
 				break;
 			case CHECK_UPDATE_COUNT:
 				Log.d(TAG, "[NonUihandler][handleMessage] - CHECK_UPDATE_COUNT");
-				try {
-//					while(!isDBReady) {
-//						Thread.sleep(500);	
-//					}
-					checkForUpdate();
-					
-				} catch (Exception e) {
-					//Ignore the exception since it's in another thread.
-					Log.i(TAG, e.getMessage());
+				if (Utils.hasNetwork(MainActivity.this)) {
+					try {
+						sendUIHandlerMsg(SHOW_CHECKING_DIALOG, 0);
+						checkForUpdate();
+						sendUIHandlerMsg(HIDE_CHECKING_DIALOG, 500);
+					} catch (Exception e) {
+						//Ignore the exception since it's in another thread.
+						Log.e(TAG, e.getMessage());
+					}
+				} else {
+					Log.i(TAG, "no internet");
 				}
 				break;
-			case UPDATE_DB:
-				Log.d(TAG,
-						"[NonUihandler][handleMessage] - UPDATE_DB");
-				try { 
-					updateDB();
-				} catch (Exception e) {
-					//Ignore the exception since it's in another thread.
-					Log.i(TAG, e.getMessage());
+			case UPDATE_DATA_TO_DB:
+				Log.d(TAG,"[NonUihandler][handleMessage] - UPDATE_DATA_TO_DB");
+				sendUIHandlerMsg(HIDE_NUMBER_OF_UPDATES, 0);
+				if (Utils.hasNetwork(MainActivity.this)) {
+					try {
+						sendUIHandlerMsg(SHOW_DOWNLOAD_PROCESS, 0);
+						updateDB();
+					} catch (Exception e) {
+						//Ignore the exception since it's in another thread.
+						Log.e(TAG, e.getMessage());
+					}
 				}
 				break;
+			case UPDATE_TIME_STAMP:
+				Log.d(TAG,"[NonUihandler][handleMessage] - UPDATE_TIME_STAMP");
+				updateTimeStamp();
+			case UPDATE_CANCEL_TIME:
+				Log.d(TAG,"[NonUihandler][handleMessage] - UPDATE_CANCEL_TIME");
+				sendUIHandlerMsg(HIDE_NUMBER_OF_UPDATES, 0);
+				updateCancelTimeStamp();
 			default:
-				Log.d(TAG,"[NonUihandler][handleMessage] Something wrong in handleMessage()");
+				Log.e(TAG,"[NonUihandler][handleMessage] Something wrong in handleMessage()");
 				break;
 			}
 		}
 		
 		private void copyDB2Phone() throws InvalidKeyException, ClientProtocolException, IOException, ParseException {
-			if (mUiHandler.hasMessages(SHOW_DOWNLOAD_DIALOG)) {
-				mUiHandler.removeMessages(SHOW_DOWNLOAD_DIALOG);
-			}
-            mUiHandler.sendEmptyMessage(SHOW_DOWNLOAD_DIALOG);
-            dbManagerment = new DBManagerment(MainActivity.this);
-            checkForUpdate();
+			Log.d(TAG,"[copyDB2Phone] + Begin");
+			dbManagerment = new DBManagerment(MainActivity.this);
+            sendNonUIHandlerMsg(CHECK_UPDATE_COUNT, 500);
+            Log.d(TAG,"[copyDB2Phone] + End");
 		}
 		
-		public void checkForUpdate() throws InvalidKeyException, ClientProtocolException, IOException, ParseException {
-			if(!Utils.isNetworkAvailable(MainActivity.this)) {
-				if (mUiHandler.hasMessages(HIDE_DOWNLOAD_DIALOG)) {
-					mUiHandler.removeMessages(HIDE_DOWNLOAD_DIALOG);
-				}
-				mUiHandler.sendEmptyMessage(HIDE_DOWNLOAD_DIALOG);
-				
-				MyDialogFragment dialog = MyDialogFragment.newInstance(MainActivity.this,
-						MyDialogFragment.NO_INTERNET_CONNETION);
-				dialog.show(MainActivity.this.getSupportFragmentManager(),
-						"dialog_internet_connection");
-				return;
+		private void updateTimeStamp() {
+			if (null != dbManagerment) {
+				dbManagerment.updateUpdateTime();
 			}
+		}
+		
+		private void updateCancelTimeStamp() {
+			if (null != dbManagerment) {
+				dbManagerment.updateCancelUpdateTime();
+			}
+		}
+		
+		private void checkForUpdate() throws InvalidKeyException, ClientProtocolException, IOException, ParseException {
+			Log.d(TAG,"[checkForUpdate] + Begin");
 			RestService service = new RestService();
-			int updateCount = service.getNumberIfDownloads(dbManagerment.getLastUpdateTime());
-			if (mUiHandler.hasMessages(HIDE_DOWNLOAD_DIALOG)) {
-				mUiHandler.removeMessages(HIDE_DOWNLOAD_DIALOG);
-			}
-            mUiHandler.sendEmptyMessage(HIDE_DOWNLOAD_DIALOG);
- 			if(updateCount > 0){
-				//If user has canceled the update then remind again after 24 hours.
-				pg.setMax(updateCount);
-				if(canShowUpdate()) {
-					if (mUiHandler.hasMessages(SHOW_NUMBER_OF_UPDATES)) {
-						mUiHandler.removeMessages(SHOW_NUMBER_OF_UPDATES);
-					}
-					Message msg = new Message();
-					msg.what = SHOW_NUMBER_OF_UPDATES;
-					msg.arg1 = updateCount;
-		            mUiHandler.sendMessage(msg);
-				}
-			}
+			mMax_Progress = service.getNumberIfDownloads(dbManagerment.getLastUpdateTime());
+			Log.d(TAG,"[checkForUpdate] + End");
 		}
 		
-		public void updateDB() throws InvalidKeyException, ClientProtocolException, IOException, ParseException, JSONException {
-			if (mUiHandler.hasMessages(DOWNLOAD_UPDATES)) {
-				mUiHandler.removeMessages(DOWNLOAD_UPDATES);
-			}
-            mUiHandler.sendEmptyMessage(DOWNLOAD_UPDATES);
+		private void updateDB() throws InvalidKeyException, ClientProtocolException, IOException, ParseException, JSONException {
             RestService service = new RestService();
             List<ContentValues> dictionaryList = service.getDictionary(dbManagerment.getLastUpdateTime());
             HashMap<ContentValues, HashMap<ContentValues, List<ContentValues>>> scenarioMap = service.getScenario(dbManagerment.getLastUpdateTime());
-			if (mUiHandler.hasMessages(HIDE_DOWNLOAD_UPDATES)) {
-				mUiHandler.removeMessages(HIDE_DOWNLOAD_UPDATES);
-			}
-	        mUiHandler.sendEmptyMessage(HIDE_DOWNLOAD_UPDATES);
             
             //Update record one by one.
-			if (mUiHandler.hasMessages(SHOW_DOWNLOAD_UPDATES_DB)) {
-				mUiHandler.removeMessages(SHOW_DOWNLOAD_UPDATES_DB);
-			}
-	        mUiHandler.sendEmptyMessage(SHOW_DOWNLOAD_UPDATES_DB);
-            
-	       
-	        int count = 0;
+	        if (dictionaryList != null && dictionaryList.size() > 0)
             for(ContentValues dictionaryContentValue : dictionaryList) {
             	dbManagerment.insertDictionary(dictionaryContentValue);
-            	Message msg = new Message();
-     	        msg.what = UPDATE_DOWNLOAD_UPDATES_DB;
-            	msg.arg1 = count ++;
-                //Update record one by one.
-    			if (mUiHandler.hasMessages(UPDATE_DOWNLOAD_UPDATES_DB)) {
-    				mUiHandler.removeMessages(UPDATE_DOWNLOAD_UPDATES_DB);
-    			}
-            	mUiHandler.sendMessage(msg);
+            	sendUIHandlerMsg(UPDATE_DOWNLOAD_PROCESS, 0);
             }
+            
         	if(scenarioMap != null && scenarioMap.size() > 0) {
     			Iterator<ContentValues> keyIter = scenarioMap.keySet().iterator();
     			while(keyIter.hasNext()) {
@@ -440,102 +425,83 @@ public class MainActivity extends FragmentActivity implements
     				HashMap<ContentValues, List<ContentValues>> dialogKeywordsMap = scenarioMap.get(scenraioValues);	
     				dbManagerment.insertScenario(scenraioValues, dialogKeywordsMap);
     			       //Update record one by one.
-    				if (mUiHandler.hasMessages(UPDATE_DOWNLOAD_UPDATES_DB)) {
-        				mUiHandler.removeMessages(UPDATE_DOWNLOAD_UPDATES_DB);
-        			}
-    				Message msg = new Message();
-         	        msg.what = UPDATE_DOWNLOAD_UPDATES_DB;
-                	msg.arg1 = count ++;
-    				msg.arg1 = count ++;
-    				mUiHandler.sendMessage(msg);
+    				sendUIHandlerMsg(UPDATE_DOWNLOAD_PROCESS, 0);
     			}
     		}
-//			dbManagerment.insertScenario(service.getScenario(dbManagerment.getLastUpdateTime()));
-//			dbManagerment.uodateUpdateTime();
-			if (mUiHandler.hasMessages(HIDE_DOWNLOAD_UPDATES_DB)) {
-				mUiHandler.removeMessages(HIDE_DOWNLOAD_UPDATES_DB);
-			}
-            mUiHandler.sendEmptyMessage(HIDE_DOWNLOAD_UPDATES_DB);
+        	sendUIHandlerMsg(HIDE_DOWNLOAD_PROCESS, 0);
 		}
 	}
 
 	private final Handler mUiHandler = new Handler() {
-		DialogFragment downloadUpdates = null;
-		DialogFragment checkUpdateDialog = null;
-		DialogFragment checkNumberOFUpdatesDialog = null;
-		int updateCount;
 		
 		@Override
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
-			case SHOW_DOWNLOAD_DIALOG: {
-				Log.d(TAG, "[mUihandler handleMessage] SHOW_DOWNLOAD_DIALOG");
-				checkUpdateDialog = MyDialogFragment.newInstance(MainActivity.this,
-						MyDialogFragment.PREPARE_DB);
-				checkUpdateDialog.show(MainActivity.this.getSupportFragmentManager(),
+			case SHOW_CHECKING_DIALOG: {
+				Log.d(TAG, "[mUihandler handleMessage] SHOW_CHECKING_DIALOG");
+				mCheckUpdateDialog = MyDialogFragment.newInstance(MainActivity.this,
+						MyDialogFragment.CHECKING_UPDATE);
+				mCheckUpdateDialog.show(MainActivity.this.getSupportFragmentManager(),
 						"check_update_dialog");
 				break;
 			}
-			case HIDE_DOWNLOAD_DIALOG: {
-				Log.d(TAG, "[mUihandler handleMessage] HIDE_DOWNLOAD_DIALOG");
-				if (checkUpdateDialog != null) {
-					checkUpdateDialog.dismiss();
+			case HIDE_CHECKING_DIALOG: {
+				Log.d(TAG, "[mUihandler handleMessage] HIDE_CHECKING_DIALOG");
+				if (mCheckUpdateDialog != null) {
+					mCheckUpdateDialog.dismiss();
+				}
+				if (mMax_Progress > 0) {
+					sendUIHandlerMsg(SHOW_NUMBER_OF_UPDATES, 0);
+				} else {
+					Log.d(TAG, "no need show update count");
 				}
 				break;
 			}
 			case SHOW_NUMBER_OF_UPDATES: {
-				Log.d(TAG, "[mUihandler handleMessage] SHOW THE NUMBERS OF UPDATE ");
-				updateCount =  msg.arg1;
-				checkNumberOFUpdatesDialog = MyDialogFragment.newInstance(MainActivity.this,
-						MyDialogFragment.UPDATE_COUNT, updateCount);
-				checkNumberOFUpdatesDialog.show(MainActivity.this.getSupportFragmentManager(),
-						"check_update_count_dialog");
+				Log.d(TAG, "[mUihandler handleMessage] SHOW_NUMBER_OF_UPDATES ");
+				mUpdateCountDialog = MyDialogFragment.newInstance(MainActivity.this,
+						MyDialogFragment.UPDATE_COUNT, mMax_Progress);
+				mUpdateCountDialog.show(MainActivity.this.getSupportFragmentManager(),
+						"dialog_update_count");
 				break;
 			}
 			case HIDE_NUMBER_OF_UPDATES: {
 				Log.d(TAG, "[mUihandler handleMessage] HIDE_NUMBER_OF_UPDATES");
-				if (checkNumberOFUpdatesDialog != null) {
-					checkNumberOFUpdatesDialog.dismiss();
+				if (mUpdateCountDialog != null) {
+					mUpdateCountDialog.dismiss();
 				}
 				break;
 			}
-			
-			case DOWNLOAD_UPDATES: {
-				Log.d(TAG, "[mUihandler handleMessage] DOWNLOAD_UPDATES");
-				downloadUpdates = MyDialogFragment.newInstance(MainActivity.this,
-						MyDialogFragment.PREPARE_DB);
-				downloadUpdates.show(MainActivity.this.getSupportFragmentManager(),
-						"download_updates");
+			case SHOW_DOWNLOAD_PROCESS: {
+				Log.d(TAG, "[mUihandler handleMessage] SHOW_DOWNLOAD_PROCESS");
+				mProgressDialog = new ProgressDialog(MainActivity.this);
+				mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+				mProgressDialog.setMax(MainActivity.mMax_Progress);
+				mProgressDialog.show();
+//				mProgressDialog = MyDialogFragment.newInstance(MainActivity.this,
+//						MyDialogFragment.DOWNLOAD_PROCESS);
+//				mProgressDialog.show(MainActivity.this.getSupportFragmentManager(),
+//						"download_updates_process");
 				break;
 			}
-			case HIDE_DOWNLOAD_UPDATES: {
-				Log.d(TAG, "[mUihandler handleMessage] HIDE_DOWNLOAD_UPDATES");
-				if (downloadUpdates != null) {
-					downloadUpdates.dismiss();
+			case HIDE_DOWNLOAD_PROCESS: {
+				Log.d(TAG, "[mUihandler handleMessage] HIDE_DOWNLOAD_PROCESS");
+				if (mProgressDialog != null) {
+					mProgressDialog.dismiss();
 				}
-				dbManagerment.uodateUpdateTime();
+				sendNonUIHandlerMsg(UPDATE_TIME_STAMP,0);
 				break;
 			}
-			case SHOW_DOWNLOAD_UPDATES_DB: {
-				Log.d(TAG, "[mUihandler handleMessage] SHOW_DOWNLOAD_UPDATES_DB");
-	                pg.show(); 
+			case UPDATE_DOWNLOAD_PROCESS: {
+				Log.d(TAG, "[mUihandler handleMessage] UPDATE_DOWNLOAD_PROCESS");
+//				if (mProgress >= mMax_Progress) {
+//					mProgressDialog.dismiss();
+//                } else {
+                	mProgress++;
+                	mProgressDialog.setProgress(mProgress);
+//                }
 				break;
 			}
-			case HIDE_DOWNLOAD_UPDATES_DB: {
-				Log.d(TAG, "[mUihandler handleMessage] HIDE_DOWNLOAD_UPDATES_DB");
-				if (pg != null) {
-					pg.dismiss();
-				}
-				break;
-			}
-			case UPDATE_DOWNLOAD_UPDATES_DB: {
-				Log.d(TAG, "[mUihandler handleMessage] UPDATE_DOWNLOAD_UPDATES_DB");
-				if (pg != null) {
-					pg.setProgress(msg.arg1);
-				}
-				break;
-			}
-			
 			default: {
 				Log.e(TAG, "[mUihandler handleMessage] Something wrong!!!");
 				break;
@@ -544,16 +510,35 @@ public class MainActivity extends FragmentActivity implements
 		}
 	};
 	
-	public static void updateDB() {
-		sendHandlerMsg(UPDATE_DB);
+	private static void sendNonUIHandlerMsg(int msgCode, int delayTime) {
+		if (mNonUiHandler.hasMessages(msgCode)) {
+			mNonUiHandler.removeMessages(msgCode);
+		}
+		if (delayTime > 0) {
+			mNonUiHandler.sendEmptyMessageDelayed(msgCode, delayTime);
+		} else {
+			mNonUiHandler.sendEmptyMessage(msgCode);
+		}
+	}
+	
+	private void sendUIHandlerMsg(int msgCode, int delayTime) {
+		if (delayTime > 0) {
+			mUiHandler.sendEmptyMessageDelayed(msgCode, delayTime);
+		} else {
+			mUiHandler.sendEmptyMessage(msgCode);
+		}
+	}
+	
+	public static void updateDateToDB() {
+		//sendUIHandlerMsg(HIDE_NUMBER_OF_UPDATES,0);
+		sendNonUIHandlerMsg(UPDATE_DATA_TO_DB,0);
 	}
 	
 	public static void updateCancelTime() {
-		dbManagerment.updateCancelUpdateTime();
+		sendNonUIHandlerMsg(UPDATE_CANCEL_TIME,0);
 	}
 	
-	@SuppressLint("SimpleDateFormat")
-	public boolean canShowUpdate() throws ParseException {
+	private static boolean canShowUpdate() throws ParseException {
 		String cancelTime = dbManagerment.getLastCancelUpdateTime();
 		if(cancelTime == null || cancelTime.length() <= 0) return true;
 		DateFormat  format2 = new SimpleDateFormat("yyyyMMddHHmmss");

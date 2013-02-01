@@ -13,7 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import sg.gov.nhb.ihuayu.activity.db.DBSqlite;
-import sg.gov.nhb.ihuayu.activity.db.entity.Dialog;
+import sg.gov.nhb.ihuayu.activity.db.entity.ScenarioDialog;
 import sg.gov.nhb.ihuayu.activity.db.entity.DialogKeywords;
 import sg.gov.nhb.ihuayu.activity.db.entity.Dictionary;
 import sg.gov.nhb.ihuayu.activity.db.entity.FuzzyResult;
@@ -177,7 +177,7 @@ public class IhuayuOperationImpl {
 		return result;
 	} 
 	
-	public List<Dialog> queryDialog(String condition, String[] params) {
+	public List<ScenarioDialog> queryDialog(String condition, String[] params) {
 		Cursor result = this.db.rawQuery(condition, params);
 		return OperationUtils.cursorToDialog(result);
 	}

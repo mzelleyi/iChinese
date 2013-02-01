@@ -8,6 +8,7 @@ import sg.gov.nhb.ihuayu.activity.MainActivity;
 import sg.gov.nhb.ihuayu.activity.BookmarkDetailFragment;
 import sg.gov.nhb.ihuayu.activity.SearchDetailFragment;
 import sg.gov.nhb.ihuayu.activity.db.entity.DialogKeywords;
+import sg.gov.nhb.ihuayu.activity.db.entity.ScenarioDialog;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -29,24 +30,27 @@ import sg.gov.nhb.ihuayu.R;
 
 public class MyDialogFragment extends DialogFragment {
 
-    public static final int	   ADD_TO_BOOKMARK      = 0;
-    public static final int	   ADD_RESULT	        = 1;
-    public static final int	   REMOVE_FROM_BOOKMARK = 2;
-    public static final int	   REMOVE_RESULT	= 3;
-    public static final int	   DO_SEARCH_DB	        = 4;
-    public static final int	   SCENARIO_DIALOG      = 5;
-    public static final int	   DIALOG_DOWNLOAD      = 6;
-    public static final int	   PREPARE_DB      = 7;
-    public static final int	   UPDATE_COUNT      = 8;
-    public static final int	   NO_INTERNET_CONNETION      = 9;
-    private static final String    TAG  = "iHuayu:MyDialogFragment";
+	public static final int											ADD_TO_BOOKMARK			= 0;
+	public static final int											ADD_RESULT				= 1;
+	public static final int											REMOVE_FROM_BOOKMARK	= 2;
+	public static final int											REMOVE_RESULT			= 3;
 
-    private static FragmentActivity parentActivity       = null;
-    private static LayoutInflater   mInflater	         = null;
-    private static HashMap<sg.gov.nhb.ihuayu.activity.db.entity.Dialog, 
-    		List<DialogKeywords>> dialogKeyMap	 = null;
-    private static sg.gov.nhb.ihuayu.activity.db.entity.Dialog	dialogItem	   = null;
-    private static List<DialogKeywords>        		        keyWordList	   = null;
+	public static final int											DO_SEARCH_DB			= 4;
+	public static final int											SCENARIO_DIALOG			= 5;
+	public static final int											DIALOG_DOWNLOAD			= 6;
+
+	public static final int											CHECKING_UPDATE			= 7;
+	public static final int											UPDATE_COUNT			= 8;
+
+	public static final int											NO_INTERNET_CONNETION	= 10;
+
+	private static final String										TAG						= "iHuayu:MyDialogFragment";
+
+	private static FragmentActivity									parentActivity			= null;
+	private static LayoutInflater									mInflater				= null;
+	private static HashMap<ScenarioDialog, List<DialogKeywords>>	dialogKeyMap			= null;
+	private static ScenarioDialog									dialogItem				= null;
+	private static List<DialogKeywords>								keyWordList				= null;
 
     public static MyDialogFragment newInstance(Context context, int dialogType) {
     	return newInstance(context, dialogType, false, null, 0, false);
@@ -90,11 +94,11 @@ public class MyDialogFragment extends DialogFragment {
 
 		if (null != param)
 		{
-			dialogKeyMap = (HashMap<sg.gov.nhb.ihuayu.activity.db.entity.Dialog, List<DialogKeywords>>) param;
-			Iterator<sg.gov.nhb.ihuayu.activity.db.entity.Dialog> iterator = dialogKeyMap.keySet().iterator();
+			dialogKeyMap = (HashMap<ScenarioDialog, List<DialogKeywords>>) param;
+			Iterator<ScenarioDialog> iterator = dialogKeyMap.keySet().iterator();
 			while (iterator.hasNext())
 			{
-				dialogItem = (sg.gov.nhb.ihuayu.activity.db.entity.Dialog) iterator.next();
+				dialogItem = (ScenarioDialog) iterator.next();
 			}
 			keyWordList = dialogKeyMap.get(dialogItem);
 			Log.d(TAG, "[newInstance] keyWordList size = " + keyWordList.size());
@@ -125,7 +129,16 @@ public class MyDialogFragment extends DialogFragment {
 	int dialogType = getArguments().getInt("dialogType");
 	boolean actionResult = getArguments().getBoolean("actionResult", false);
 	final boolean isSearchDetail = getArguments().getBoolean("isSearchDetail", false);
-	if (dialogType == ADD_TO_BOOKMARK) {
+	
+	if (dialogType == NO_INTERNET_CONNETION) {
+		return new AlertDialog.Builder(parentActivity).setIcon(android.R.drawable.ic_dialog_alert)
+			.setTitle(R.string.dialog_msg_no_internet_connection)
+			.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+			    public void onClick(DialogInterface dialog, int whichButton) {
+			    	
+			    }
+			}).create();
+	} else if (dialogType == ADD_TO_BOOKMARK) {
 	    return new AlertDialog.Builder(parentActivity).setIcon(android.R.drawable.ic_dialog_alert)
 		    .setTitle(R.string.dialog_msg_add_to_bookmark)
 		    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -171,16 +184,7 @@ public class MyDialogFragment extends DialogFragment {
 			    }
 			}).create();
 	    }
-	} 
-	 else if (dialogType == NO_INTERNET_CONNETION) {
-			return new AlertDialog.Builder(parentActivity).setIcon(android.R.drawable.ic_dialog_alert)
-				.setTitle(R.string.dialog_msg_no_internet_connection)
-				.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-				    public void onClick(DialogInterface dialog, int whichButton) {
-				    	
-				    }
-				}).create();
-	}else if (dialogType == REMOVE_FROM_BOOKMARK) {
+	} else if (dialogType == REMOVE_FROM_BOOKMARK) {
 	    return new AlertDialog.Builder(parentActivity).setIcon(android.R.drawable.ic_dialog_alert)
 		    .setTitle(R.string.dialog_msg_remove_from_bookmark)
 		    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -200,23 +204,7 @@ public class MyDialogFragment extends DialogFragment {
 				}
 			}
 		    }).create();
-	}else if (dialogType == UPDATE_COUNT) {
-		int numberOfUpdates = getArguments().getInt("numberOfUpdates");
-	    return new AlertDialog.Builder(parentActivity).setIcon(android.R.drawable.ic_dialog_alert)
-	    .setTitle(numberOfUpdates + " new items available! Do you want to update?")
-	    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-		public void onClick(DialogInterface dialog, int whichButton) {
-			//Nothing to do
-//		    ResultDetailFragment.doPositiveClick(REMOVE_FROM_BOOKMARK);
-			 MainActivity.updateDB();
-		}
-	    }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-		public void onClick(DialogInterface dialog, int whichButton) {
-		   MainActivity.updateCancelTime();
-		}
-	    }).create();
-	} 
-	else if (dialogType == REMOVE_RESULT) {
+	}else if (dialogType == REMOVE_RESULT) {
 	    if (actionResult) {
 		return new AlertDialog.Builder(parentActivity).setIcon(android.R.drawable.ic_dialog_alert)
 			.setTitle(R.string.dialog_msg_remove_success)
@@ -248,19 +236,34 @@ public class MyDialogFragment extends DialogFragment {
 	    dialog.setIndeterminate(true);
 	    dialog.setCancelable(true);
 	    return dialog;
-	}
-	else if (dialogType == DIALOG_DOWNLOAD) {
+	} else if (dialogType == DIALOG_DOWNLOAD) {
 	    ProgressDialog dialog = new ProgressDialog(parentActivity);
 	    dialog.setMessage(parentActivity.getResources().getString(R.string.dialog_msg_download_hint));
 	    dialog.setIndeterminate(true);
 	    dialog.setCancelable(true);
 	    return dialog;
-	}else if (dialogType == PREPARE_DB) {
+	} else if (dialogType == CHECKING_UPDATE) {
 	    ProgressDialog dialog = new ProgressDialog(parentActivity);
-	    dialog.setMessage(parentActivity.getResources().getString(R.string.dialog_msg_prepare_db_hint));
+	    dialog.setMessage(parentActivity.getResources().getString(R.string.dialog_msg_checking_update_hint));
 	    dialog.setIndeterminate(true);
 	    dialog.setCancelable(true);
 	    return dialog;
+	} else if (dialogType == UPDATE_COUNT) {
+		int numberOfUpdates = getArguments().getInt("numberOfUpdates");
+		return new AlertDialog.Builder(parentActivity).setIcon(android.R.drawable.ic_dialog_alert)
+				.setTitle(numberOfUpdates + " " + parentActivity.getResources().getString(R.string.dialog_msg_update_count_remind))
+				.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton)
+					{
+						MainActivity.updateDateToDB();
+					}
+				})
+				.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener()	{
+					public void onClick(DialogInterface dialog, int whichButton)
+					{
+						MainActivity.updateCancelTime();
+					}
+				}).create();
 	} else if (dialogType == SCENARIO_DIALOG) {
 	    View dialogView = mInflater.inflate(R.layout.scenario_fragment_dialog, null);
 	    final Dialog dialog = new Dialog(parentActivity, R.style.custom_dialog);

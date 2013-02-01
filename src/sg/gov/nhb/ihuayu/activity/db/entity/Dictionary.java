@@ -3,13 +3,13 @@
  */
 package sg.gov.nhb.ihuayu.activity.db.entity;
 
-import java.util.Comparator;
 
 /**
  * @author lixingwang
  *
  */
-public class Dictionary implements Comparable{
+//public class Dictionary implements Comparable{
+public class Dictionary {
 	private int rowid;
 	private int id;
 	private String language_dir;
@@ -149,9 +149,9 @@ public class Dictionary implements Comparable{
 //          return one.compareTo(two);   
 //	}
 	
-	@Override
-	public int compareTo(Object paramT) {
-	    String two = ((Dictionary)paramT).getKeyword();   
-        return two.compareTo(this.getKeyword());   
-	}
+//	@Override
+//	public int compareTo(Object paramT) {
+//	    String two = ((Dictionary)paramT).getKeyword();   
+//        return two.compareTo(this.getKeyword());   
+//	}
 }

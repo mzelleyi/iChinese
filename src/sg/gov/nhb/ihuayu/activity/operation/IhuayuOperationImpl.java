@@ -6,7 +6,6 @@ package sg.gov.nhb.ihuayu.activity.operation;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -56,7 +55,8 @@ public class IhuayuOperationImpl {
 	public void insertDictionary(List<ContentValues> params) {
 //		db.execSQL("CREATE TABLE name (id INTEGER, language_dir VARCHAR(10), keyword VARCHAR(1024),keyword_length INTEGER, src VARCHAR(1024), destination VARCHAR(1024), chinese_audio_link VARCHAR(1024), chinese_py_with_tone TEXT, dict_category CHAR(50), sample_sentence_EN VARCHAR(1024), sample_sentence_CN VARCHAR(1024), sample_sentence_PY VARCHAR(1024), sample_sentence_CN_Audio_link VARCHAR(1024))");
 		for(ContentValues values : params) {
-			long result = this.db.insert("dictionary", null, values);
+			//long result = this.db.insert("dictionary", null, values);
+			this.db.insert("dictionary", null, values);
 		}
 	} 
 	

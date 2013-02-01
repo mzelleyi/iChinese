@@ -95,16 +95,26 @@ public class Utils {
 	public static boolean isNetworkAvailable(Context context)  
 	{  
 	    ConnectivityManager mConnMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);  
-	    NetworkInfo mWifi = mConnMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);  
-	    NetworkInfo mMobile = mConnMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);  
-	    boolean flag = false;  
-	    if((mWifi != null)  && ((mWifi.isAvailable())))  
-	    {  
-	        if((mWifi.isConnected()) || (mMobile.isConnected()))  
-	        {  
-	            flag = true;  
-	        }  
-	    }  
-	    return flag;  
+//	    NetworkInfo mWifi = mConnMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);  
+//	    NetworkInfo mMobile = mConnMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);  
+//	    boolean flag = false;  
+//	    if((mWifi != null)  && ((mWifi.isAvailable())))  
+//	    {  
+//	        if((mWifi.isConnected()) || (mMobile.isConnected()))  
+//	        {  
+//	            flag = true;  
+//	        }  
+//	    }
+	    NetworkInfo activeNetworkInfo = mConnMgr.getActiveNetworkInfo();
+	    if (activeNetworkInfo == null) {
+	    	return false;
+	    } else {
+	    	if (activeNetworkInfo.isConnected()) {
+	    		return true;
+	    	} else {
+	    		return false;
+	    	}
+	    }
+	    //return flag;  
 	}  
 }

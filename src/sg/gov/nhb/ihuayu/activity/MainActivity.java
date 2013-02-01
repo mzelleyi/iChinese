@@ -370,10 +370,12 @@ public class MainActivity extends FragmentActivity implements
 			case UPDATE_TIME_STAMP:
 				Log.d(TAG,"[NonUihandler][handleMessage] - UPDATE_TIME_STAMP");
 				updateTimeStamp();
+				break;
 			case UPDATE_CANCEL_TIME:
 				Log.d(TAG,"[NonUihandler][handleMessage] - UPDATE_CANCEL_TIME");
 				sendUIHandlerMsg(HIDE_NUMBER_OF_UPDATES, 0);
 				updateCancelTimeStamp();
+				break;
 			default:
 				Log.e(TAG,"[NonUihandler][handleMessage] Something wrong in handleMessage()");
 				break;
@@ -403,6 +405,7 @@ public class MainActivity extends FragmentActivity implements
 			Log.d(TAG,"[checkForUpdate] + Begin");
 			RestService service = new RestService();
 			mMax_Progress = service.getNumberIfDownloads(dbManagerment.getLastUpdateTime());
+			Log.i(TAG,"[checkForUpdate] update count ="+mMax_Progress);
 			Log.d(TAG,"[checkForUpdate] + End");
 		}
 		
@@ -433,7 +436,6 @@ public class MainActivity extends FragmentActivity implements
 	}
 
 	private final Handler mUiHandler = new Handler() {
-		
 		@Override
 		public void handleMessage(Message msg) {
 			switch (msg.what) {

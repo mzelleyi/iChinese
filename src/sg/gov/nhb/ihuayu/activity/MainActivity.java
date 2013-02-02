@@ -20,6 +20,7 @@ import sg.gov.nhb.ihuayu.activity.operation.DBManagerment;
 import sg.gov.nhb.ihuayu.activity.rest.FileUtils;
 import sg.gov.nhb.ihuayu.activity.rest.RestService;
 import sg.gov.nhb.ihuayu.view.MyDialogFragment;
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.res.Resources;
@@ -159,8 +160,7 @@ public class MainActivity extends FragmentActivity implements
 			}
 			catch (ParseException e)
 			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Log.i(TAG, e.getMessage());
 			}
 		}
 		
@@ -370,6 +370,7 @@ public class MainActivity extends FragmentActivity implements
 			case UPDATE_TIME_STAMP:
 				Log.d(TAG,"[NonUihandler][handleMessage] - UPDATE_TIME_STAMP");
 				updateTimeStamp();
+				updateCancelTimeStamp();
 				break;
 			case UPDATE_CANCEL_TIME:
 				Log.d(TAG,"[NonUihandler][handleMessage] - UPDATE_CANCEL_TIME");
@@ -540,13 +541,14 @@ public class MainActivity extends FragmentActivity implements
 		sendNonUIHandlerMsg(UPDATE_CANCEL_TIME,0);
 	}
 	
-	private static boolean canShowUpdate() throws ParseException {
+	@SuppressLint("SimpleDateFormat")
+	private boolean canShowUpdate() throws ParseException {
 		String cancelTime = dbManagerment.getLastCancelUpdateTime();
 		if(cancelTime == null || cancelTime.length() <= 0) return true;
-		DateFormat  format2 = new SimpleDateFormat("yyyyMMddHHmmss");
 		Date now = new Date(); 
-		Date date = format2.parse(cancelTime);
-		long diff = now.getTime() - date.getTime();
+		DateFormat  cancelFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+		Date cancelDateTime = cancelFormat.parse(cancelTime);
+		long diff = now.getTime() - cancelDateTime.getTime();
 		long day =  diff / (1000 * 60 * 60 * 24);
 		if(day >= 1) return true;
 		return false;

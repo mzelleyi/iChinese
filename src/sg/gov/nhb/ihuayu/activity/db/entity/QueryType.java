@@ -1,15 +1,15 @@
 /**
  * 
  */
+
 package sg.gov.nhb.ihuayu.activity.db.entity;
 
 /**
  * @author lixingwang
- *
  */
 public enum QueryType {
-	
-   EN {
+
+    EN {
         @Override
         public String getName() {
             return "en2sc";
@@ -21,5 +21,5 @@ public enum QueryType {
             return "sc2en";
         }
     };
-	public abstract String getName();
+    public abstract String getName();
 }

@@ -634,6 +634,7 @@ public class SearchFragment extends Fragment {
 
         public SearchListAdapter(Context context) {
             super(context, android.R.layout.simple_list_item_2);
+            mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
 
         public void setData(List<Dictionary> data) {

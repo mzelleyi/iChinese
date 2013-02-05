@@ -184,7 +184,7 @@ public class ScenarioFragment extends Fragment {
     /**
      * A custom Loader that loads all of the Scenarios from DB.
      */
-    public class ScenarioListLoader extends AsyncTaskLoader<List<Scenario>> {
+    public static class ScenarioListLoader extends AsyncTaskLoader<List<Scenario>> {
         // final InterestingConfigChanges mLastConfig = new
         // InterestingConfigChanges();
 

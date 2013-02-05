@@ -245,9 +245,14 @@ public class IhuayuOperationImpl {
                 new String[] {
                     OperationUtils.getCurrentApplicationVersion(this.manager.getContext())
                 });
-        if (result.moveToNext()) {
-            dataTime = result.getString(result.getColumnIndex("Last_Update"));
+        if (result != null) {
+            if (result.moveToNext()) {
+                dataTime = result.getString(result.getColumnIndex("Last_Update"));
+            }
+        } else {
+            Log.w(TAG, "Cannot query last update time");
         }
+        
         if (dataTime == null || dataTime.length() <= 0) {
             dataTime = "2011-04-01T01S01S01";
         }
@@ -270,8 +275,10 @@ public class IhuayuOperationImpl {
         String dataTime = "";
         Cursor result = this.db.rawQuery(
                 "select Last_Update from Information where version = 'cancel'", null);
-        if (result.moveToNext()) {
-            dataTime = result.getString(result.getColumnIndex("Last_Update"));
+        if (result != null) {
+            if (result.moveToNext()) {
+                dataTime = result.getString(result.getColumnIndex("Last_Update"));
+            }
         }
         if (dataTime == null || dataTime.length() <= 0) {
             dataTime = null;

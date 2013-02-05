@@ -352,7 +352,7 @@ public class ScenarioDetailFragment extends Fragment {
     /**
      * A custom Loader that loads all of the installed applications.
      */
-    public class ScenarioDialogLoader extends
+    public static class ScenarioDialogLoader extends
             AsyncTaskLoader<List<HashMap<ScenarioDialog, List<DialogKeywords>>>> {
 
         List<HashMap<ScenarioDialog, List<DialogKeywords>>> mDialogList = null;

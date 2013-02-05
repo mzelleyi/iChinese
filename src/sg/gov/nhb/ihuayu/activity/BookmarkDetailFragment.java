@@ -707,7 +707,7 @@ public class BookmarkDetailFragment extends Fragment implements
     /**
      * A custom Loader that loads all of the installed applications.
      */
-    public class ResultDemoLoader extends AsyncTaskLoader<Dictionary> {
+    public static class ResultDemoLoader extends AsyncTaskLoader<Dictionary> {
 
         Dictionary mDictionary = null;
 

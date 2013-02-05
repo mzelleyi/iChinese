@@ -41,10 +41,11 @@ public class BookmarkDetailFragment extends Fragment implements
     private static final String TAG = "iHuayu:BookmarkDetailFragment";
     private static FragmentActivity parentActivity = null;
     private static View mParentView = null;
-    private static ImageView mFavoriteImg = null;
-    private static Button mBtnPrev = null;
-    private static Button mBtnNext = null;
     private static boolean mBeFavorited = false;
+    
+    private ImageView mFavoriteImg = null;
+    private Button mBtnPrev = null;
+    private Button mBtnNext = null;
 
     private static final int UPDATE_CURRENT = 1;
     private static final int UPDATE_NEXT = 2;
@@ -683,7 +684,7 @@ public class BookmarkDetailFragment extends Fragment implements
         // mBeFavorited = false;
     }
 
-    private static void updateFavoriteImg(boolean mFavorited) {
+    private void updateFavoriteImg(boolean mFavorited) {
 
         Log.d(TAG, "[updateFavoriteImg] This item has been bookmarked = " + mFavorited);
         if (mFavorited) {
@@ -706,7 +707,7 @@ public class BookmarkDetailFragment extends Fragment implements
     /**
      * A custom Loader that loads all of the installed applications.
      */
-    public static class ResultDemoLoader extends AsyncTaskLoader<Dictionary> {
+    public class ResultDemoLoader extends AsyncTaskLoader<Dictionary> {
 
         Dictionary mDictionary = null;
 

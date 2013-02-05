@@ -32,6 +32,7 @@ public class HelpFragment extends Fragment {
     static HelpFragment newInstance() {
         Log.d(TAG, "[newInstance] + Begin");
         HelpFragment fragment = new HelpFragment();
+        Log.d(TAG, "[newInstance] + End");
         return fragment;
     }
 
@@ -40,6 +41,7 @@ public class HelpFragment extends Fragment {
         Log.d(TAG, "[onCreate] + Begin");
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "[onCreate] + End");
     }
 
     /**
@@ -50,6 +52,7 @@ public class HelpFragment extends Fragment {
             Bundle savedInstanceState) {
         Log.d(TAG, "[onCreateView] + Begin");
         View v = inflater.inflate(R.layout.help_fragment, container, false);
+        Log.d(TAG, "[onCreateView] + End");
         return v;
     }
 
@@ -70,10 +73,9 @@ public class HelpFragment extends Fragment {
                 // TODO Auto-generated method stub
                 FragmentManager fm = activity.getSupportFragmentManager();
                 // fm.popBackStack();
-                // Fragment currentFragment =
-                // fm.findFragmentById(R.id.tab_content_info);
                 Fragment currentFragment = fm.findFragmentByTag(MainActivity.fragment_tag_info);
                 if (currentFragment == null) {
+                	Log.i(TAG, "[onViewCreated] new InfoFragment then replace tab_info");
                     Fragment newFragment = InfoFragment.newInstance();
                     FragmentTransaction ft = fm.beginTransaction();
                     ft.replace(R.id.tab_content_info, newFragment, MainActivity.fragment_tag_info);
@@ -82,27 +84,6 @@ public class HelpFragment extends Fragment {
                 }
             }
         });
+        Log.d(TAG, "[onViewCreated] + End");
     }
-
-    // @Override
-    // public void onResume() {
-    // Log.d(TAG, "[onResume] + Begin");
-    // // TODO Auto-generated method stub
-    // super.onResume();
-    // final FragmentActivity activity = this.getActivity();
-    // Button backBtn =
-    // (Button)activity.findViewById(R.id.fragment_help_title_button);
-    // backBtn.setOnClickListener(new View.OnClickListener() {
-    // public void onClick(View v) {
-    // // TODO Auto-generated method stub
-    // FragmentManager fm = activity.getSupportFragmentManager();
-    // FragmentTransaction ft = fm.beginTransaction();
-    // Fragment newFragment = InfoFragment.newInstance();
-    // ft.replace(R.id.tab_content_info, newFragment);
-    // ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-    // ft.commit();
-    // }
-    // });
-    // Log.d(TAG, "[onResume] + End");
-    // }
 }

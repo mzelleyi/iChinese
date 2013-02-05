@@ -52,7 +52,6 @@ public class ScenarioDetailFragment extends Fragment {
 
     private static final String TAG = "iHuayu:ScenarioDetailFragment";
     private static FragmentActivity parentActivity = null;
-    private static LayoutInflater mInflater = null;
     private static Scenario mScenario = null;
 
     private static final int PLAY_DIALOG_AUDIO = 401;
@@ -83,8 +82,8 @@ public class ScenarioDetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         Log.d(TAG, "[onCreateView] + Begin");
-        mInflater = inflater;
-        View v = mInflater.inflate(R.layout.scenario_detail_fragment, container, false);
+        View v = inflater.inflate(R.layout.scenario_detail_fragment, container, false);
+        Log.d(TAG, "[onCreateView] + End");
         return v;
     }
 
@@ -160,6 +159,7 @@ public class ScenarioDetailFragment extends Fragment {
             // ft.addToBackStack(null);
             ft.commit();
         }
+        Log.d(TAG, "[onViewCreated] + End");
     }
 
     private final Handler mUiHandler = new Handler() {
@@ -266,7 +266,7 @@ public class ScenarioDetailFragment extends Fragment {
         Log.d(TAG, "[doPositiveClick] + Begin");
     }
 
-    public static class ScenarioDialogFragment extends ListFragment implements
+    public class ScenarioDialogFragment extends ListFragment implements
             LoaderManager.LoaderCallbacks<List<HashMap<ScenarioDialog, List<DialogKeywords>>>> {
 
         // This is the Adapter being used to display the list's data.
@@ -352,7 +352,7 @@ public class ScenarioDetailFragment extends Fragment {
     /**
      * A custom Loader that loads all of the installed applications.
      */
-    public static class ScenarioDialogLoader extends
+    public class ScenarioDialogLoader extends
             AsyncTaskLoader<List<HashMap<ScenarioDialog, List<DialogKeywords>>>> {
 
         List<HashMap<ScenarioDialog, List<DialogKeywords>>> mDialogList = null;
@@ -490,16 +490,16 @@ public class ScenarioDetailFragment extends Fragment {
         }
     }
 
-    public static class ScenarioDialogAdapter extends
+    public class ScenarioDialogAdapter extends
             ArrayAdapter<HashMap<ScenarioDialog, List<DialogKeywords>>> {
         private ScenarioDialog dialogItem = null;
         private List<DialogKeywords> keyWordList = null;
+        private final LayoutInflater mInflater;
 
         public ScenarioDialogAdapter(Context context) {
             // super(context, android.R.layout.simple_list_item_2);
             super(context, R.layout.scenario_detail_listitem_female);
-            // mInflater =
-            // (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
 
         public void setData(List<HashMap<ScenarioDialog, List<DialogKeywords>>> data) {

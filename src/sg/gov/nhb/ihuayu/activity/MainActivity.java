@@ -19,7 +19,6 @@ import sg.gov.nhb.ihuayu.activity.operation.DBManagerment;
 import sg.gov.nhb.ihuayu.activity.rest.FileUtils;
 import sg.gov.nhb.ihuayu.activity.rest.RestService;
 import sg.gov.nhb.ihuayu.view.MyDialogFragment;
-import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.res.Resources;
@@ -36,20 +35,22 @@ import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
 import android.widget.TabHost;
-import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TextView;
 
 /**
  * @author Kesen
  */
 public class MainActivity extends FragmentActivity implements
-        OnTabChangeListener {
+        TabHost.OnTabChangeListener {
+
+    // Message code for do action
     private static final int COPY_DB_TO_PHONE = 101;
     private static final int CHECK_UPDATE_COUNT = 102;
     private static final int UPDATE_DATA_TO_DB = 103;
     private static final int UPDATE_TIME_STAMP = 104;
     private static final int UPDATE_CANCEL_TIME = 105;
 
+    // Message code for dialog
     private static final int SHOW_CHECKING_DIALOG = 106;
     private static final int HIDE_CHECKING_DIALOG = 107;
     private static final int SHOW_NUMBER_OF_UPDATES = 108;
@@ -59,12 +60,15 @@ public class MainActivity extends FragmentActivity implements
     private static final int HIDE_DOWNLOAD_PROCESS = 112;
 
     private static final String TAG = "iHuayu:MainActivity";
+    // Flag for HandlerThread
+    private static final String THREAD_NAME = "MainActivity";
+    // Flag for tab name
     private static final String TAB_SEARCH = "Search";
     private static final String TAB_SCENARIO = "Scenario";
     private static final String TAB_BOOKMARK = "Bookmark";
     private static final String TAB_INFO = "Info";
-    private static final String THREAD_NAME = "MainActivity";
 
+    // Flag for fragment
     public static final String fragment_tag_search = "tag_Search";
     public static final String fragment_tag_scenario = "tag_Scenario";
     public static final String fragment_tag_bookmark = "tag_Bookmark";
@@ -74,22 +78,16 @@ public class MainActivity extends FragmentActivity implements
     public static final String fragment_tag_search_detail = "tag_search_detail";
     public static final String fragment_tag_scenario_detail = "tag_scenario_detail";
 
-    // The update/copyDB Handler Thread
-    private HandlerThread mHandlerThread = null;
-    // The DB Operation Thread
-    private static NonUiHandler mNonUiHandler = null;
-
     public static DBManagerment dbManagerment = null;
     public static Resources mRes = null;
-    private TabHost mTabHost = null;
-    private static DialogFragment mCheckUpdateDialog = null;
-    private static DialogFragment mUpdateCountDialog = null;
-    private static ProgressDialog mProgressDialog = null;
-
     public static int mMax_Progress = 0;
-    private static int mProgress = 0;
-
-    // private ProgressDialog pg = null;
+    
+    // The DB Operation Thread
+    private static NonUiHandler mNonUiHandler = null;
+    // The update/copyDB Handler Thread
+    private HandlerThread mHandlerThread = null;
+    
+    private TabHost mTabHost = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -242,7 +240,7 @@ public class MainActivity extends FragmentActivity implements
         Log.d(TAG, "[onTabChanged] + Begin,tabTag:" + tabTag);
         // TODO Auto-generated method stub
 
-        // //Pop to home page
+        // // Pop to home page
         // FragmentManager fm = getSupportFragmentManager();
         // if (fm.getBackStackEntryCount() > 0) {
         // Log.d(TAG, "[onTabChanged] popBackStack ");
@@ -269,8 +267,7 @@ public class MainActivity extends FragmentActivity implements
     }
 
     private void updateTab(String tabTag, int viewHolderId) {
-        Log.d(TAG,
-                "[updateTab] + Begin, tabTag=" + tabTag + ",viewHolderId="
+        Log.d(TAG, "[updateTab] + Begin, tabTag=" + tabTag + ",viewHolderId="
                         + String.valueOf(viewHolderId));
 
         FragmentManager fm = this.getSupportFragmentManager();
@@ -278,7 +275,6 @@ public class MainActivity extends FragmentActivity implements
         FragmentTransaction ft = fm.beginTransaction();
         Fragment newFragment = fm.findFragmentById(viewHolderId);
         if (newFragment == null) {
-            Log.d(TAG, "[updateTab] find fragment == null, do add");
             String fragmentTag = null;
             if (TAB_SEARCH.equals(tabTag)) {
                 newFragment = SearchFragment.newInstance();
@@ -296,13 +292,12 @@ public class MainActivity extends FragmentActivity implements
                 Log.e(TAG, "Error Tab Type");
             }
             BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED = false;
-            // Add the fragment
+            Log.i(TAG, "[updateTab] find fragment == null, do add fragment:"+fragmentTag);
             ft.add(viewHolderId, newFragment, fragmentTag);
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
             ft.commit();
         } else {
             if (BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED && TAB_BOOKMARK.equals(tabTag)) {
-
                 Fragment fragment = fm.findFragmentByTag(MainActivity.fragment_tag_bookmark_detail);
                 if (fragment != null) {
                     Log.i(TAG, "[updateTab] BookmarkFragment show detail view");
@@ -316,7 +311,7 @@ public class MainActivity extends FragmentActivity implements
                     BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED = false;
                 }
             } else {
-                Log.d(TAG, "[updateTab] find fragment != null, do setCurrentTabByTag");
+                Log.i(TAG, "[updateTab] find fragment != null, do setCurrentTabByTag");
                 mTabHost.setCurrentTabByTag(tabTag);
             }
         }
@@ -449,6 +444,12 @@ public class MainActivity extends FragmentActivity implements
     }
 
     private final Handler mUiHandler = new Handler() {
+
+        private DialogFragment mCheckUpdateDialog = null;
+        private DialogFragment mUpdateCountDialog = null;
+        private ProgressDialog mProgressDialog = null;
+        private int mProgress = 0;
+
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
@@ -493,11 +494,6 @@ public class MainActivity extends FragmentActivity implements
                     mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
                     mProgressDialog.setMax(MainActivity.mMax_Progress);
                     mProgressDialog.show();
-                    // mProgressDialog =
-                    // MyDialogFragment.newInstance(MainActivity.this,
-                    // MyDialogFragment.DOWNLOAD_PROCESS);
-                    // mProgressDialog.show(MainActivity.this.getSupportFragmentManager(),
-                    // "download_updates_process");
                     break;
                 }
                 case HIDE_DOWNLOAD_PROCESS: {
@@ -554,7 +550,6 @@ public class MainActivity extends FragmentActivity implements
         sendNonUIHandlerMsg(UPDATE_CANCEL_TIME, 0);
     }
 
-    @SuppressLint("SimpleDateFormat")
     private boolean canShowUpdate() throws ParseException {
         String cancelTime = dbManagerment.getLastCancelUpdateTime();
         if (cancelTime == null || cancelTime.length() <= 0)

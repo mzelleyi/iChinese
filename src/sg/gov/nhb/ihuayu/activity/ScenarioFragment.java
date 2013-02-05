@@ -93,7 +93,7 @@ public class ScenarioFragment extends Fragment {
         }
     }
 
-    public static class ScenarioListFragment extends ListFragment implements
+    public class ScenarioListFragment extends ListFragment implements
             LoaderManager.LoaderCallbacks<List<Scenario>> {
 
         // This is the Adapter being used to display the list's data.
@@ -184,7 +184,7 @@ public class ScenarioFragment extends Fragment {
     /**
      * A custom Loader that loads all of the Scenarios from DB.
      */
-    public static class ScenarioListLoader extends AsyncTaskLoader<List<Scenario>> {
+    public class ScenarioListLoader extends AsyncTaskLoader<List<Scenario>> {
         // final InterestingConfigChanges mLastConfig = new
         // InterestingConfigChanges();
 
@@ -337,7 +337,7 @@ public class ScenarioFragment extends Fragment {
         }
     }
 
-    public static class ScenarioListAdapter extends ArrayAdapter<Scenario> {
+    public class ScenarioListAdapter extends ArrayAdapter<Scenario> {
         private final LayoutInflater mInflater;
 
         public ScenarioListAdapter(Context context) {

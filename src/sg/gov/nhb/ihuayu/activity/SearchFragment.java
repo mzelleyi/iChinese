@@ -64,8 +64,6 @@ public class SearchFragment extends Fragment {
     private static final int VIEW_TYPE_SUGGEST = 0;
     private static final int VIEW_TYPE_FUZZY = 1;
 
-    // private static final int VIEW_TYPE_SCENARIO = 3;
-
     // Define Thread Name
     private static final String THREAD_NAME = "SearchFragmentThread";
     // The DB Handler Thread
@@ -73,27 +71,24 @@ public class SearchFragment extends Fragment {
     // The DB Operation Thread
     private static NonUiHandler mNonUiHandler = null;
     private static FragmentActivity parentActivity = null;
-    private static SearchListAdapter mAdapter = null;
-    private static SearchScenarioAdapter mScenarioAdapter = null;
-    private static ListView mListView = null;
-    private static ListView mScenarioListView = null;
-    private static LayoutInflater mInflater = null;
-    private static DialogFragment searchDialog = null;
-    private static QueryType mSearchKeyType = QueryType.EN;
-    private static EditText mEditText = null;
-    private static Button mBtnLanguage = null;
-    private static LinearLayout mFuzzyHintLayout = null;
-    private static TextView mFuzzySuggestHint = null;
-    private static TextView mEmptySuggestHint = null;
-    private static TextView mDicDivider = null;
-    private static TextView mSceDivider = null;
-    private static List<Dictionary> mDicList = new ArrayList<Dictionary>();
-    private static List<Scenario> mSceList = new ArrayList<Scenario>();
-    private InputMethodManager mInputMethodManager = null;
     private static boolean bFuzzyMode = false;
 
-    // If non-null, this is the current filter the user has provided.
-    String mCurFilter;
+    private SearchListAdapter mAdapter = null;
+    private SearchScenarioAdapter mScenarioAdapter = null;
+    private ListView mListView = null;
+    private ListView mScenarioListView = null;
+
+    private QueryType mSearchKeyType = QueryType.EN;
+    private EditText mEditText = null;
+    private Button mBtnLanguage = null;
+    private LinearLayout mFuzzyHintLayout = null;
+    private TextView mFuzzySuggestHint = null;
+    private TextView mEmptySuggestHint = null;
+    private TextView mDicDivider = null;
+    private TextView mSceDivider = null;
+    private List<Dictionary> mDicList = new ArrayList<Dictionary>();
+    private List<Scenario> mSceList = new ArrayList<Scenario>();
+    private InputMethodManager mInputMethodManager = null;
 
     /**
      * Create a new instance of SearchFragment
@@ -123,8 +118,8 @@ public class SearchFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, "[onCreateView] + Begin");
-        mInflater = inflater;
-        View v = mInflater.inflate(R.layout.search_fragment, container, false);
+        View v = inflater.inflate(R.layout.search_fragment, container, false);
+        Log.d(TAG, "[onCreateView] + End");
         return v;
     }
 
@@ -296,7 +291,7 @@ public class SearchFragment extends Fragment {
                         || actionId == EditorInfo.IME_ACTION_GO) {
                     Log.d(TAG, "[onEditorAction] -> IME_ACTION_SEARCH ");
                     String searchKey = mEditText.getText().toString();
-                    sendFuzzySearchMsg(searchKey, 0);
+                    sendFuzzySearchMsg(searchKey, 300);
                     handled = true;
                 }
                 return handled;
@@ -386,6 +381,11 @@ public class SearchFragment extends Fragment {
     }
 
     private void sendFuzzySearchMsg(String key, long delayTime) {
+        if (mUiHandler.hasMessages(MSG_DO_FUZZY_SEARCH)) {
+            mUiHandler.removeMessages(MSG_DO_FUZZY_SEARCH);
+        }
+        mUiHandler.sendEmptyMessage(MSG_DO_FUZZY_SEARCH);
+
         if (mNonUiHandler.hasMessages(MSG_DO_FUZZY_SEARCH)) {
             mNonUiHandler.removeMessages(MSG_DO_FUZZY_SEARCH);
         }
@@ -399,14 +399,14 @@ public class SearchFragment extends Fragment {
     }
 
     private Handler mUiHandler = new Handler() {
-
-        DialogFragment downloadDialog = null;
+        private DialogFragment searchDialog = null;
+        private DialogFragment downloadDialog = null;
 
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case SearchFragment.MSG_REFRESH_SUGGEST_LISTVIEW: {
-                    Log.d(TAG, "[mUiHandler][MSG_REFRESH_SUGGEST_LISTVIEW]");
+                    Log.d(TAG, "[mUihandler][MSG_REFRESH_SUGGEST_LISTVIEW]");
                     @SuppressWarnings("unchecked")
                     List<Dictionary> dicList = (List<Dictionary>) msg.obj;
 
@@ -425,8 +425,17 @@ public class SearchFragment extends Fragment {
                     mAdapter.notifyDataSetChanged();
                     break;
                 }
+                case SearchFragment.MSG_DO_FUZZY_SEARCH: {
+                    Log.d(TAG, "[mUihandler][MSG_DO_FUZZY_SEARCH]");
+                    mInputMethodManager.hideSoftInputFromWindow(mEditText.getWindowToken(), 0);
+                    searchDialog = MyDialogFragment.newInstance(parentActivity,
+                            MyDialogFragment.DO_SEARCH_DB);
+                    searchDialog.show(parentActivity.getSupportFragmentManager(),
+                            "dialog_search_db");
+                    break;
+                }
                 case SearchFragment.MSG_REFRESH_FUZZY_RESULT: {
-                    Log.d(TAG, "[mUiHandler][MSG_REFRESH_FUZZY_RESULT]");
+                    Log.d(TAG, "[mUihandler][MSG_REFRESH_FUZZY_RESULT]");
                     searchDialog.dismiss();
 
                     FuzzyResult fuzzyResult = (FuzzyResult) msg.obj;
@@ -434,9 +443,9 @@ public class SearchFragment extends Fragment {
                     List<Scenario> sceList = fuzzyResult.getScenarioList();
                     int dicListSize = dicList.size();
                     int sceListSize = sceList.size();
-                    Log.d(TAG, "[mUiHandler] FuzzyResult Dictionary size = "
+                    Log.i(TAG, "[mUihandler] FuzzyResult Dictionary size = "
                             + dicListSize);
-                    Log.d(TAG, "[mUiHandler] FuzzyResult Scenario size = "
+                    Log.i(TAG, "[mUihandler] FuzzyResult Scenario size = "
                             + sceListSize);
 
                     // Handle dictionary search result
@@ -467,8 +476,7 @@ public class SearchFragment extends Fragment {
                         for (Scenario object : sceList) {
                             mSceList.add(object);
                         }
-                        Log.d(TAG,
-                                "[mUiHandler] mSceList size = " + mSceList.size());
+                        Log.d(TAG, "[mUihandler] mSceList size = " + mSceList.size());
                         if (mSceList.size() > 0) {
                             mSceDivider.setVisibility(View.VISIBLE);
                             mScenarioListView.setVisibility(View.VISIBLE);
@@ -502,7 +510,7 @@ public class SearchFragment extends Fragment {
     };
 
     /**
-     * The NonUiHandler to do DB action
+     * The NonUihandler to do DB action
      * 
      * @author kesen
      */
@@ -517,31 +525,25 @@ public class SearchFragment extends Fragment {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case SearchFragment.MSG_DO_SUGGEST_SEARCH: {
-                    Log.d(TAG, "[NonUiHandler] handle msg [MSG_DO_SUGGEST_SEARCH]");
+                    Log.d(TAG, "[NonUihandler] handle msg [MSG_DO_SUGGEST_SEARCH]");
                     String suggestSearchStr = (String) msg.obj;
                     doSuggestSearch(suggestSearchStr);
                     break;
                 }
                 case SearchFragment.MSG_DO_FUZZY_SEARCH: {
-                    Log.d(TAG, "[NonUiHandler] handle msg [MSG_DO_FUZZY_SEARCH]");
-                    mInputMethodManager.hideSoftInputFromWindow(mEditText.getWindowToken(), 0);
-                    searchDialog = MyDialogFragment.newInstance(parentActivity,
-                            MyDialogFragment.DO_SEARCH_DB);
-                    searchDialog.show(parentActivity.getSupportFragmentManager(),
-                            "dialog_search_db");
-
+                    Log.d(TAG, "[NonUihandler] handle msg [MSG_DO_FUZZY_SEARCH]");
                     String fuzzySearchStr = (String) msg.obj;
                     doFuzzySearch(fuzzySearchStr);
                     break;
                 }
                 case SearchFragment.MSG_PLAY_AUDIO: {
-                    Log.d(TAG, "[NonUiHandler] handle msg [MSG_PLAY_AUDIO]");
+                    Log.d(TAG, "[NonUihandler] handle msg [MSG_PLAY_AUDIO]");
                     String audioStr = (String) msg.obj;
                     doPlayAudio(audioStr);
                     break;
                 }
                 default:
-                    Log.d(TAG, "[NonUihandler][handleMessage] Something wrong in handleMessage()");
+                    Log.w(TAG, "[NonUihandler][handleMessage] Something wrong in handleMessage()");
                     break;
             }
         }
@@ -628,6 +630,7 @@ public class SearchFragment extends Fragment {
     }
 
     public static class SearchListAdapter extends ArrayAdapter<Dictionary> {
+        private LayoutInflater mInflater = null;
 
         public SearchListAdapter(Context context) {
             super(context, android.R.layout.simple_list_item_2);
@@ -724,9 +727,11 @@ public class SearchFragment extends Fragment {
     }
 
     public static class SearchScenarioAdapter extends ArrayAdapter<Scenario> {
+        private LayoutInflater mInflater = null;
 
         public SearchScenarioAdapter(Context context) {
             super(context, android.R.layout.simple_list_item_2);
+            mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
 
         public void setData(List<Scenario> data) {

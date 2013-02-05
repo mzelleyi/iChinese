@@ -15,7 +15,6 @@ import sg.gov.nhb.ihuayu.activity.db.entity.Dictionary;
 import sg.gov.nhb.ihuayu.activity.rest.AudioPlayer;
 import sg.gov.nhb.ihuayu.view.MyDialogFragment;
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.os.Handler;
@@ -56,8 +55,8 @@ public class BookmarkFragment extends Fragment {
     private static final String TAG = "iHuayu:BookmarkFragment";
     private static FragmentActivity parentActivity = null;
     private static LayoutInflater mInflater = null;
-    private static Resources mRes = null;
-    public BookmarkListFragment mBookmarkListFragment = null;
+    // private static Resources mRes = null;
+    public static boolean TAB_BOOKMARK_DATA_CHANGED = false;
 
     private static WindowManager mWindowManager = null;
     private static TextView mDialogText = null;
@@ -77,6 +76,8 @@ public class BookmarkFragment extends Fragment {
     private static final int INDICATE_HIDE = 506;
     private static final int SHOW_DOWNLOAD_DIALOG = 507;
     private static final int HIDE_DOWNLOAD_DIALOG = 508;
+    
+    public BookmarkListFragment mBookmarkListFragment = null;
 
     // Define Thread Name
     private static final String THREAD_NAME = "BookmarkFragmentThread";
@@ -84,8 +85,6 @@ public class BookmarkFragment extends Fragment {
     private HandlerThread mHandlerThread = null;
     // The DB Operation Thread
     private static NonUiHandler mNonUiHandler = null;
-
-    public static boolean TAB_BOOKMARK_DATA_CHANGED = false;
 
     /**
      * Create a new instance of SearchFragment
@@ -114,7 +113,7 @@ public class BookmarkFragment extends Fragment {
         // TODO Auto-generated method stub
         super.onViewCreated(view, savedInstanceState);
         parentActivity = this.getActivity();
-        mRes = parentActivity.getResources();
+        // mRes = parentActivity.getResources();
 
         mWindowManager = (WindowManager) parentActivity.getSystemService(Context.WINDOW_SERVICE);
 
@@ -136,7 +135,7 @@ public class BookmarkFragment extends Fragment {
             public void onClick(View v) {
                 // TODO Auto-generated method stub
                 if (editBtn.getText().toString().equalsIgnoreCase(
-                        mRes.getString(R.string.title_bar_btn_edit))) {
+                        MainActivity.mRes.getString(R.string.title_bar_btn_edit))) {
                     mBookmarkListFragment.enterEditMode();
                     editBtn.setText(R.string.title_bar_btn_done);
                 } else {
@@ -333,7 +332,8 @@ public class BookmarkFragment extends Fragment {
                         mAudioPlayer.doPlay(audioStr);
                     } else {
                         Toast.makeText(parentActivity,
-                                mRes.getString(R.string.toast_download_failed), Toast.LENGTH_SHORT)
+                                MainActivity.mRes.getString(R.string.toast_download_failed),
+                                Toast.LENGTH_SHORT)
                                 .show();
                     }
                 }

@@ -40,9 +40,9 @@ public class SearchDetailFragment extends Fragment implements
     private static final String TAG = "iHuayu:SearchDetailFragment";
     private static FragmentActivity parentActivity = null;
     private static View mParentView = null;
-    private static ImageView mFavoriteImg = null;
-    private static Button mBtnPrev = null;
-    private static Button mBtnNext = null;
+    private ImageView mFavoriteImg = null;
+    private Button mBtnPrev = null;
+    private Button mBtnNext = null;
     private static boolean mBeFavorited = false;
 
     private static final int UPDATE_CURRENT = 1;
@@ -645,7 +645,7 @@ public class SearchDetailFragment extends Fragment implements
         // mBeFavorited = false;
     }
 
-    private static void updateFavoriteImg(boolean mFavorited) {
+    private void updateFavoriteImg(boolean mFavorited) {
         Log.d(TAG, "[updateFavoriteImg] This item has been bookmarked = " + mFavorited);
         if (mFavorited) {
             mFavoriteImg.setImageResource(R.drawable.btn_mark_on);

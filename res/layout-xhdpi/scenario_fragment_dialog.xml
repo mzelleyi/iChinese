@@ -12,7 +12,7 @@
      distributed under the License is distributed on an "AS IS" BASIS,
      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
      See the License for the specific language governing permissions and
-     limitations under the License.
+     limitations under the License.
 -->
 
 <!-- Top-level content view for the simple fragment sample. -->
@@ -20,23 +20,42 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_wordmap"
+    android:orientation="vertical"
     android:paddingBottom="@dimen/margin_h5"
     android:paddingLeft="@dimen/margin_h3"
     android:paddingRight="@dimen/margin_h3"
     android:paddingTop="@dimen/margin_h5" >
 
+    <Button
+        android:id="@+id/scenario_fragment_dialog_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/margin_h2"
+        android:background="@drawable/btn_popup_ok"
+        android:paddingBottom="@dimen/margin_h4"
+        android:paddingLeft="@dimen/margin_h6"
+        android:paddingRight="@dimen/margin_h6"
+        android:paddingTop="@dimen/margin_h4"
+        android:text="@string/dialog_btn_ok"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/white_normal" >
+    </Button>
+
     <ScrollView
         android:id="@+id/scrollView1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scrollbars="vertical"
-        android:layout_alignParentTop="true" >
+        android:layout_height="match_parent"
+        android:layout_above="@id/scenario_fragment_dialog_btn"
+        android:scrollbars="vertical" >
 
         <LinearLayout
             android:id="@+id/dialog_text_panel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" >
+
             <TextView
                 android:id="@+id/dialog_text_firstline"
                 android:layout_width="match_parent"
@@ -45,6 +64,7 @@
                 android:gravity="top|center_horizontal"
                 android:hint="@string/dummy_text"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
+
             <TextView
                 android:id="@+id/dialog_text_secondline"
                 android:layout_width="match_parent"
@@ -53,6 +73,7 @@
                 android:gravity="top|center_horizontal"
                 android:hint="@string/dummy_text"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
+
             <TextView
                 android:id="@+id/dialog_text_thridline"
                 android:layout_width="match_parent"
@@ -62,6 +83,7 @@
                 android:gravity="top|center_horizontal"
                 android:hint="@string/dummy_text"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
+
             <TextView
                 android:id="@+id/dialog_words_define_hint"
                 android:layout_width="wrap_content"
@@ -74,12 +96,14 @@
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@color/white_normal"
                 android:textColorHint="@color/white_normal" />
+
             <LinearLayout
                 android:id="@+id/dialog_words_define_panel_0"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:baselineAligned="true"
                 android:orientation="horizontal" />
+
             <LinearLayout
                 android:id="@+id/dialog_words_define_panel_1"
                 android:layout_width="wrap_content"
@@ -88,23 +112,5 @@
                 android:orientation="horizontal" />
         </LinearLayout>
     </ScrollView>
-
-    <Button
-        android:id="@+id/scenario_fragment_dialog_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:background="@drawable/btn_popup_ok"
-        android:paddingBottom="@dimen/margin_h4"
-        android:paddingLeft="@dimen/margin_h6"
-        android:paddingRight="@dimen/margin_h6"
-        android:paddingTop="@dimen/margin_h4"
-        android:text="@string/dialog_btn_ok"
-        android:textColor="@color/white_normal"
-        android:textSize="@dimen/btn_dialog_text_size" >
-
-        <requestFocus />
-    </Button>
 
 </RelativeLayout>

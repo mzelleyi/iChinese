@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import sg.gov.nhb.ihuayu.R;
+
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
@@ -115,7 +117,8 @@ public class FileUtils {
             }
 
             try {
-                InputStream is = context.getAssets().open(DATABASE_FILENAME);
+                //InputStream is = context.getAssets().open(DATABASE_FILENAME);
+                InputStream is = context.getResources().openRawResource(R.raw.database);
                 OutputStream os = new FileOutputStream(DB_PATH + DATABASE_FILENAME);
                 byte[] buffer = new byte[1024];
                 int length;

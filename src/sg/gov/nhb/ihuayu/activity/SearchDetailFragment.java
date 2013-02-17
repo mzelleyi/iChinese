@@ -1,6 +1,9 @@
 
 package sg.gov.nhb.ihuayu.activity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import sg.gov.nhb.ihuayu.activity.db.entity.Dictionary;
 import sg.gov.nhb.ihuayu.activity.rest.AudioPlayer;
 import sg.gov.nhb.ihuayu.view.MyDialogFragment;
@@ -35,7 +38,7 @@ import android.widget.Toast;
  * @author Kesen
  */
 public class SearchDetailFragment extends Fragment implements
-        LoaderManager.LoaderCallbacks<Dictionary> {
+        LoaderManager.LoaderCallbacks<List<Dictionary>> {
 
     private static final String TAG = "iHuayu:SearchDetailFragment";
     private static FragmentActivity parentActivity = null;
@@ -123,7 +126,7 @@ public class SearchDetailFragment extends Fragment implements
     }
 
     @Override
-    public Loader<Dictionary> onCreateLoader(int arg0, Bundle arg1) {
+    public Loader<List<Dictionary>> onCreateLoader(int arg0, Bundle arg1) {
         // TODO Auto-generated method stub
         Log.d(TAG, "[ResultDemoFragment][onCreateLoader] + Begin");
         // This is called when a new Loader needs to be created. This
@@ -132,7 +135,7 @@ public class SearchDetailFragment extends Fragment implements
     }
 
     @Override
-    public void onLoadFinished(Loader<Dictionary> loader, Dictionary data) {
+    public void onLoadFinished(Loader<List<Dictionary>> loader, List<Dictionary> data) {
         // TODO Auto-generated method stub
         Log.d(TAG, "[ResultDemoFragment][onLoadFinished] + Begin");
         // Set the new data in the adapter.
@@ -184,26 +187,45 @@ public class SearchDetailFragment extends Fragment implements
             }
         });
 
-        if (data == null) {
+        int size = data.size();
+        if (size == 2) {
             if (mUpdateType == UPDATE_NEXT) {
-                Log.i(TAG, "[onLoadFinished] data is null, UpdataType is UPDATE_NEXT");
-                mBtnNext.setEnabled(false);
-                mBtnNext.setClickable(false);
+                mCurrentDic = data.get(0);
+            } else if (mUpdateType == UPDATE_PREV) {
+                mCurrentDic = data.get(1);
+            }
+            mBtnPrev.setEnabled(true);
+            mBtnPrev.setClickable(true);
+            mBtnNext.setEnabled(true);
+            mBtnNext.setClickable(true);
+        } else if (size == 1) {
+            mCurrentDic = data.get(0);
+            if (mUpdateType == UPDATE_NEXT) {
                 mBtnPrev.setEnabled(true);
                 mBtnPrev.setClickable(true);
+                mBtnNext.setEnabled(false);
+                mBtnNext.setClickable(false);
             } else if (mUpdateType == UPDATE_PREV) {
-                Log.i(TAG, "[onLoadFinished] mCurrentDic is null, UpdataType is UPDATE_PREV");
                 mBtnPrev.setEnabled(false);
                 mBtnPrev.setClickable(false);
                 mBtnNext.setEnabled(true);
                 mBtnNext.setClickable(true);
             }
-        } else {
-            mCurrentDic = data;
-            mBtnPrev.setEnabled(true);
-            mBtnPrev.setClickable(true);
-            mBtnNext.setEnabled(true);
-            mBtnNext.setClickable(true);
+        } else if (size == 3) {
+            Log.i(TAG, "[onLoadFinished] UPDATE_CURRENT");
+            mCurrentDic = data.get(1);
+            if (data.get(0) == null) {
+                mBtnPrev.setEnabled(false);
+                mBtnPrev.setClickable(false);
+            } else if (data.get(2) == null) {
+                mBtnNext.setEnabled(false);
+                mBtnNext.setClickable(false);
+            } else {
+                mBtnPrev.setEnabled(true);
+                mBtnPrev.setClickable(true);
+                mBtnNext.setEnabled(true);
+                mBtnNext.setClickable(true);
+            }
         }
 
         if (mCurrentDic != null) {
@@ -357,7 +379,7 @@ public class SearchDetailFragment extends Fragment implements
     }
 
     @Override
-    public void onLoaderReset(Loader<Dictionary> arg0) {
+    public void onLoaderReset(Loader<List<Dictionary>> arg0) {
         // TODO Auto-generated method stub
         Log.d(TAG, "[ResultDemoFragment][onLoaderReset] + Begin");
         // Clear the data in the adapter.
@@ -666,9 +688,10 @@ public class SearchDetailFragment extends Fragment implements
     /**
      * A custom Loader that loads all of the installed applications.
      */
-    public static class ResultDemoLoader extends AsyncTaskLoader<Dictionary> {
+    public static class ResultDemoLoader extends AsyncTaskLoader<List<Dictionary>> {
 
-        Dictionary mDictionary = null;
+        List<Dictionary> mDictionary = null;
+        List<Dictionary> mDicList = null;
 
         public ResultDemoLoader(Context context) {
             super(context);
@@ -680,12 +703,31 @@ public class SearchDetailFragment extends Fragment implements
          * published by the loader.
          */
         @Override
-        public Dictionary loadInBackground() {
+        public List<Dictionary> loadInBackground() {
             Log.d(TAG, "[ResultDemoLoader][loadInBackground] + Begin");
-            Dictionary entries = null;
+            List<Dictionary> entries = new ArrayList<Dictionary>();
             if (mUpdateType == UPDATE_CURRENT) {
                 Log.i(TAG, "[ResultDemoLoader][loadInBackground] Set Current");
-                entries = mCurrentDic;
+
+                if (mCurrentDic.getRowid() == 1) {
+                    if (null != mCurrentDic) {
+                        entries.add(0, null);
+                        entries.add(1, mCurrentDic);
+                        entries.add(2, mCurrentDic);
+                        return entries;
+                    }
+                } else {
+                    mDicList = MainActivity.dbManagerment.getNextDictionary(mCurrentDic.getRowid());
+                    if (mDicList.size() > 0) {
+                        entries.add(0, mCurrentDic);
+                        entries.add(1, mCurrentDic);
+                        entries.add(2, mDicList.get(0));
+                    } else {
+                        entries.add(0, mCurrentDic);
+                        entries.add(1, mCurrentDic);
+                        entries.add(2, null);
+                    }
+                }
             } else if (mUpdateType == UPDATE_NEXT) {
                 Log.i(TAG, "[ResultDemoLoader][loadInBackground] Get Next");
                 entries = MainActivity.dbManagerment.getNextDictionary(mCurrentDic.getRowid());
@@ -704,7 +746,7 @@ public class SearchDetailFragment extends Fragment implements
          * adds a little more logic.
          */
         @Override
-        public void deliverResult(Dictionary dic) {
+        public void deliverResult(List<Dictionary> dic) {
             Log.d(TAG, "[ResultDemoLoader][deliverResult] + Begin");
             if (this.isReset()) {
                 // An async query came in while the loader is stopped. We
@@ -714,7 +756,7 @@ public class SearchDetailFragment extends Fragment implements
                 }
             }
 
-            Dictionary oldDictionary = dic;
+            List<Dictionary> oldDictionary = dic;
             mDictionary = dic;
 
             if (this.isStarted()) {
@@ -767,7 +809,7 @@ public class SearchDetailFragment extends Fragment implements
          * Handles a request to cancel a load.
          */
         @Override
-        public void onCanceled(Dictionary dic) {
+        public void onCanceled(List<Dictionary> dic) {
             Log.d(TAG, "[ResultDemoLoader][onCanceled] + Begin");
             super.onCanceled(dic);
 
@@ -799,7 +841,7 @@ public class SearchDetailFragment extends Fragment implements
          * Helper function to take care of releasing resources associated with
          * an actively loaded data set.
          */
-        protected void onReleaseResources(Dictionary data) {
+        protected void onReleaseResources(List<Dictionary> data) {
             // For a simple List<> there is nothing to do. For something
             // like a Cursor, we would close it here.
         }

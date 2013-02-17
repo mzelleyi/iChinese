@@ -1,6 +1,9 @@
 
 package sg.gov.nhb.ihuayu.activity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import sg.gov.nhb.ihuayu.activity.db.entity.Dictionary;
 import sg.gov.nhb.ihuayu.activity.rest.AudioPlayer;
 import sg.gov.nhb.ihuayu.view.MyDialogFragment;
@@ -36,16 +39,15 @@ import android.widget.Toast;
  * @author Kesen
  */
 public class BookmarkDetailFragment extends Fragment implements
-        LoaderManager.LoaderCallbacks<Dictionary> {
+        LoaderManager.LoaderCallbacks<List<Dictionary>> {
 
     private static final String TAG = "iHuayu:BookmarkDetailFragment";
     private static FragmentActivity parentActivity = null;
     private static View mParentView = null;
-    private static boolean mBeFavorited = false;
-    
     private ImageView mFavoriteImg = null;
     private Button mBtnPrev = null;
     private Button mBtnNext = null;
+    private static boolean mBeFavorited = false;
 
     private static final int UPDATE_CURRENT = 1;
     private static final int UPDATE_NEXT = 2;
@@ -82,7 +84,6 @@ public class BookmarkDetailFragment extends Fragment implements
      * @return
      */
     static BookmarkDetailFragment newInstance(Dictionary dictionary) {
-
         Log.d(TAG, "[newInstance] + Begin");
         BookmarkDetailFragment fragment = new BookmarkDetailFragment();
         mCurrentDic = dictionary;
@@ -94,8 +95,8 @@ public class BookmarkDetailFragment extends Fragment implements
      * When creating, retrieve this parameter from its arguments.
      */
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
         Log.d(TAG, "[onCreateView] + Begin");
         View v = inflater.inflate(R.layout.result_detail_fragment, container, false);
         mParentView = v;
@@ -111,7 +112,6 @@ public class BookmarkDetailFragment extends Fragment implements
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-
         Log.d(TAG, "[onViewCreated] + Begin");
         // TODO Auto-generated method stub
         super.onViewCreated(view, savedInstanceState);
@@ -127,8 +127,7 @@ public class BookmarkDetailFragment extends Fragment implements
     }
 
     @Override
-    public Loader<Dictionary> onCreateLoader(int arg0, Bundle arg1) {
-
+    public Loader<List<Dictionary>> onCreateLoader(int arg0, Bundle arg1) {
         // TODO Auto-generated method stub
         Log.d(TAG, "[ResultDemoFragment][onCreateLoader] + Begin");
         // This is called when a new Loader needs to be created. This
@@ -137,8 +136,7 @@ public class BookmarkDetailFragment extends Fragment implements
     }
 
     @Override
-    public void onLoadFinished(Loader<Dictionary> loader, Dictionary data) {
-
+    public void onLoadFinished(Loader<List<Dictionary>> loader, List<Dictionary> data) {
         // TODO Auto-generated method stub
         Log.d(TAG, "[ResultDemoFragment][onLoadFinished] + Begin");
         // Set the new data in the adapter.
@@ -146,10 +144,8 @@ public class BookmarkDetailFragment extends Fragment implements
 
         mBtnPrev = (Button) mParentView.findViewById(R.id.result_detail_footbar_btn_prev);
         mBtnPrev.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View v) {
-
                 // TODO Auto-generated method stub
                 Log.d(TAG, "[onClick] btnPrev ");
                 // mCurrentDic = mResultList.get(mCurrentPos);
@@ -166,10 +162,8 @@ public class BookmarkDetailFragment extends Fragment implements
 
         mBtnNext = (Button) mParentView.findViewById(R.id.result_detail_footbar_btn_next);
         mBtnNext.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View v) {
-
                 // TODO Auto-generated method stub
                 Log.d(TAG, "[onClick] btnNext ");
                 // mCurrentDic = mResultList.get(mCurrentPos);
@@ -187,9 +181,7 @@ public class BookmarkDetailFragment extends Fragment implements
         // Set Back Button On Click Listener
         Button backBtn = (Button) mParentView.findViewById(R.id.result_detail_title_bar_backbtn);
         backBtn.setOnClickListener(new View.OnClickListener() {
-
             public void onClick(View v) {
-
                 // TODO Auto-generated method stub
                 FragmentManager fm = parentActivity.getSupportFragmentManager();
                 Fragment currentFragment = fm.findFragmentByTag(MainActivity.fragment_tag_bookmark);
@@ -205,26 +197,45 @@ public class BookmarkDetailFragment extends Fragment implements
             }
         });
 
-        if (data == null) {
+        int size = data.size();
+        if (size == 2) {
             if (mUpdateType == UPDATE_NEXT) {
-                Log.i(TAG, "[onLoadFinished] data is null, UpdataType is UPDATE_NEXT");
-                mBtnNext.setEnabled(false);
-                mBtnNext.setClickable(false);
+                mCurrentDic = data.get(0);
+            } else if (mUpdateType == UPDATE_PREV) {
+                mCurrentDic = data.get(1);
+            }
+            mBtnPrev.setEnabled(true);
+            mBtnPrev.setClickable(true);
+            mBtnNext.setEnabled(true);
+            mBtnNext.setClickable(true);
+        } else if (size == 1) {
+            mCurrentDic = data.get(0);
+            if (mUpdateType == UPDATE_NEXT) {
                 mBtnPrev.setEnabled(true);
                 mBtnPrev.setClickable(true);
+                mBtnNext.setEnabled(false);
+                mBtnNext.setClickable(false);
             } else if (mUpdateType == UPDATE_PREV) {
-                Log.i(TAG, "[onLoadFinished] mCurrentDic is null, UpdataType is UPDATE_PREV");
                 mBtnPrev.setEnabled(false);
                 mBtnPrev.setClickable(false);
                 mBtnNext.setEnabled(true);
                 mBtnNext.setClickable(true);
             }
-        } else {
-            mCurrentDic = data;
-            mBtnPrev.setEnabled(true);
-            mBtnPrev.setClickable(true);
-            mBtnNext.setEnabled(true);
-            mBtnNext.setClickable(true);
+        } else if (size == 3) {
+            Log.i(TAG, "[onLoadFinished] UPDATE_CURRENT");
+            mCurrentDic = data.get(1);
+            if (data.get(0) == null) {
+                mBtnPrev.setEnabled(false);
+                mBtnPrev.setClickable(false);
+            } else if (data.get(2) == null) {
+                mBtnNext.setEnabled(false);
+                mBtnNext.setClickable(false);
+            } else {
+                mBtnPrev.setEnabled(true);
+                mBtnPrev.setClickable(true);
+                mBtnNext.setEnabled(true);
+                mBtnNext.setClickable(true);
+            }
         }
 
         if (mCurrentDic != null) {
@@ -254,10 +265,8 @@ public class BookmarkDetailFragment extends Fragment implements
             ImageView audioImg = (ImageView) mParentView
                     .findViewById(R.id.result_detail_des_second_line_icon);
             audioImg.setOnClickListener(new View.OnClickListener() {
-
                 @Override
                 public void onClick(View v) {
-
                     // TODO Auto-generated method stub
                     Log.d(TAG, "[onClick] audioImg + Begin");
                     String sentanceAudio = mCurrentDic.getChinese_audio();
@@ -276,10 +285,8 @@ public class BookmarkDetailFragment extends Fragment implements
             mFavoriteImg = (ImageView) mParentView
                     .findViewById(R.id.result_detail_des_favorite_img);
             mFavoriteImg.setOnClickListener(new View.OnClickListener() {
-
                 @Override
                 public void onClick(View v) {
-
                     // TODO Auto-generated method stub
                     if (!mBeFavorited) {
                         // mDialogType = MyDialogFragment.ADD_TO_BOOKMARK;
@@ -323,10 +330,8 @@ public class BookmarkDetailFragment extends Fragment implements
                         .findViewById(R.id.result_detail_sample_cn_text);
                 // speak_cn_icon.setVisibility(View.VISIBLE);
                 speak_cn_icon.setOnClickListener(new View.OnClickListener() {
-
                     @Override
                     public void onClick(View v) {
-
                         // TODO Auto-generated method stub
                         String sentanceAudio = mCurrentDic.getSample_sentance_audio();
                         Log.d(TAG, "[onClick] sentanceAudio = " + sentanceAudio);
@@ -384,8 +389,7 @@ public class BookmarkDetailFragment extends Fragment implements
     }
 
     @Override
-    public void onLoaderReset(Loader<Dictionary> arg0) {
-
+    public void onLoaderReset(Loader<List<Dictionary>> arg0) {
         // TODO Auto-generated method stub
         Log.d(TAG, "[ResultDemoFragment][onLoaderReset] + Begin");
         // Clear the data in the adapter.
@@ -393,22 +397,18 @@ public class BookmarkDetailFragment extends Fragment implements
     }
 
     private final Handler mUiHandler = new Handler() {
-
         DialogFragment downloadDialog = null;
 
         @Override
         public void handleMessage(Message msg) {
-
             switch (msg.what) {
                 case UPDATE_FAV_IMAGE: {
-                    Log.d(TAG,
-                            "[mUihandler handleMessage] UPDATE_FAV_IMAGE");
+                    Log.d(TAG, "[mUihandler handleMessage] UPDATE_FAV_IMAGE");
                     updateFavoriteImg((Boolean) msg.obj);
                     break;
                 }
                 case UPDATE_ADD_RESULT: {
-                    Log.d(TAG,
-                            "[mUihandler handleMessage] UPDATE_ADD_RESULT");
+                    Log.d(TAG, "[mUihandler handleMessage] UPDATE_ADD_RESULT");
                     if (msg.arg1 > 0) {
                         // mDialogType =
                         // MyDialogFragment.ADD_RESULT;
@@ -426,8 +426,7 @@ public class BookmarkDetailFragment extends Fragment implements
                     break;
                 }
                 case UPDATE_REMOVE_RESULT: {
-                    Log.d(TAG,
-                            "[mUihandler handleMessage] UPDATE_REMOVE_RESULT");
+                    Log.d(TAG, "[mUihandler handleMessage] UPDATE_REMOVE_RESULT");
                     if (msg.arg1 > 0) {
                         // mDialogType = -1;
                         mBeFavorited = false;
@@ -444,27 +443,22 @@ public class BookmarkDetailFragment extends Fragment implements
                     break;
                 }
                 case SHOW_DOWNLOAD_DIALOG: {
-                    Log.d(TAG,
-                            "[mUihandler handleMessage] SHOW_DOWNLOAD_DIALOG");
-                    downloadDialog = MyDialogFragment.newInstance(
-                            parentActivity,
+                    Log.d(TAG, "[mUihandler handleMessage] SHOW_DOWNLOAD_DIALOG");
+                    downloadDialog = MyDialogFragment.newInstance(parentActivity,
                             MyDialogFragment.DIALOG_DOWNLOAD);
-                    downloadDialog.show(
-                            parentActivity.getSupportFragmentManager(),
+                    downloadDialog.show(parentActivity.getSupportFragmentManager(),
                             "dialog_download");
                     break;
                 }
                 case HIDE_DOWNLOAD_DIALOG: {
-                    Log.d(TAG,
-                            "[mUihandler handleMessage] HIDE_DOWNLOAD_DIALOG");
+                    Log.d(TAG, "[mUihandler handleMessage] HIDE_DOWNLOAD_DIALOG");
                     if (downloadDialog != null) {
                         downloadDialog.dismiss();
                     }
                     break;
                 }
                 default: {
-                    Log.e(TAG,
-                            "[mUihandler handleMessage] Something wrong!!!");
+                    Log.e(TAG, "[mUihandler handleMessage] Something wrong!!!");
                     break;
                 }
             }
@@ -476,18 +470,19 @@ public class BookmarkDetailFragment extends Fragment implements
      * 
      * @author kesen
      */
-    private final class NonUiHandler extends Handler {
-
-        public NonUiHandler(Looper looper) {
-
+    private final class NonUiHandler extends Handler
+    {
+        public NonUiHandler(Looper looper)
+        {
             super(looper);
             Log.d(TAG, "[NonUihandler] Constructor");
         }
 
         @Override
-        public void handleMessage(Message msg) {
-
-            switch (msg.what) {
+        public void handleMessage(Message msg)
+        {
+            switch (msg.what)
+            {
                 case CHECK_FAV_STATUS:
                     Log.d(TAG, "[NonUihandler][handleMessage] - CHECK_FAV_STATUS");
                     doCheckMarked();
@@ -514,15 +509,16 @@ public class BookmarkDetailFragment extends Fragment implements
             }
         }
 
-        private void doAddToBookmark() {
-
+        private void doAddToBookmark()
+        {
             Log.d(TAG, "[NonUihandler][doAddToBookmark] + Begin");
             Log.d(TAG,
                     "[NonUihandler][doAddToBookmark] mCurrent Dictionary ID = "
                             + mCurrentDic.getId());
             int result = (int) MainActivity.dbManagerment.addBookmark(mCurrentDic.getId());
             Log.d(TAG, "[NonUihandler][doRemoveFromBookmark] result = " + result);
-            if (mUiHandler != null) {
+            if (mUiHandler != null)
+            {
                 if (mUiHandler.hasMessages(UPDATE_ADD_RESULT)) {
                     mUiHandler.removeMessages(UPDATE_ADD_RESULT);
                 }
@@ -533,14 +529,15 @@ public class BookmarkDetailFragment extends Fragment implements
             Log.d(TAG, "[NonUihandler][doAddToBookmark] + End");
         }
 
-        private void doRemoveFromBookmark() {
-
+        private void doRemoveFromBookmark()
+        {
             Log.d(TAG, "[NonUihandler][doRemoveFromBookmark] + Begin");
             Log.d(TAG, "[NonUihandler][doRemoveFromBookmark] mCurrent Dictionary ID = "
                     + mCurrentDic.getId());
             int result = MainActivity.dbManagerment.removeFromFavorites(mCurrentDic.getId());
             Log.d(TAG, "[NonUihandler][doRemoveFromBookmark] result = " + result);
-            if (mUiHandler != null) {
+            if (mUiHandler != null)
+            {
                 if (mUiHandler.hasMessages(UPDATE_REMOVE_RESULT)) {
                     mUiHandler.removeMessages(UPDATE_REMOVE_RESULT);
                 }
@@ -551,8 +548,8 @@ public class BookmarkDetailFragment extends Fragment implements
             Log.d(TAG, "[NonUihandler][doRemoveFromBookmark] + End");
         }
 
-        private void doCheckMarked() {
-
+        private void doCheckMarked()
+        {
             Log.d(TAG, "[NonUihandler][doCheckMarked] + Begin");
             int dictionaryId = -1;
             if (null != mCurrentDic) {
@@ -563,7 +560,8 @@ public class BookmarkDetailFragment extends Fragment implements
                 mBeFavorited = MainActivity.dbManagerment.hasbookmarked(mCurrentDic.getId());
             }
             Log.d(TAG, "[NonUihandler][doCheckMarked] hasbookmarked = " + mBeFavorited);
-            if (mUiHandler != null) {
+            if (mUiHandler != null)
+            {
                 if (mUiHandler.hasMessages(UPDATE_FAV_IMAGE)) {
                     mUiHandler.removeMessages(UPDATE_FAV_IMAGE);
                 }
@@ -574,7 +572,6 @@ public class BookmarkDetailFragment extends Fragment implements
         }
 
         private void doPlayAudio(String audio) {
-
             Log.d(TAG, "[NonUihandler][doPlayAudio] + Begin");
             String audioStr = null;
             if (audio != null) {
@@ -605,8 +602,7 @@ public class BookmarkDetailFragment extends Fragment implements
                         Toast.makeText(
                                 parentActivity,
                                 parentActivity.getResources().getString(
-                                        R.string.toast_download_failed),
-                                Toast.LENGTH_SHORT).show();
+                                        R.string.toast_download_failed), Toast.LENGTH_SHORT).show();
                     }
                 }
             } catch (Exception e) {
@@ -655,8 +651,8 @@ public class BookmarkDetailFragment extends Fragment implements
     }
 
     public static void doPositiveClick(int dialogType) {
-
-        switch (dialogType) {
+        switch (dialogType)
+        {
             case MyDialogFragment.ADD_TO_BOOKMARK:
                 Log.d(TAG, "[doPositiveClick] - ADD_TO_BOOKMARK");
                 sendHandlerMsg(ADD_TO_BOOKMARK);
@@ -677,7 +673,6 @@ public class BookmarkDetailFragment extends Fragment implements
     }
 
     public static void doNegativeClick() {
-
         // Do stuff here.
         Log.i(TAG, "Negative click!");
         // mDialogType = -1;
@@ -685,7 +680,6 @@ public class BookmarkDetailFragment extends Fragment implements
     }
 
     private void updateFavoriteImg(boolean mFavorited) {
-
         Log.d(TAG, "[updateFavoriteImg] This item has been bookmarked = " + mFavorited);
         if (mFavorited) {
             mFavoriteImg.setImageResource(R.drawable.btn_mark_on);
@@ -695,7 +689,6 @@ public class BookmarkDetailFragment extends Fragment implements
     }
 
     private static void sendHandlerMsg(int msgCode) {
-
         if (mNonUiHandler != null) {
             if (mNonUiHandler.hasMessages(msgCode)) {
                 mNonUiHandler.removeMessages(msgCode);
@@ -707,12 +700,12 @@ public class BookmarkDetailFragment extends Fragment implements
     /**
      * A custom Loader that loads all of the installed applications.
      */
-    public static class ResultDemoLoader extends AsyncTaskLoader<Dictionary> {
+    public static class ResultDemoLoader extends AsyncTaskLoader<List<Dictionary>> {
 
-        Dictionary mDictionary = null;
+        List<Dictionary> mDictionary = null;
+        List<Dictionary> mDicList = null;
 
         public ResultDemoLoader(Context context) {
-
             super(context);
         }
 
@@ -722,13 +715,31 @@ public class BookmarkDetailFragment extends Fragment implements
          * published by the loader.
          */
         @Override
-        public Dictionary loadInBackground() {
-
+        public List<Dictionary> loadInBackground() {
             Log.d(TAG, "[ResultDemoLoader][loadInBackground] + Begin");
-            Dictionary entries = null;
+            List<Dictionary> entries = new ArrayList<Dictionary>();
             if (mUpdateType == UPDATE_CURRENT) {
                 Log.i(TAG, "[ResultDemoLoader][loadInBackground] Set Current");
-                entries = mCurrentDic;
+
+                if (mCurrentDic.getRowid() == 1) {
+                    if (null != mCurrentDic) {
+                        entries.add(0, null);
+                        entries.add(1, mCurrentDic);
+                        entries.add(2, mCurrentDic);
+                        return entries;
+                    }
+                } else {
+                    mDicList = MainActivity.dbManagerment.getNextDictionary(mCurrentDic.getRowid());
+                    if (mDicList.size() > 0) {
+                        entries.add(0, mCurrentDic);
+                        entries.add(1, mCurrentDic);
+                        entries.add(2, mDicList.get(0));
+                    } else {
+                        entries.add(0, mCurrentDic);
+                        entries.add(1, mCurrentDic);
+                        entries.add(2, null);
+                    }
+                }
             } else if (mUpdateType == UPDATE_NEXT) {
                 Log.i(TAG, "[ResultDemoLoader][loadInBackground] Get Next");
                 entries = MainActivity.dbManagerment.getNextDictionary(mCurrentDic.getRowid());
@@ -747,8 +758,7 @@ public class BookmarkDetailFragment extends Fragment implements
          * adds a little more logic.
          */
         @Override
-        public void deliverResult(Dictionary dic) {
-
+        public void deliverResult(List<Dictionary> dic) {
             Log.d(TAG, "[ResultDemoLoader][deliverResult] + Begin");
             if (this.isReset()) {
                 // An async query came in while the loader is stopped. We
@@ -758,7 +768,7 @@ public class BookmarkDetailFragment extends Fragment implements
                 }
             }
 
-            Dictionary oldDictionary = dic;
+            List<Dictionary> oldDictionary = dic;
             mDictionary = dic;
 
             if (this.isStarted()) {
@@ -782,7 +792,6 @@ public class BookmarkDetailFragment extends Fragment implements
          */
         @Override
         protected void onStartLoading() {
-
             Log.d(TAG, "[ResultDemoLoader][onStartLoading] + Begin");
             if (mDictionary != null) {
                 // If we currently have a result available, deliver it
@@ -803,7 +812,6 @@ public class BookmarkDetailFragment extends Fragment implements
          */
         @Override
         protected void onStopLoading() {
-
             Log.d(TAG, "[ResultDemoLoader][onStopLoading] + Begin");
             // Attempt to cancel the current load task if possible.
             this.cancelLoad();
@@ -813,8 +821,7 @@ public class BookmarkDetailFragment extends Fragment implements
          * Handles a request to cancel a load.
          */
         @Override
-        public void onCanceled(Dictionary dic) {
-
+        public void onCanceled(List<Dictionary> dic) {
             Log.d(TAG, "[ResultDemoLoader][onCanceled] + Begin");
             super.onCanceled(dic);
 
@@ -828,7 +835,6 @@ public class BookmarkDetailFragment extends Fragment implements
          */
         @Override
         protected void onReset() {
-
             Log.d(TAG, "[ResultDemoLoader][onReset] + Begin");
             super.onReset();
 
@@ -847,8 +853,7 @@ public class BookmarkDetailFragment extends Fragment implements
          * Helper function to take care of releasing resources associated with
          * an actively loaded data set.
          */
-        protected void onReleaseResources(Dictionary data) {
-
+        protected void onReleaseResources(List<Dictionary> data) {
             // For a simple List<> there is nothing to do. For something
             // like a Cursor, we would close it here.
         }

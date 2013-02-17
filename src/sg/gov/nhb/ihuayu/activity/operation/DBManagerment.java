@@ -109,24 +109,65 @@ public class DBManagerment {
         return dictionaryList.get(0);
     }
 
-    public Dictionary getNextDictionary(int currentDictionaryId) {
+    public List<Dictionary> getNextDictionary(int currentDictionaryId) {
         List<Dictionary> dictionaryList = operation.queryDictionary(
-                "select rowid, * from dictionary where rowid = ? ", new String[] {
-                    (currentDictionaryId + 1) + ""
+                "select rowid, * from dictionary where rowid in (?,?)", new String[] {
+                        (currentDictionaryId + 1) + "", (currentDictionaryId + 2) + ""
                 });
-        if (dictionaryList == null || dictionaryList.size() == 0)
+        if (dictionaryList != null) {
+            int size = dictionaryList.size();
+            Log.d(TAG, "[getNextDictionary] size = " + size);
+            return dictionaryList;
+//            if (size == 2) {
+//                Log.d(TAG, "[getNextDictionary] get(0).getRowid = "
+//                        + dictionaryList.get(0).getRowid());
+//                Log.d(TAG, "[getNextDictionary] get(1).getRowid = "
+//                        + dictionaryList.get(1).getRowid());
+//                return dictionaryList.get(0);
+//            } else if (size == 1) {
+//                Log.d(TAG, "[getNextDictionary] get(0).getRowid = "
+//                        + dictionaryList.get(0).getRowid());
+//                return dictionaryList.get(0);
+//            } else {
+//                Log.e(TAG, "[getNextDictionary] error while getNextDictionary");
+//                return null;
+//            }
+        } else {
+            Log.e(TAG, "[getNextDictionary] error while getNextDictionary");
             return null;
-        return dictionaryList.get(0);
+        }
     }
 
-    public Dictionary getPreviousDictionary(int currentDictionaryId) {
+    public List<Dictionary> getPreviousDictionary(int currentDictionaryId) {
         List<Dictionary> dictionaryList = operation.queryDictionary(
-                "select rowid, * from dictionary where rowid = ? ", new String[] {
-                    (currentDictionaryId - 1) + ""
+                // "select rowid, * from dictionary where rowid = ? ", new
+                // String[] {
+                // (currentDictionaryId - 1) + ""});
+                "select rowid, * from dictionary where rowid in (?,?)", new String[] {
+                        (currentDictionaryId - 1) + "", (currentDictionaryId - 2) + ""
                 });
-        if (dictionaryList == null || dictionaryList.size() == 0)
+        if (dictionaryList != null) {
+            int size = dictionaryList.size();
+            Log.d(TAG, "[getPreviousDictionary] size = " + size);
+            return dictionaryList;
+//            if (size == 2) {
+//                Log.d(TAG, "[getPreviousDictionary] get(0).getRowid = "
+//                        + dictionaryList.get(0).getRowid());
+//                Log.d(TAG, "[getPreviousDictionary] get(1).getRowid = "
+//                        + dictionaryList.get(1).getRowid());
+//                return dictionaryList.get(1);
+//            } else if (size == 1) {
+//                Log.d(TAG, "[getPreviousDictionary] get(0).getRowid = "
+//                        + dictionaryList.get(0).getRowid());
+//                return dictionaryList.get(0);
+//            } else {
+//                Log.e(TAG, "[getPreviousDictionary] error while getPreviousDictionary");
+//                return null;
+//            }
+        } else {
+            Log.e(TAG, "[getPreviousDictionary] error while getPreviousDictionary");
             return null;
-        return dictionaryList.get(0);
+        }
     }
 
     // For update

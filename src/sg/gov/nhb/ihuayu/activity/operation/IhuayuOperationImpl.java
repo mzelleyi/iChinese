@@ -18,7 +18,6 @@ import sg.gov.nhb.ihuayu.activity.db.entity.DialogKeywords;
 import sg.gov.nhb.ihuayu.activity.db.entity.Dictionary;
 import sg.gov.nhb.ihuayu.activity.db.entity.FuzzyResult;
 import sg.gov.nhb.ihuayu.activity.db.entity.Scenario;
-import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -167,14 +166,12 @@ public class IhuayuOperationImpl {
         return result;
     }
 
-    @SuppressLint("SimpleDateFormat")
     private String getStandardTimeStr() throws ParseException {
         DateFormat format2 = new SimpleDateFormat("yyyyMMddHHmmss");
         Date now = new Date();
         return format2.format(now);
     }
 
-    @SuppressLint("SimpleDateFormat")
     private String getUpdatesTimeStr() throws ParseException {
         // 2011-04-01T01S01S01
         DateFormat format2 = new SimpleDateFormat("yyyy-MM-dd'T'HH'S'mm'S'ss");

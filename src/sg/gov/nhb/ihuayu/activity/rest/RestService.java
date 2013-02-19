@@ -26,7 +26,6 @@ import org.json.JSONException;
 import sg.gov.nhb.ihuayu.activity.aes.AESUtils;
 import sg.gov.nhb.ihuayu.activity.operation.OperationUtils;
 
-import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.util.Log;
 
@@ -131,7 +130,6 @@ public class RestService {
                 + AESUtils.encription(KEY, "2010-04-01T01S01S01") + "\"}";
     }
 
-    @SuppressLint("SimpleDateFormat")
     private String getStandardTimeStr() throws ParseException {
         DateFormat format2 = new SimpleDateFormat("yyyyMMddHHmmss");
         Date now = new Date();

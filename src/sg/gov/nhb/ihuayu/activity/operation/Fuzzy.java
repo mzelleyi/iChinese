@@ -7,7 +7,6 @@ import java.util.List;
 
 import sg.gov.nhb.ihuayu.activity.db.entity.Dictionary;
 
-import android.annotation.SuppressLint;
 
 /**
  * 
@@ -16,7 +15,6 @@ import android.annotation.SuppressLint;
 /**
  * @author lixingwang
  */
-@SuppressLint("DefaultLocale")
 public class Fuzzy {
 
     public List<Dictionary> fuzzySearch(String keyword, String langDir,

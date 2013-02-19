@@ -34,13 +34,17 @@ import android.util.Log;
  */
 public class RestService {
 
-    public static final String GET_NUMBER_OF_DOWNLOADS_URL = "http://ihuayu.gistxl.com/smc/WebServices/SMCWCFService.svc/GetNumberOfDownloads";
-    public static final String GET_DICTIONARY_UPDATE_URL = "http://ihuayu.gistxl.com/smc/WebServices/SMCWCFService.svc/GetDictionariesV1_1";
-    public static final String GET_SCENARIO_UPDATE_URL = "http://ihuayu.gistxl.com/smc/WebServices/SMCWCFService.svc/GetScenariosV1_1";
-    private static final String KEY = "NLBkey1111111111";
-    private static final String TAG = "iHuayu:DatabaseHelper";
-    private static final String AUDIO_DOWNLOAD_URL = "http://ihuayu.gistxl.com/smc/";
-
+//	public static final String GET_NUMBER_OF_DOWNLOADS_URL = "http://ihuayu.gistxl.com/smc/WebServices/SMCWCFService.svc/GetNumberOfDownloads";
+//	public static final String GET_DICTIONARY_UPDATE_URL = "http://ihuayu.gistxl.com/smc/WebServices/SMCWCFService.svc/GetDictionariesV1_1";
+//	public static final String GET_SCENARIO_UPDATE_URL = "http://ihuayu.gistxl.com/smc/WebServices/SMCWCFService.svc/GetScenariosV1_1";
+	public static final String GET_NUMBER_OF_DOWNLOADS_URL = "http://ihuayu.gistxl.com/smctest/WebServices/SMCWCFService.svc/GetNumberOfDownloads";
+	public static final String GET_DICTIONARY_UPDATE_URL = "http://ihuayu.gistxl.com/smctest/WebServices/SMCWCFService.svc/GetDictionariesV1_1";
+	public static final String GET_SCENARIO_UPDATE_URL = "http://ihuayu.gistxl.com/smctest/WebServices/SMCWCFService.svc/GetScenariosV1_1";
+	private static final String KEY = "NLBkey1111111111";
+	private static final String TAG = "iHuayu:DatabaseHelper";
+//	private static final String AUDIO_DOWNLOAD_URL = "http://ihuayu.gistxl.com/smc/";
+//	private static final String AUDIO_DOWNLOAD_URL = "http://ihuayu.gistxl.com/smctest/";
+	
     public int getNumberIfDownloads(String lastUpdateTime) throws ClientProtocolException,
             IOException, InvalidKeyException, ParseException {
         long start = System.currentTimeMillis();
@@ -104,21 +108,21 @@ public class RestService {
                 .getScenarioFromJsonObject(resultArray);
         return scenariaoDialogKeyWords;
     }
-
-    public int getAudioDownload(String audioURL) throws ClientProtocolException, IOException,
-            InvalidKeyException, ParseException {
-        HttpClient client = new DefaultHttpClient();
-        HttpPost httpPost = new HttpPost(AUDIO_DOWNLOAD_URL + audioURL);
-        // StringEntity entity = new
-        // StringEntity(getRequestJsonString(lastUpdateTime), "UTF-8");
-        // entity.setContentEncoding("UTF-8");
-        // entity.setContentType("application/json");
-        // httpPost.setEntity(entity);
-        HttpResponse response = client.execute(httpPost);
-        // System.out.println("Wangzai 1111 " +
-        // EntityUtils.toString(response.getEntity()));
-        return Integer.parseInt(EntityUtils.toString(response.getEntity()));
-    }
+//
+//    public int getAudioDownload(String audioURL) throws ClientProtocolException, IOException,
+//            InvalidKeyException, ParseException {
+//        HttpClient client = new DefaultHttpClient();
+//        HttpPost httpPost = new HttpPost(AUDIO_DOWNLOAD_URL + audioURL);
+//        // StringEntity entity = new
+//        // StringEntity(getRequestJsonString(lastUpdateTime), "UTF-8");
+//        // entity.setContentEncoding("UTF-8");
+//        // entity.setContentType("application/json");
+//        // httpPost.setEntity(entity);
+//        HttpResponse response = client.execute(httpPost);
+//        // System.out.println("Wangzai 1111 " +
+//        // EntityUtils.toString(response.getEntity()));
+//        return Integer.parseInt(EntityUtils.toString(response.getEntity()));
+//    }
 
     public String getRequestJsonString(String lastUpdateTime) throws ParseException {
         return "{\"rLastDownloadDate\":\"" + lastUpdateTime + "\",\"rAuthToken\":\""

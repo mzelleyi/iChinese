@@ -235,7 +235,7 @@ public class OperationUtils {
                 } else if ("title_py".equalsIgnoreCase(name)) {
                     value.put("Title_PY", object.getString(name));
                 } else if ("dialog".equalsIgnoreCase(name)) {
-                    dialogKeywords = getDialogFromJsonObject(object.getJSONArray("dialog"));
+                    dialogKeywords = getDialogFromJsonObject(object.getJSONArray("dialog"), object.getString("scenario_id"));
                 }
             }
             dialogKeywordsMap.put(value, dialogKeywords);
@@ -245,7 +245,7 @@ public class OperationUtils {
 
     @SuppressWarnings("unchecked")
     private static HashMap<ContentValues, List<ContentValues>> getDialogFromJsonObject(
-            JSONArray resultArray) throws JSONException {
+            JSONArray resultArray, String titleId) throws JSONException {
 
         // List<ContentValues> valuesList = new ArrayList<ContentValues>();
         HashMap<ContentValues, List<ContentValues>> dialogKeywordsMap = new HashMap<ContentValues, List<ContentValues>>();
@@ -277,16 +277,17 @@ public class OperationUtils {
                     dialogValue.put("Sentence_Audio_Link", object.getString(name));
                 } else if ("keyword".equalsIgnoreCase(name)) {
                     // /
-                    keywordValues = getDialogKeyWorkdFromJsonObject(object.getJSONArray("keyword"));
+                    keywordValues = getDialogKeyWorkdFromJsonObject(object.getJSONArray("keyword"), object.getString("dialogue_id"));
                 }
             }
+        	dialogValue.put("Title_ID", titleId);
             dialogKeywordsMap.put(dialogValue, keywordValues);
         }
         return dialogKeywordsMap;
     }
 
     @SuppressWarnings("unchecked")
-    private static List<ContentValues> getDialogKeyWorkdFromJsonObject(JSONArray resultArray)
+    private static List<ContentValues> getDialogKeyWorkdFromJsonObject(JSONArray resultArray,  String dialogID)
             throws JSONException {
         List<ContentValues> valuesList = new ArrayList<ContentValues>();
         for (int i = 0; i < resultArray.length(); i++) {
@@ -307,6 +308,7 @@ public class OperationUtils {
                     value.put("Keyword_PY", object.getString(name));
                 }
             }
+            value.put("Dialog_ID", dialogID);
             valuesList.add(value);
         }
         return valuesList;

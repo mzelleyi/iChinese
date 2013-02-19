@@ -65,6 +65,11 @@ public class FileUtils {
         File file = new File(SDPATH + fileName);
         return file.exists();
     }
+    
+	public boolean delete(String fileName) {
+		File file = new File(SDPATH + fileName);
+		return file.delete();
+	}
 
     public String getFilePath(String fileName) {
         File file = new File(SDPATH + fileName);

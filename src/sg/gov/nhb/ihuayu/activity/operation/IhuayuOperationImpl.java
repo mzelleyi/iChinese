@@ -18,6 +18,7 @@ import sg.gov.nhb.ihuayu.activity.db.entity.DialogKeywords;
 import sg.gov.nhb.ihuayu.activity.db.entity.Dictionary;
 import sg.gov.nhb.ihuayu.activity.db.entity.FuzzyResult;
 import sg.gov.nhb.ihuayu.activity.db.entity.Scenario;
+import sg.gov.nhb.ihuayu.activity.rest.AudioPlayer;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -60,7 +61,20 @@ public class IhuayuOperationImpl {
     }
 
     public long insertDictionary(ContentValues param) {
-        return this.db.insert("dictionary", null, param);
+		if(param != null) {
+			String id = param.getAsString("id");
+			int updateCount = this.db.update("dictionary", param, "id=?", new String[]{id});
+			if(updateCount == 0) {
+				this.db.insert("dictionary", null, param);
+			}else {
+				//Remove exist file.
+				AudioPlayer player = AudioPlayer.newInstance();
+				player.deleteExistAudioFile(param.getAsString("chinese_audio_link"));
+				player.deleteExistAudioFile(param.getAsString("sample_sentence_CN_Audio_link"));
+			}
+			return updateCount;
+		}
+		return 0;
     }
 
     public void insertIntoScenarioDialogKeyWord(
@@ -95,30 +109,48 @@ public class IhuayuOperationImpl {
 
     public void insertIntoScenarioDialogKeyWord(ContentValues contentValues,
             HashMap<ContentValues, List<ContentValues>> dialogKeywordsMap) {
-        if (contentValues != null && contentValues.size() > 0) {
-            insertTable("Scenario_Category", contentValues);
-        }
-        if (dialogKeywordsMap != null && dialogKeywordsMap.size() > 0) {
-            if (dialogKeywordsMap != null && dialogKeywordsMap.size() > 0) {
-                Iterator<ContentValues> dialogKeyIter = dialogKeywordsMap
-                        .keySet().iterator();
-                while (dialogKeyIter.hasNext()) {
-                    ContentValues dialogValues = dialogKeyIter.next();
-                    insertTable("Dialog", dialogValues);
+    	if (contentValues != null && contentValues.size() > 0) {
+//			insertTable("Scenario_Category", contentValues);
+			updateAndInsertScenario(contentValues, "Scenario_Category", "Title_ID");
+		}
+		if (dialogKeywordsMap != null && dialogKeywordsMap.size() > 0) {
+			if (dialogKeywordsMap != null && dialogKeywordsMap.size() > 0) {
+				Iterator<ContentValues> dialogKeyIter = dialogKeywordsMap
+						.keySet().iterator();
+				while (dialogKeyIter.hasNext()) {
+					ContentValues dialogValues = dialogKeyIter.next();
+//					insertTable("Dialog", dialogValues);
+					updateAndInsertScenario(dialogValues, "Dialog", "Dialog_ID");
+					List<ContentValues> keyWordValues = dialogKeywordsMap
+							.get(dialogValues);
+					if (keyWordValues != null) {
+						for (ContentValues keywordValues : keyWordValues) {
+//							insertTable("Dialog_Keyword", keywordValues);
+							updateAndInsertScenario(keywordValues, "Dialog_Keyword", "ID");
+						}
+					}
+				}
 
-                    List<ContentValues> keyWordValues = dialogKeywordsMap
-                            .get(dialogValues);
-                    if (keyWordValues != null) {
-                        for (ContentValues keywordValues : keyWordValues) {
-                            insertTable("Dialog_Keyword", keywordValues);
-                        }
-                    }
-                }
-
-            }
-        }
+			}
+		}
     }
 
+	public int updateAndInsertScenario(ContentValues contentValues, String tableName, String primeryKeyId) {
+		if(contentValues != null) {
+			String id = contentValues.getAsString(primeryKeyId);
+			int updateCount = this.db.update(tableName, contentValues, primeryKeyId + "=?", new String[]{id});
+			if(updateCount == 0) {
+				this.db.insert(tableName, null, contentValues);
+			}else {
+				//Remove exist file.
+				String audioFile = contentValues.getAsString("Sentence_Audio_Link");
+				AudioPlayer.newInstance().deleteExistAudioFile(audioFile);
+			}
+			return updateCount;
+		}
+		return 0;
+	}
+	
     public long insertToBookmark(String dictionaryID) {
         try {
             ContentValues contentValues = new ContentValues();

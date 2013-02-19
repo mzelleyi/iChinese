@@ -19,7 +19,7 @@ import android.util.Log;
 public class AudioPlayer {
 
     private static final String TAG = "iHuayu:AudioPlayer";
-    private static final String AUDIO_DOWNLOAD_URL = "http://ihuayu.gistxl.com/smc";
+    private static final String AUDIO_DOWNLOAD_URL = "http://ihuayu.gistxl.com/smctest";
     private static final String STORAGE_PATH = "/audio/";
     private static AudioPlayer player = null;
 
@@ -131,5 +131,31 @@ public class AudioPlayer {
         inputStream = urlConn.getInputStream();
         return inputStream;
     }
+    
+    public boolean deleteExistAudioFile(String audioURL) {
+		if(audioURL != null && audioURL.length() > 0) {
+			try {
+				return removedDownloaded(audioURL);
+			} catch (Exception e) {
+				//
+				Log.i("Remove Local Audio File Error: ", e.getLocalizedMessage());
+			}
+		}
+		return false;
+	}
+	
+	private boolean removedDownloaded(String audioURL) throws Exception {
+		Log.d(TAG, "[removedDownloaded] + Begin");
+		Log.d(TAG, "[removedDownloaded] + audioURL = "+audioURL);
+		String audioName = audioURL.split("/")[1];
+		Log.d(TAG, "[removedDownloaded] audioName = "+audioName);
+		FileUtils fileUtils = new FileUtils();
+		if (fileUtils.delete(STORAGE_PATH + audioName)) {
+			return true;
+		} else {
+			Log.i(TAG, "[removedDownloaded] the audio file isn't exist, return false");
+			return false;
+		}
+	}
 
 }

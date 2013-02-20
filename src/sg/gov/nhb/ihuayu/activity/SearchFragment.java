@@ -81,6 +81,7 @@ public class SearchFragment extends Fragment {
     private QueryType mSearchKeyType = QueryType.EN;
     private EditText mEditText = null;
     private Button mBtnLanguage = null;
+    private ImageView mPromptImg = null;
     private LinearLayout mFuzzyHintLayout = null;
     private TextView mFuzzySuggestHint = null;
     private TextView mEmptySuggestHint = null;
@@ -158,7 +159,7 @@ public class SearchFragment extends Fragment {
             }
         });
 
-        final ImageView mPromptImg = (ImageView) parentActivity
+        mPromptImg = (ImageView) parentActivity
                 .findViewById(R.id.search_fragment_prompt_image);
         final ImageView mClearImg = (ImageView) parentActivity
                 .findViewById(R.id.search_bar_edit_clear);
@@ -221,6 +222,7 @@ public class SearchFragment extends Fragment {
         mScenarioAdapter = new SearchScenarioAdapter(parentActivity);
         mScenarioListView.setScrollingCacheEnabled(false);
         mScenarioListView.setAdapter(mScenarioAdapter);
+        mScenarioListView.setEmptyView(parentActivity.findViewById(R.id.search_fragment_emptyview));
         // mScenarioListView.setCacheColorHint(R.color.black_normal);
         mScenarioListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -448,13 +450,20 @@ public class SearchFragment extends Fragment {
                     Log.i(TAG, "[mUihandler] FuzzyResult Scenario size = "
                             + sceListSize);
 
+                    // if (sceListSize > 0 || dicListSize > 0) {
+                    mPromptImg.setVisibility(View.GONE);
+                    // } else {
+                    // mPromptImg.setVisibility(View.VISIBLE);
+                    // }
+
                     // Handle dictionary search result
+                    mDicList.clear();
                     if (dicListSize > 0) {
-                        mDicList.clear();
                         for (Dictionary object : dicList) {
                             mDicList.add(object);
                         }
                     }
+                    Log.d(TAG, "[mUihandler] mDicList size = " + mDicList.size());
                     if (mDicList.size() > 0) {
                         mDicDivider.setVisibility(View.VISIBLE);
                         if (!fuzzyResult.isExactResult()) {
@@ -471,21 +480,27 @@ public class SearchFragment extends Fragment {
                     mAdapter.notifyDataSetChanged();
 
                     // Handle scenario search result
+                    mSceList.clear();
                     if (sceListSize > 0) {
-                        mSceList.clear();
                         for (Scenario object : sceList) {
                             mSceList.add(object);
                         }
-                        Log.d(TAG, "[mUihandler] mSceList size = " + mSceList.size());
-                        if (mSceList.size() > 0) {
-                            mSceDivider.setVisibility(View.VISIBLE);
-                            mScenarioListView.setVisibility(View.VISIBLE);
-                        }
+                    }
+                    Log.d(TAG, "[mUihandler] mSceList size = " + mSceList.size());
+                    if (mSceList.size() > 0) {
+                        mSceDivider.setVisibility(View.VISIBLE);
+                        mScenarioListView.setVisibility(View.VISIBLE);
                         mScenarioAdapter.setData(mSceList);
                         mScenarioAdapter.notifyDataSetChanged();
                     } else {
                         mSceDivider.setVisibility(View.GONE);
-                        mScenarioListView.setVisibility(View.GONE);
+                        if (mDicList.size() > 0) {
+                            mScenarioListView.setVisibility(View.GONE);
+                        } else {
+                            mScenarioListView.setVisibility(View.VISIBLE);
+                            mScenarioAdapter.setData(mSceList);
+                            mScenarioAdapter.notifyDataSetChanged();
+                        }
                     }
                     break;
                 }

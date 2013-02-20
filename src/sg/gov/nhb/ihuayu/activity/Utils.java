@@ -69,8 +69,11 @@ public class Utils {
             Log.w(TAG, "[getSpanableText] startPos is -1");
             return spannableString;
         }
-
         int endPos = startPos + hightlightText.length();
+        if (endPos >= orginText.length()) {
+            Log.w(TAG, "[getSpanableText] endPos is over length");
+            return spannableString;
+        }
         spannableString.setSpan(new ForegroundColorSpan(Color.RED),
                 startPos, endPos, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         Log.d(TAG, "[getSpanableText] + End");

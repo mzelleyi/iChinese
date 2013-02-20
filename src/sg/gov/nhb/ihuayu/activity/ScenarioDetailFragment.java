@@ -593,12 +593,23 @@ public class ScenarioDetailFragment extends Fragment {
                         DialogKeywords keyItem = keyWordList.get(i);
                         String keyStr = keyItem.getDest_keyword();
                         Log.d(TAG, "[getView] keyStr = " + keyStr);
-                        int firstIndex = sectenceStr.indexOf(keyStr);
-                        int lastIndex = firstIndex + keyStr.length();
-                        Log.d(TAG, "[getView] firstIndex = " + firstIndex + ",lastIndex = "
-                                + lastIndex);
-                        spanStr.setSpan(new ForegroundColorSpan(Color.RED), firstIndex, lastIndex,
-                                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        int firstIndex = -1;
+                        int lastIndex = -1;
+
+                        if (keyStr.length() > 0) {
+                            firstIndex = sectenceStr.toLowerCase().indexOf(keyStr.toLowerCase());
+                            if (firstIndex != -1) {
+                                lastIndex = firstIndex + keyStr.length();
+                                if (lastIndex < sectenceStr.length()) {
+                                    Log.d(TAG, "[getView] firstIndex = " + firstIndex
+                                            + ",lastIndex = "
+                                            + lastIndex);
+                                    spanStr.setSpan(new ForegroundColorSpan(Color.RED), firstIndex,
+                                            lastIndex,
+                                            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                }
+                            }
+                        }
                     }
                     firstLine.setText(spanStr);
 

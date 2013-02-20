@@ -247,23 +247,37 @@ public class SearchFragment extends Fragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 // TODO Auto-generated method stub
                 Log.d(TAG, "[onTextChanged] + Begin");
+                Log.d(TAG, "[onTextChanged] start=" + start + ",before=" + before + ",count="
+                        + count);
                 String text = s.toString().trim();
                 Log.d(TAG, "[onTextChanged] text string is :" + text);
                 if (text == null || text.equals("")) {
                     sendSuggentSearchMsg(null, DELAY_REFRESH_LIST_VIEW);
+                    bFuzzyMode = false;
                     mClearImg.setVisibility(View.GONE);
                     mPromptImg.setVisibility(View.VISIBLE);
                 } else {
-                    if (mSearchKeyType == QueryType.EN) {
-                        if (text.length() > 2) {
+                    if (start - before != 0) {
+                        Log.i(TAG, "[onTextChanged] set fuzzyMode = false");
+                        bFuzzyMode = false;
+                    }
+                    if (bFuzzyMode) {
+                        Log.i(TAG, "[onTextChanged] is bFuzzyMode, do sendFuzzySearchMsg");
+                        sendFuzzySearchMsg(text, 0);
+                    } else {
+                        Log.i(TAG, "[onTextChanged] isn't bFuzzyMode, do sendSuggentSearchMsg");
+                        if (mSearchKeyType == QueryType.EN) {
+                            if (text.length() > 2) {
+                                sendSuggentSearchMsg(text, DELAY_REFRESH_LIST_VIEW);
+                                mPromptImg.setVisibility(View.GONE);
+                            }
+                            mClearImg.setVisibility(View.VISIBLE);
+                        } else {
                             sendSuggentSearchMsg(text, DELAY_REFRESH_LIST_VIEW);
+                            mClearImg.setVisibility(View.VISIBLE);
                             mPromptImg.setVisibility(View.GONE);
                         }
-                        mClearImg.setVisibility(View.VISIBLE);
-                    } else {
-                        sendSuggentSearchMsg(text, DELAY_REFRESH_LIST_VIEW);
-                        mClearImg.setVisibility(View.VISIBLE);
-                        mPromptImg.setVisibility(View.GONE);
+                        bFuzzyMode = false;
                     }
                 }
                 Log.d(TAG, "[onTextChanged] + End");
@@ -294,6 +308,7 @@ public class SearchFragment extends Fragment {
                     Log.d(TAG, "[onEditorAction] -> IME_ACTION_SEARCH ");
                     String searchKey = mEditText.getText().toString();
                     sendFuzzySearchMsg(searchKey, 300);
+                    bFuzzyMode = true;
                     handled = true;
                 }
                 return handled;
@@ -422,7 +437,7 @@ public class SearchFragment extends Fragment {
                     mSceDivider.setVisibility(View.GONE);
                     mScenarioListView.setVisibility(View.GONE);
 
-                    bFuzzyMode = false;
+                    // bFuzzyMode = false;
                     mAdapter.setData(mDicList);
                     mAdapter.notifyDataSetChanged();
                     break;
@@ -475,7 +490,7 @@ public class SearchFragment extends Fragment {
                         mDicDivider.setVisibility(View.GONE);
                         mFuzzyHintLayout.setVisibility(View.GONE);
                     }
-                    bFuzzyMode = true;
+                    // bFuzzyMode = true;
                     mAdapter.setData(mDicList);
                     mAdapter.notifyDataSetChanged();
 

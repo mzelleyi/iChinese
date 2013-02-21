@@ -180,8 +180,8 @@ public class DBManagerment {
         operation.insertDictionary(params);
     }
 
-    public int deleteDictionary(String id) {
-    	return operation.deleteDictionary(id);
+    public void deleteDictionary(String id) {
+    	operation.deleteDictionary(id);
     }
     
     // For update

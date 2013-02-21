@@ -81,8 +81,9 @@ public class IhuayuOperationImpl {
 		return 0;
     }
     
-    public int deleteDictionary(String id){
-    	return this.db.delete("dictionary", "id=?", new String[]{id});
+    public void deleteDictionary(String id){
+    	this.db.delete("Favorites", "Dictionary_ID=?", new String[]{id});
+    	this.db.delete("dictionary", "id=?", new String[]{id});
     }
 
     public void insertIntoScenarioDialogKeyWord(

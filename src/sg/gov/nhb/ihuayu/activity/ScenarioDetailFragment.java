@@ -596,17 +596,20 @@ public class ScenarioDetailFragment extends Fragment {
                         int firstIndex = -1;
                         int lastIndex = -1;
 
-                        if (keyStr.length() > 0) {
-                            firstIndex = sectenceStr.toLowerCase().indexOf(keyStr.toLowerCase());
-                            if (firstIndex != -1) {
-                                lastIndex = firstIndex + keyStr.length();
-                                if (lastIndex < sectenceStr.length()) {
-                                    Log.d(TAG, "[getView] firstIndex = " + firstIndex
-                                            + ",lastIndex = "
-                                            + lastIndex);
-                                    spanStr.setSpan(new ForegroundColorSpan(Color.RED), firstIndex,
-                                            lastIndex,
-                                            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        if (keyStr != null && sectenceStr != null) {
+                            if (keyStr.length() > 0 && sectenceStr.length() > 0) {
+                                firstIndex = sectenceStr.toLowerCase()
+                                        .indexOf(keyStr.toLowerCase());
+                                Log.d(TAG, "[getView] firstIndex = " + firstIndex);
+                                if (firstIndex != -1) {
+                                    lastIndex = firstIndex + keyStr.length();
+                                    if (lastIndex <= sectenceStr.length()) {
+                                        Log.d(TAG, "[getView] lastIndex = " + lastIndex);
+                                        spanStr.setSpan(new ForegroundColorSpan(Color.RED),
+                                                firstIndex,
+                                                lastIndex,
+                                                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                    }
                                 }
                             }
                         }

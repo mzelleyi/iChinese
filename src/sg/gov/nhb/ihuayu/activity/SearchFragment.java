@@ -307,8 +307,11 @@ public class SearchFragment extends Fragment {
                         || actionId == EditorInfo.IME_ACTION_GO) {
                     Log.d(TAG, "[onEditorAction] -> IME_ACTION_SEARCH ");
                     String searchKey = mEditText.getText().toString();
-                    sendFuzzySearchMsg(searchKey, 300);
-                    bFuzzyMode = true;
+                    Log.d(TAG, "[onEditorAction] searchKey = " + searchKey);
+                    if (null != searchKey && !searchKey.trim().isEmpty()) {
+                        sendFuzzySearchMsg(searchKey, 300);
+                        bFuzzyMode = true;
+                    }
                     handled = true;
                 }
                 return handled;

@@ -306,22 +306,32 @@ public class MyDialogFragment extends DialogFragment {
             final LinearLayout wordslayout_1 = (LinearLayout) dialogView
                     .findViewById(R.id.dialog_words_define_panel_1);
             for (int i = 0; i < keyWordList.size(); i++) {
+                DialogKeywords words = keyWordList.get(i);
+                if (null == words) {
+                    Log.w(TAG, "[onCreateDialog] DialogKeywords == null, do return !");
+                    continue;
+                }
+                
+                String keyStr = words.getDest_keyword();
+                if (keyStr == null || keyStr.length() == 0) {
+                    Log.w(TAG, "[onCreateDialog] keyStr == null, do return !");
+                    continue;
+                }
+                
                 View wordsView = mInflater.inflate(R.layout.scenario_fragment_dialog_words, null);
                 TextView textEn = (TextView) wordsView.findViewById(R.id.dialog_text_word_en);
                 TextView textPY = (TextView) wordsView.findViewById(R.id.dialog_text_word_py);
                 TextView textCN = (TextView) wordsView.findViewById(R.id.dialog_text_word_cn);
-                DialogKeywords words = keyWordList.get(i);
-                if (null != words) {
-                    String enStr = words.getSrc_keyword();
-                    String pyStr = words.getKeyword_py();
-                    String cnStr = words.getDest_keyword();
-                    Log.d(TAG, "[onCreateDialog] enStr = " + enStr);
-                    Log.d(TAG, "[onCreateDialog] pyStr = " + pyStr);
-                    Log.d(TAG, "[onCreateDialog] cnStr = " + cnStr);
-                    textEn.setText(enStr);
-                    textPY.setText(pyStr);
-                    textCN.setText(cnStr);
-                }
+                
+                String enStr = words.getSrc_keyword();
+                String pyStr = words.getKeyword_py();
+                String cnStr = words.getDest_keyword();
+                Log.d(TAG, "[onCreateDialog] enStr = " + enStr);
+                Log.d(TAG, "[onCreateDialog] pyStr = " + pyStr);
+                Log.d(TAG, "[onCreateDialog] cnStr = " + cnStr);
+                textEn.setText(enStr);
+                textPY.setText(pyStr);
+                textCN.setText(cnStr);
                 if (i < 3) {
                     wordslayout_0.addView(wordsView);
                     wordslayout_0.getViewTreeObserver().addOnGlobalLayoutListener(

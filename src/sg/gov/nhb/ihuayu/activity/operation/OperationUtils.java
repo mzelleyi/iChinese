@@ -207,6 +207,8 @@ public class OperationUtils {
                     value.put("sample_sentence_PY", object.getString(key));
                 } else if ("sample_audio".equalsIgnoreCase(key)) {
                     value.put("sample_sentence_CN_Audio_link", object.getString(key));
+                }else if("deleted".equals(key)) {
+                	value.put("deleted", object.getString(key));
                 }
             }
             valuesList.add(value);
@@ -236,6 +238,8 @@ public class OperationUtils {
                     value.put("Title_PY", object.getString(name));
                 } else if ("dialog".equalsIgnoreCase(name)) {
                     dialogKeywords = getDialogFromJsonObject(object.getJSONArray("dialog"), object.getString("scenario_id"));
+                }else if("deleted".equals(name)) {
+                	value.put("deleted", object.getString(name));
                 }
             }
             dialogKeywordsMap.put(value, dialogKeywords);
@@ -278,6 +282,8 @@ public class OperationUtils {
                 } else if ("keyword".equalsIgnoreCase(name)) {
                     // /
                     keywordValues = getDialogKeyWorkdFromJsonObject(object.getJSONArray("keyword"), object.getString("dialogue_id"));
+                }else if("deleted".equals(name)) {
+                	dialogValue.put("deleted", object.getString(name));
                 }
             }
         	dialogValue.put("Title_ID", titleId);
@@ -306,6 +312,8 @@ public class OperationUtils {
                     value.put("Dest_Keyword", object.getString(name));
                 } else if ("keyword_py".equalsIgnoreCase(name)) {
                     value.put("Keyword_PY", object.getString(name));
+                }else if("deleted".equals(name)) {
+                	value.put("deleted", object.getString(name));
                 }
             }
             value.put("Dialog_ID", dialogID);

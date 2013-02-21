@@ -13,11 +13,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import sg.gov.nhb.ihuayu.activity.db.DBSqlite;
-import sg.gov.nhb.ihuayu.activity.db.entity.ScenarioDialog;
 import sg.gov.nhb.ihuayu.activity.db.entity.DialogKeywords;
 import sg.gov.nhb.ihuayu.activity.db.entity.Dictionary;
 import sg.gov.nhb.ihuayu.activity.db.entity.FuzzyResult;
 import sg.gov.nhb.ihuayu.activity.db.entity.Scenario;
+import sg.gov.nhb.ihuayu.activity.db.entity.ScenarioDialog;
 import sg.gov.nhb.ihuayu.activity.rest.AudioPlayer;
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -63,18 +63,26 @@ public class IhuayuOperationImpl {
     public long insertDictionary(ContentValues param) {
 		if(param != null) {
 			String id = param.getAsString("id");
-			int updateCount = this.db.update("dictionary", param, "id=?", new String[]{id});
-			if(updateCount == 0) {
-				this.db.insert("dictionary", null, param);
-			}else {
-				//Remove exist file.
-				AudioPlayer player = AudioPlayer.newInstance();
-				player.deleteExistAudioFile(param.getAsString("chinese_audio_link"));
-				player.deleteExistAudioFile(param.getAsString("sample_sentence_CN_Audio_link"));
-			}
-			return updateCount;
+			if("true".equalsIgnoreCase(param.getAsString("deleted"))) {
+    			deleteDictionary(param.getAsString("id"));
+    		}else{
+				int updateCount = this.db.update("dictionary", param, "id=?", new String[]{id});
+				if(updateCount == 0) {
+					this.db.insert("dictionary", null, param);
+				}else {
+					//Remove exist file.
+					AudioPlayer player = AudioPlayer.newInstance();
+					player.deleteExistAudioFile(param.getAsString("chinese_audio_link"));
+					player.deleteExistAudioFile(param.getAsString("sample_sentence_CN_Audio_link"));
+				}
+				return updateCount;
+    		}
 		}
 		return 0;
+    }
+    
+    public int deleteDictionary(String id){
+    	return this.db.delete("dictionary", "id=?", new String[]{id});
     }
 
     public void insertIntoScenarioDialogKeyWord(
@@ -106,12 +114,39 @@ public class IhuayuOperationImpl {
         }
 
     }
+    
+    public void deleteScenario(String id) {
+    	//Get Dialog 
+    	List<ScenarioDialog> dialogList = queryDialog(
+                "select * from Dialog where title_id = ? ", new String[] {
+                    id
+                });
+    	for(ScenarioDialog dialog : dialogList) {
+    		db.delete("Dialog_Keyword", "Dialog_ID=?", new String[]{dialog.getId()});
+    	}
+    	db.delete("Dialog", "Title_ID=?", new String[]{id});
+     	db.delete("Scenario_Category", "Title_ID=?", new String[]{id});
+    }
 
+    public void deleteDialog(String id) {
+    	//Get Dialog 
+    	db.delete("Dialog", "Dialog_ID=?", new String[]{id});
+    }
+    
+    public void deleteDialogKeyword(String id) {
+    	//Get Dialog 
+     	db.delete("Dialog_Keyword", "ID=?", new String[]{id});
+    }
+    
     public void insertIntoScenarioDialogKeyWord(ContentValues contentValues,
             HashMap<ContentValues, List<ContentValues>> dialogKeywordsMap) {
     	if (contentValues != null && contentValues.size() > 0) {
 //			insertTable("Scenario_Category", contentValues);
-			updateAndInsertScenario(contentValues, "Scenario_Category", "Title_ID");
+    		if("true".equalsIgnoreCase(contentValues.getAsString("deleted"))) {
+    			deleteScenario(contentValues.getAsString("Title_ID"));
+    		}else{
+    			updateAndInsertScenario(contentValues, "Scenario_Category", "Title_ID");
+    		}
 		}
 		if (dialogKeywordsMap != null && dialogKeywordsMap.size() > 0) {
 			if (dialogKeywordsMap != null && dialogKeywordsMap.size() > 0) {
@@ -120,13 +155,21 @@ public class IhuayuOperationImpl {
 				while (dialogKeyIter.hasNext()) {
 					ContentValues dialogValues = dialogKeyIter.next();
 //					insertTable("Dialog", dialogValues);
-					updateAndInsertScenario(dialogValues, "Dialog", "Dialog_ID");
+					if("true".equalsIgnoreCase(contentValues.getAsString("deleted"))) {
+		    			deleteDialog(contentValues.getAsString("Dialog_ID"));
+		    		}else{
+		    			updateAndInsertScenario(dialogValues, "Dialog", "Dialog_ID");
+		    		}
 					List<ContentValues> keyWordValues = dialogKeywordsMap
 							.get(dialogValues);
 					if (keyWordValues != null) {
 						for (ContentValues keywordValues : keyWordValues) {
 //							insertTable("Dialog_Keyword", keywordValues);
-							updateAndInsertScenario(keywordValues, "Dialog_Keyword", "ID");
+							if("true".equalsIgnoreCase(keywordValues.getAsString("deleted"))) {
+				    			deleteDialogKeyword(keywordValues.getAsString("ID"));
+				    		}else{
+				    			updateAndInsertScenario(keywordValues, "Dialog_Keyword", "ID");
+				    		}
 						}
 					}
 				}

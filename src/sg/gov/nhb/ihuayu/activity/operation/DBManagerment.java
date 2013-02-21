@@ -180,6 +180,10 @@ public class DBManagerment {
         operation.insertDictionary(params);
     }
 
+    public int deleteDictionary(String id) {
+    	return operation.deleteDictionary(id);
+    }
+    
     // For update
     public void insertScenario(
             HashMap<ContentValues, HashMap<ContentValues, List<ContentValues>>> scenarioDialogKeyword) {

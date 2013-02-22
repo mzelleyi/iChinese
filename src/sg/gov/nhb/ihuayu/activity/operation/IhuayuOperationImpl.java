@@ -156,7 +156,7 @@ public class IhuayuOperationImpl {
 				while (dialogKeyIter.hasNext()) {
 					ContentValues dialogValues = dialogKeyIter.next();
 //					insertTable("Dialog", dialogValues);
-					if("true".equalsIgnoreCase(contentValues.getAsString("deleted"))) {
+					if("true".equalsIgnoreCase(dialogValues.getAsString("deleted"))) {
 		    			deleteDialog(contentValues.getAsString("Dialog_ID"));
 		    		}else{
 		    			updateAndInsertScenario(dialogValues, "Dialog", "Dialog_ID");

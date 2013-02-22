@@ -365,6 +365,7 @@ public class MainActivity extends FragmentActivity implements
                             // Ignore the exception since it's in another
                             // thread.
                             Log.e(TAG, e.getMessage());
+                            sendUIHandlerMsg(HIDE_DOWNLOAD_PROCESS, 0);
                         }
                     }
                     break;

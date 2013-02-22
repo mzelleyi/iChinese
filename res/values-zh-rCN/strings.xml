@@ -46,8 +46,8 @@
     <string name="dialog_msg_remove_from_bookmark">Remove From Bookmark?</string>
     <string name="dialog_msg_add_success">Add Success</string>
     <string name="dialog_msg_add_failed">Add Failed</string>
-    <string name="dialog_msg_remove_success">Remove Success</string>
-    <string name="dialog_msg_remove_failed">Remove Failed</string>
+    <string name="dialog_msg_remove_success">Removed Success</string>
+    <string name="dialog_msg_remove_failed">Removed Fail</string>
     <string name="dialog_msg_checking_update_hint">Checking updates</string>
     <string name="dialog_msg_search_hint">Please wait while searching!</string>
     <string name="dialog_msg_download_hint">Downloading!</string>

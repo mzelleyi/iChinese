@@ -190,7 +190,7 @@ public class BookmarkFragment extends Fragment {
             {
                 case REMOVE_FAILED: {
                     Log.d(TAG, "[mUihandler handleMessage] REMOVE_FAILED");
-                    Toast toast = Toast.makeText(parentActivity, "Remove Failed",
+                    Toast toast = Toast.makeText(parentActivity, parentActivity.getResources().getString(R.string.dialog_msg_remove_failed),
                             Toast.LENGTH_SHORT);
                     toast.setGravity(Gravity.CENTER, 0, 0);
                     toast.show();
@@ -198,7 +198,7 @@ public class BookmarkFragment extends Fragment {
                 }
                 case REMOVE_SUCCESS: {
                     Log.d(TAG, "[mUihandler handleMessage] REMOVE_SUCCESS");
-                    Toast toast = Toast.makeText(parentActivity, "Remove Successed",
+                    Toast toast = Toast.makeText(parentActivity, parentActivity.getResources().getString(R.string.dialog_msg_remove_success),
                             Toast.LENGTH_SHORT);
                     toast.setGravity(Gravity.CENTER, 0, 0);
                     toast.show();
@@ -272,9 +272,8 @@ public class BookmarkFragment extends Fragment {
         private void doRemoveAction(int[] removeId)
         {
             Log.d(TAG, "[NonUihandler][doRemoveAction] + Begin");
-            for (int i = 0; i < removeId.length; i++) {
-                Log.d(TAG, "[NonUihandler] remove id = " + removeId[i]);
-            }
+            int removeItemSize = removeId.length;
+            Log.d(TAG, "[NonUihandler] remove item size = " + removeItemSize);
 
             // try
             // {
@@ -292,13 +291,15 @@ public class BookmarkFragment extends Fragment {
             // mUiHandler.sendEmptyMessageDelayed(REMOVE_FAILED, 100);
             // }
             // }
-            if (mUiHandler != null)
-            {
-                if (mUiHandler.hasMessages(REMOVE_SUCCESS)) {
-                    mUiHandler.removeMessages(REMOVE_SUCCESS);
+            if (removeItemSize > 0) {
+                if (mUiHandler != null)
+                {
+                    if (mUiHandler.hasMessages(REMOVE_SUCCESS)) {
+                        mUiHandler.removeMessages(REMOVE_SUCCESS);
+                    }
+                    Log.d(TAG, "[NonUihandler] Send REMOVE_SUCCESS msg");
+                    mUiHandler.sendEmptyMessageDelayed(REMOVE_SUCCESS, 100);
                 }
-                Log.d(TAG, "[NonUihandler] Send REMOVE_SUCCESS msg");
-                mUiHandler.sendEmptyMessageDelayed(REMOVE_SUCCESS, 100);
             }
             Log.d(TAG, "[NonUihandler][doRemoveAction] + End");
         }

@@ -22,6 +22,7 @@ import sg.gov.nhb.ihuayu.view.MyDialogFragment;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -33,8 +34,11 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TabHost;
+import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 
 /**
@@ -81,13 +85,14 @@ public class MainActivity extends FragmentActivity implements
     public static DBManagerment dbManagerment = null;
     public static Resources mRes = null;
     public static int mMax_Progress = 0;
-    
+
     // The DB Operation Thread
     private static NonUiHandler mNonUiHandler = null;
     // The update/copyDB Handler Thread
     private HandlerThread mHandlerThread = null;
-    
+
     private TabHost mTabHost = null;
+    private LayoutInflater mInflater = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -98,46 +103,48 @@ public class MainActivity extends FragmentActivity implements
         // mContext = this.getApplicationContext();
         // mActivity = (FragmentActivity) this.getParent();
         mRes = this.getResources();
+        mInflater = this.getLayoutInflater();
 
-        // pg = new ProgressDialog(this);
-        // pg.setMessage("Updating ...");
-        // pg.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        // pg.setCancelable(false);
-        // mContext = this.getApplication();
         mTabHost = (TabHost) findViewById(android.R.id.tabhost);
         mTabHost.setup();
-        mTabHost.getTabWidget().setDividerDrawable(null);
-        mTabHost.addTab(mTabHost
-                .newTabSpec(TAB_SEARCH)
-                .setIndicator(mRes.getString(R.string.tab_bar_search),
-                        this.getResources().getDrawable(R.drawable.tab_search_selector))
-                .setContent(R.id.tab_content_search));
-        mTabHost.addTab(mTabHost
-                .newTabSpec(TAB_SCENARIO)
-                .setIndicator(mRes.getString(R.string.tab_bar_scenario),
-                        this.getResources().getDrawable(R.drawable.tab_scenarios_selector))
-                .setContent(R.id.tab_content_scenario));
-        mTabHost.addTab(mTabHost
-                .newTabSpec(TAB_BOOKMARK)
-                .setIndicator(mRes.getString(R.string.tab_bar_bookmark),
-                        this.getResources().getDrawable(R.drawable.tab_bookmark_selector))
-                .setContent(R.id.tab_content_bookmark));
-        mTabHost.addTab(mTabHost
-                .newTabSpec(TAB_INFO)
-                .setIndicator(mRes.getString(R.string.tab_bar_info),
-                        this.getResources().getDrawable(R.drawable.tab_help_selector))
-                .setContent(R.id.tab_content_info));
 
-        for (int i = 0; i < mTabHost.getTabWidget().getChildCount(); i++)
-        {
-            View view = mTabHost.getTabWidget().getChildAt(i);
-            view.setBackgroundResource(R.drawable.tab_bg_selector);
+        setupTab(TAB_SEARCH);
+        setupTab(TAB_SCENARIO);
+        setupTab(TAB_BOOKMARK);
+        setupTab(TAB_INFO);
 
-            TextView title = (TextView) view.findViewById(android.R.id.title);
-            title.setTextSize(mRes.getDimension(R.dimen.tab_bar_textview_size));
-            title.setTextColor(mRes.getColorStateList(R.color.tab_text_color));
-            title.invalidate();
-        }
+        // mTabHost.getTabWidget().setDividerDrawable(null);
+        // mTabHost.addTab(mTabHost
+        // .newTabSpec(TAB_SEARCH)
+        // .setIndicator(mRes.getString(R.string.tab_bar_search),
+        // mRes.getDrawable(R.drawable.tab_search_selector))
+        // .setContent(R.id.tab_content_search));
+        // mTabHost.addTab(mTabHost
+        // .newTabSpec(TAB_SCENARIO)
+        // .setIndicator(mRes.getString(R.string.tab_bar_scenario),
+        // mRes.getDrawable(R.drawable.tab_scenarios_selector))
+        // .setContent(R.id.tab_content_scenario));
+        // mTabHost.addTab(mTabHost
+        // .newTabSpec(TAB_BOOKMARK)
+        // .setIndicator(mRes.getString(R.string.tab_bar_bookmark),
+        // mRes.getDrawable(R.drawable.tab_bookmark_selector))
+        // .setContent(R.id.tab_content_bookmark));
+        // mTabHost.addTab(mTabHost
+        // .newTabSpec(TAB_INFO)
+        // .setIndicator(mRes.getString(R.string.tab_bar_info),
+        // mRes.getDrawable(R.drawable.tab_help_selector))
+        // .setContent(R.id.tab_content_info));
+        //
+        // for (int i = 0; i < mTabHost.getTabWidget().getChildCount(); i++)
+        // {
+        // View view = mTabHost.getTabWidget().getChildAt(i);
+        // view.setBackgroundResource(R.drawable.tab_bg_selector);
+        //
+        // TextView title = (TextView) view.findViewById(android.R.id.title);
+        // title.setTextSize(mRes.getDimension(R.dimen.tab_bar_textview_size));
+        // title.setTextColor(mRes.getColorStateList(R.color.tab_text_color));
+        // title.invalidate();
+        // }
 
         mTabHost.setCurrentTabByTag(TAB_SEARCH);
 
@@ -266,9 +273,52 @@ public class MainActivity extends FragmentActivity implements
         Log.d(TAG, "[onTabChanged] + End");
     }
 
+    private void setupTab(final String tag) {
+        View tabview = null;
+        TabSpec tabSpec = null;
+
+        if (TAB_SEARCH.equals(tag)) {
+            tabview = createTabView(mRes.getString(R.string.tab_bar_search),
+                    mRes.getDrawable(R.drawable.tab_search_selector));
+            tabSpec = mTabHost.newTabSpec(tag).setIndicator(tabview)
+                    .setContent(R.id.tab_content_search);
+        } else if (TAB_SCENARIO.equals(tag)) {
+            tabview = createTabView(mRes.getString(R.string.tab_bar_scenario),
+                    mRes.getDrawable(R.drawable.tab_scenarios_selector));
+            tabSpec = mTabHost.newTabSpec(tag).setIndicator(tabview)
+                    .setContent(R.id.tab_content_scenario);
+        } else if (TAB_BOOKMARK.equals(tag)) {
+            tabview = createTabView(mRes.getString(R.string.tab_bar_bookmark),
+                    mRes.getDrawable(R.drawable.tab_bookmark_selector));
+            tabSpec = mTabHost.newTabSpec(tag).setIndicator(tabview)
+                    .setContent(R.id.tab_content_bookmark);
+        } else if (TAB_INFO.equals(tag)) {
+            tabview = createTabView(mRes.getString(R.string.tab_bar_info),
+                    mRes.getDrawable(R.drawable.tab_help_selector));
+            tabSpec = mTabHost.newTabSpec(tag).setIndicator(tabview)
+                    .setContent(R.id.tab_content_info);
+        } else {
+            Log.e(TAG, "Error Tab Type");
+        }
+        mTabHost.addTab(tabSpec);
+    }
+
+    private View createTabView(final String text, final Drawable icon) {
+        View view = mInflater.inflate(R.layout.tab_item, null);
+        view.setBackgroundResource(R.drawable.tab_bg_selector);
+
+        ImageView img = (ImageView) view.findViewById(R.id.tab_item_icon);
+        img.setImageDrawable(icon);
+
+        TextView tv = (TextView) view.findViewById(R.id.tab_item_text);
+        tv.setText(text);
+        tv.setTextColor(mRes.getColorStateList(R.color.tab_text_color));
+        return view;
+    }
+
     private void updateTab(String tabTag, int viewHolderId) {
         Log.d(TAG, "[updateTab] + Begin, tabTag=" + tabTag + ",viewHolderId="
-                        + String.valueOf(viewHolderId));
+                + String.valueOf(viewHolderId));
 
         FragmentManager fm = this.getSupportFragmentManager();
         Log.i(TAG, "[updateTab] getBackStackEntryCount " + fm.getBackStackEntryCount());
@@ -292,7 +342,7 @@ public class MainActivity extends FragmentActivity implements
                 Log.e(TAG, "Error Tab Type");
             }
             BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED = false;
-            Log.i(TAG, "[updateTab] find fragment == null, do add fragment:"+fragmentTag);
+            Log.i(TAG, "[updateTab] find fragment == null, do add fragment:" + fragmentTag);
             ft.add(viewHolderId, newFragment, fragmentTag);
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
             ft.commit();

@@ -56,8 +56,8 @@
             </EditText>
             <ImageView
 		        android:id="@+id/search_bar_edit_clear"
-		        android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
+		        android:layout_width="@dimen/search_bar_clear_icon_size"
+	            android:layout_height="@dimen/search_bar_clear_icon_size"
 	            android:layout_marginRight="@dimen/margin_h3"
 	            android:layout_alignParentRight="true"
 	            android:layout_centerVertical="true"

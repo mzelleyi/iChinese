@@ -19,7 +19,7 @@
 	        android:gravity="center"
 	        android:maxLines="1"
 	        android:text="@string/tab_bar_bookmark"
-	        android:textColor="#ffffff"
+	        android:textColor="@color/white_normal"
 	        android:textSize="@dimen/title_bar_center_text_size"
 	        android:textStyle="bold"
 	        android:typeface="normal" />
@@ -30,7 +30,7 @@
             android:layout_margin="@dimen/margin_h2"
             android:layout_alignParentLeft="true"
             android:text="@string/title_bar_btn_edit"
-            android:textColor="#ffffff"
+            android:textColor="@color/white_normal"
             android:textStyle="bold"
             android:textSize="@dimen/title_bar_side_text_size"
             android:background="@drawable/btn_navbar" />

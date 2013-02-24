@@ -303,6 +303,7 @@ public class SearchFragment extends Fragment {
                 Log.d(TAG, "[onEditorAction] + Begin ,actionId = " + actionId);
                 boolean handled = false;
                 if (actionId == EditorInfo.IME_ACTION_SEARCH
+                        || actionId == EditorInfo.IME_ACTION_UNSPECIFIED
                         || actionId == EditorInfo.IME_ACTION_DONE
                         || actionId == EditorInfo.IME_ACTION_GO) {
                     Log.d(TAG, "[onEditorAction] -> IME_ACTION_SEARCH ");

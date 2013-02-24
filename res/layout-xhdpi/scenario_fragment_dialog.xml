@@ -101,6 +101,8 @@
                 android:id="@+id/dialog_words_define_panel_0"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/margin_h1"
+                android:layout_marginRight="@dimen/margin_h1"
                 android:baselineAligned="true"
                 android:orientation="horizontal" />
 
@@ -108,6 +110,8 @@
                 android:id="@+id/dialog_words_define_panel_1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/margin_h1"
+                android:layout_marginRight="@dimen/margin_h1"
                 android:baselineAligned="true"
                 android:orientation="horizontal" />
         </LinearLayout>

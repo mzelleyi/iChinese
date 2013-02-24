@@ -25,8 +25,8 @@
         android:layout_alignParentTop="true">
         <ImageView 
 	        android:id="@+id/scenario_dialog_img_icon"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
+	        android:layout_width="@dimen/scenario_dialog_gender_icon_size"
+	        android:layout_height="@dimen/scenario_dialog_gender_icon_size"
 	        android:layout_alignParentRight="true"
 	        android:layout_centerVertical="true"
 	        android:layout_marginLeft="@dimen/margin_h3"
@@ -63,8 +63,8 @@
     	    android:paddingTop="@dimen/margin_h2" >
     	    <ImageView 
 		        android:id="@+id/scenario_dialog_img_speaker"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
+		        android:layout_width="@dimen/scenario_dialog_speaker_icon_size"
+		        android:layout_height="@dimen/scenario_dialog_speaker_icon_size"
 		        android:layout_centerVertical="true"
 		        android:layout_alignParentLeft="true"
 		        android:layout_marginTop="@dimen/margin_h2"
@@ -90,8 +90,8 @@
     	    android:layout_below="@id/scenario_dialog_first_line_layout" >
     	    <ImageView 
 		        android:id="@+id/scenario_dialog_img2_speaker"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
+		        android:layout_width="@dimen/scenario_dialog_speaker_icon_size"
+		        android:layout_height="@dimen/scenario_dialog_speaker_icon_size"
 		        android:layout_centerVertical="true"
 		        android:layout_alignParentLeft="true"
 		        android:layout_marginTop="@dimen/margin_h2"

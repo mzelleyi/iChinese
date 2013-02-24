@@ -32,7 +32,7 @@
             android:hint="@string/dummy_text"
             android:textColor="@color/white_normal"
             android:textColorHint="@color/white_normal"
-            android:textSize="@dimen/keywords_box_textsize"
+            android:textSize="@dimen/listview_second_text_size"
             android:gravity="center" />
         <TextView
             android:id="@+id/dialog_text_word_py"
@@ -42,7 +42,7 @@
             android:hint="@string/dummy_text"
             android:textColor="@color/white_normal"
             android:textColorHint="@color/white_normal"
-            android:textSize="@dimen/keywords_box_textsize"
+            android:textSize="@dimen/listview_second_text_size"
             android:gravity="center" />
         <TextView
             android:id="@+id/dialog_text_word_cn"
@@ -52,7 +52,7 @@
             android:hint="@string/dummy_text"
             android:textColor="@color/white_normal"
             android:textColorHint="@color/white_normal"
-            android:textSize="@dimen/keywords_box_textsize"
+            android:textSize="@dimen/listview_second_text_size"
             android:gravity="center" />
 </LinearLayout>
 

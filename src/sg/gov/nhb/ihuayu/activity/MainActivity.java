@@ -159,15 +159,15 @@ public class MainActivity extends FragmentActivity implements
             sendNonUIHandlerMsg(COPY_DB_TO_PHONE, 500);
         } else {
             dbManagerment = new DBManagerment(MainActivity.this);
-            try
-            {
-                if (canShowUpdate()) {
-                    sendNonUIHandlerMsg(CHECK_UPDATE_COUNT, 500);
-                }
-            } catch (ParseException e)
-            {
-                Log.i(TAG, e.getMessage());
-            }
+//            try
+//            {
+//                if (canShowUpdate()) {
+//                    sendNonUIHandlerMsg(CHECK_UPDATE_COUNT, 500);
+//                }
+//            } catch (ParseException e)
+//            {
+//                Log.i(TAG, e.getMessage());
+//            }
         }
 
         Log.d(TAG, "[onCreate] + End");
@@ -197,7 +197,15 @@ public class MainActivity extends FragmentActivity implements
         // TODO Auto-generated method stub
         super.onResume();
         mTabHost.setOnTabChangedListener(this);
-
+        try
+	      {
+	          if (canShowUpdate()) {
+	              sendNonUIHandlerMsg(CHECK_UPDATE_COUNT, 500);
+	          }
+	      } catch (ParseException e)
+	      {
+	          Log.i(TAG, e.getMessage());
+	      }
         Log.d(TAG, "[onResume] + End");
     }
 
@@ -574,6 +582,7 @@ public class MainActivity extends FragmentActivity implements
     };
 
     private static void sendNonUIHandlerMsg(int msgCode, int delayTime) {
+    	if(mNonUiHandler == null) return;
         if (mNonUiHandler.hasMessages(msgCode)) {
             mNonUiHandler.removeMessages(msgCode);
         }
@@ -602,6 +611,7 @@ public class MainActivity extends FragmentActivity implements
     }
 
     private boolean canShowUpdate() throws ParseException {
+    	if(dbManagerment == null) return false;
         String cancelTime = dbManagerment.getLastCancelUpdateTime();
         if (cancelTime == null || cancelTime.length() <= 0)
             return true;

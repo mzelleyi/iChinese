@@ -20,7 +20,7 @@
 	        android:gravity="center"
 	        android:maxLines="1"
 	        android:text="@string/title_bar_text_detail"
-	        android:textColor="#ffffff"
+	        android:textColor="@color/white_normal"
 	        android:textSize="@dimen/title_bar_center_text_size"
 	        android:textStyle="bold"
 	        android:typeface="normal" />
@@ -28,25 +28,60 @@
             android:id="@+id/result_detail_title_bar_backbtn"
             android:layout_width="@dimen/title_bar_side_button_width"
             android:layout_height="match_parent"
-            android:layout_margin="@dimen/margin_h3"
+            android:layout_margin="@dimen/margin_h2"
             android:layout_alignParentLeft="true"
             android:text="@string/title_bar_btn_back"
-            android:textColor="#ffffff"
+            android:textColor="@color/white_normal"
             android:textStyle="bold"
             android:textSize="@dimen/title_bar_side_text_size"
             android:background="@drawable/btn_back" />
     </RelativeLayout>
     
-    <LinearLayout
-        android:id="@+id/result_detail_content"
+    <RelativeLayout
+        android:id="@+id/result_detail_footbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="@dimen/margin_h2" >
+        <Button
+            android:id="@+id/result_detail_footbar_btn_prev"
+            android:layout_width="@dimen/btn_prev_next_width"
+            android:layout_height="@dimen/btn_prev_next_height"
+            android:layout_margin="@dimen/margin_h1"
+            android:paddingLeft="@dimen/margin_h2"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:text="@string/foot_bar_btn_prev"
+            android:textColor="@color/white_normal"
+            android:textStyle="bold"
+            android:textSize="@dimen/btn_prev_next_text_size"
+            android:background="@drawable/btn_prev_selector" />
+        <Button
+            android:id="@+id/result_detail_footbar_btn_next"
+            android:layout_width="@dimen/btn_prev_next_width"
+            android:layout_height="@dimen/btn_prev_next_height"
+            android:layout_margin="@dimen/margin_h1"
+            android:paddingRight="@dimen/margin_h2"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:text="@string/foot_bar_btn_next"
+            android:textColor="@color/white_normal"
+            android:textStyle="bold"
+            android:textSize="@dimen/btn_prev_next_text_size"
+            android:background="@drawable/btn_next_selector" />
+    </RelativeLayout>
+    
+    <RelativeLayout
+        android:id="@+id/result_detail_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_below="@id/result_detail_title_bar"
-        android:orientation="vertical" >
+        android:layout_above="@id/result_detail_footbar" >
         <LinearLayout
             android:id="@+id/result_detail_description"
 		    android:layout_width="match_parent"
 		    android:layout_height="@dimen/result_description_height"
+		    android:layout_alignParentTop="true"
 		    android:paddingLeft="@dimen/margin_h2"
 		    android:paddingTop="@dimen/margin_h1"
 		    android:paddingRight="@dimen/margin_h2"
@@ -135,9 +170,11 @@
 		</LinearLayout>
 		
         <ScrollView
-	        android:id="@+id/scrollView_2"
+	        android:id="@+id/scrollView_sample"
 	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
+	        android:layout_height="match_parent"
+	        android:layout_below="@id/result_detail_description"
+	        android:layout_above="@id/result_detail_footbar"
 	        android:scrollbars="vertical" >
 			<LinearLayout
 		        android:id="@+id/result_detail_sample"
@@ -226,39 +263,5 @@
 				</LinearLayout>
 			</LinearLayout>
 		</ScrollView>
-    </LinearLayout>
-    
-    <RelativeLayout
-        android:id="@+id/result_detail_footbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="@dimen/margin_h2" >
-        <Button
-            android:id="@+id/result_detail_footbar_btn_prev"
-            android:layout_width="@dimen/btn_prev_next_width"
-            android:layout_height="@dimen/btn_prev_next_height"
-            android:layout_margin="@dimen/margin_h2"
-            android:paddingLeft="@dimen/margin_h2"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:text="@string/foot_bar_btn_prev"
-            android:textColor="@color/white_normal"
-            android:textStyle="bold"
-            android:textSize="@dimen/btn_prev_next_text_size"
-            android:background="@drawable/btn_prev_selector" />
-        <Button
-            android:id="@+id/result_detail_footbar_btn_next"
-            android:layout_width="@dimen/btn_prev_next_width"
-            android:layout_height="@dimen/btn_prev_next_height"
-            android:layout_margin="@dimen/margin_h2"
-            android:paddingRight="@dimen/margin_h2"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:text="@string/foot_bar_btn_next"
-            android:textColor="@color/white_normal"
-            android:textStyle="bold"
-            android:textSize="@dimen/btn_prev_next_text_size"
-            android:background="@drawable/btn_next_selector" />
     </RelativeLayout>
 </RelativeLayout>

@@ -64,6 +64,8 @@ public class SearchFragment extends Fragment {
     private static final int VIEW_TYPE_SUGGEST = 0;
     private static final int VIEW_TYPE_FUZZY = 1;
 
+    private static final String PREFERENCE_SEARCH_TYPE = "mSearchType";
+
     // Define Thread Name
     private static final String THREAD_NAME = "SearchFragmentThread";
     // The DB Handler Thread
@@ -339,7 +341,7 @@ public class SearchFragment extends Fragment {
         Log.d(TAG, "[onResume] + Begin");
         super.onResume();
         SharedPreferences prefs = this.getActivity().getPreferences(Context.MODE_PRIVATE);
-        String restoredText = prefs.getString("currentSearchType", null);
+        String restoredText = prefs.getString(PREFERENCE_SEARCH_TYPE, null);
         Log.i(TAG, "[onResume] read preference is " + restoredText);
         if (restoredText != null) {
             if (restoredText.equalsIgnoreCase("en2sc")) {
@@ -368,7 +370,7 @@ public class SearchFragment extends Fragment {
         super.onPause();
         SharedPreferences.Editor editor = this.getActivity().getPreferences(Context.MODE_PRIVATE)
                 .edit();
-        editor.putString("currentSearchType", mSearchKeyType.getName());
+        editor.putString(PREFERENCE_SEARCH_TYPE, mSearchKeyType.getName());
         editor.apply();
         Log.i(TAG, "[onPause] write preference is " + mSearchKeyType.getName());
         Log.d(TAG, "[onPause] + End");

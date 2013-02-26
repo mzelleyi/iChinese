@@ -286,7 +286,8 @@ public class MyDialogFragment extends DialogFragment {
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton)
                                 {
-                                    MainActivity.updateCancelTime();
+                                    // Do nothing.
+                                    // MainActivity.updateCancelTime();
                                 }
                             }).create();
         } else if (dialogType == SCENARIO_DIALOG) {
@@ -311,18 +312,18 @@ public class MyDialogFragment extends DialogFragment {
                     Log.w(TAG, "[onCreateDialog] DialogKeywords == null, do return !");
                     continue;
                 }
-                
+
                 String keyStr = words.getDest_keyword();
                 if (keyStr == null || keyStr.length() == 0) {
                     Log.w(TAG, "[onCreateDialog] keyStr == null, do return !");
                     continue;
                 }
-                
+
                 View wordsView = mInflater.inflate(R.layout.scenario_fragment_dialog_words, null);
                 TextView textEn = (TextView) wordsView.findViewById(R.id.dialog_text_word_en);
                 TextView textPY = (TextView) wordsView.findViewById(R.id.dialog_text_word_py);
                 TextView textCN = (TextView) wordsView.findViewById(R.id.dialog_text_word_cn);
-                
+
                 String enStr = words.getSrc_keyword();
                 String pyStr = words.getKeyword_py();
                 String cnStr = words.getDest_keyword();

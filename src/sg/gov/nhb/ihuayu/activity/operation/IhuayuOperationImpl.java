@@ -61,29 +61,35 @@ public class IhuayuOperationImpl {
     }
 
     public long insertDictionary(ContentValues param) {
-		if(param != null) {
-			String id = param.getAsString("id");
-			if("true".equalsIgnoreCase(param.getAsString("deleted"))) {
-    			deleteDictionary(param.getAsString("id"));
-    		}else{
-				int updateCount = this.db.update("dictionary", param, "id=?", new String[]{id});
-				if(updateCount == 0) {
-					this.db.insert("dictionary", null, param);
-				}else {
-					//Remove exist file.
-					AudioPlayer player = AudioPlayer.newInstance();
-					player.deleteExistAudioFile(param.getAsString("chinese_audio_link"));
-					player.deleteExistAudioFile(param.getAsString("sample_sentence_CN_Audio_link"));
-				}
-				return updateCount;
-    		}
-		}
-		return 0;
+        if (param != null) {
+            String id = param.getAsString("id");
+            if ("true".equalsIgnoreCase(param.getAsString("deleted"))) {
+                deleteDictionary(param.getAsString("id"));
+            } else {
+                int updateCount = this.db.update("dictionary", param, "id=?", new String[] {
+                    id
+                });
+                if (updateCount == 0) {
+                    this.db.insert("dictionary", null, param);
+                } else {
+                    // Remove exist file.
+                    AudioPlayer player = AudioPlayer.newInstance();
+                    player.deleteExistAudioFile(param.getAsString("chinese_audio_link"));
+                    player.deleteExistAudioFile(param.getAsString("sample_sentence_CN_Audio_link"));
+                }
+                return updateCount;
+            }
+        }
+        return 0;
     }
-    
-    public void deleteDictionary(String id){
-    	this.db.delete("Favorites", "Dictionary_ID=?", new String[]{id});
-    	this.db.delete("dictionary", "id=?", new String[]{id});
+
+    public void deleteDictionary(String id) {
+        this.db.delete("Favorites", "Dictionary_ID=?", new String[] {
+            id
+        });
+        this.db.delete("dictionary", "id=?", new String[] {
+            id
+        });
     }
 
     public void insertIntoScenarioDialogKeyWord(
@@ -115,86 +121,100 @@ public class IhuayuOperationImpl {
         }
 
     }
-    
+
     public void deleteScenario(String id) {
-    	//Get Dialog 
-    	List<ScenarioDialog> dialogList = queryDialog(
+        // Get Dialog
+        List<ScenarioDialog> dialogList = queryDialog(
                 "select * from Dialog where title_id = ? ", new String[] {
                     id
                 });
-    	for(ScenarioDialog dialog : dialogList) {
-    		db.delete("Dialog_Keyword", "Dialog_ID=?", new String[]{dialog.getId()});
-    	}
-    	db.delete("Dialog", "Title_ID=?", new String[]{id});
-     	db.delete("Scenario_Category", "Title_ID=?", new String[]{id});
+        for (ScenarioDialog dialog : dialogList) {
+            db.delete("Dialog_Keyword", "Dialog_ID=?", new String[] {
+                dialog.getId()
+            });
+        }
+        db.delete("Dialog", "Title_ID=?", new String[] {
+            id
+        });
+        db.delete("Scenario_Category", "Title_ID=?", new String[] {
+            id
+        });
     }
 
     public void deleteDialog(String id) {
-    	//Get Dialog 
-    	db.delete("Dialog", "Dialog_ID=?", new String[]{id});
+        // Get Dialog
+        db.delete("Dialog", "Dialog_ID=?", new String[] {
+            id
+        });
     }
-    
+
     public void deleteDialogKeyword(String id) {
-    	//Get Dialog 
-     	db.delete("Dialog_Keyword", "ID=?", new String[]{id});
+        // Get Dialog
+        db.delete("Dialog_Keyword", "ID=?", new String[] {
+            id
+        });
     }
-    
+
     public void insertIntoScenarioDialogKeyWord(ContentValues contentValues,
             HashMap<ContentValues, List<ContentValues>> dialogKeywordsMap) {
-    	if (contentValues != null && contentValues.size() > 0) {
-//			insertTable("Scenario_Category", contentValues);
-    		if("true".equalsIgnoreCase(contentValues.getAsString("deleted"))) {
-    			deleteScenario(contentValues.getAsString("Title_ID"));
-    		}else{
-    			updateAndInsertScenario(contentValues, "Scenario_Category", "Title_ID");
-    		}
-		}
-		if (dialogKeywordsMap != null && dialogKeywordsMap.size() > 0) {
-			if (dialogKeywordsMap != null && dialogKeywordsMap.size() > 0) {
-				Iterator<ContentValues> dialogKeyIter = dialogKeywordsMap
-						.keySet().iterator();
-				while (dialogKeyIter.hasNext()) {
-					ContentValues dialogValues = dialogKeyIter.next();
-//					insertTable("Dialog", dialogValues);
-					if("true".equalsIgnoreCase(dialogValues.getAsString("deleted"))) {
-		    			deleteDialog(contentValues.getAsString("Dialog_ID"));
-		    		}else{
-		    			updateAndInsertScenario(dialogValues, "Dialog", "Dialog_ID");
-		    		}
-					List<ContentValues> keyWordValues = dialogKeywordsMap
-							.get(dialogValues);
-					if (keyWordValues != null) {
-						for (ContentValues keywordValues : keyWordValues) {
-//							insertTable("Dialog_Keyword", keywordValues);
-							if("true".equalsIgnoreCase(keywordValues.getAsString("deleted"))) {
-				    			deleteDialogKeyword(keywordValues.getAsString("ID"));
-				    		}else{
-				    			updateAndInsertScenario(keywordValues, "Dialog_Keyword", "ID");
-				    		}
-						}
-					}
-				}
+        if (contentValues != null && contentValues.size() > 0) {
+            // insertTable("Scenario_Category", contentValues);
+            if ("true".equalsIgnoreCase(contentValues.getAsString("deleted"))) {
+                deleteScenario(contentValues.getAsString("Title_ID"));
+            } else {
+                updateAndInsertScenario(contentValues, "Scenario_Category", "Title_ID");
+            }
+        }
+        if (dialogKeywordsMap != null && dialogKeywordsMap.size() > 0) {
+            if (dialogKeywordsMap != null && dialogKeywordsMap.size() > 0) {
+                Iterator<ContentValues> dialogKeyIter = dialogKeywordsMap
+                        .keySet().iterator();
+                while (dialogKeyIter.hasNext()) {
+                    ContentValues dialogValues = dialogKeyIter.next();
+                    // insertTable("Dialog", dialogValues);
+                    if ("true".equalsIgnoreCase(dialogValues.getAsString("deleted"))) {
+                        deleteDialog(contentValues.getAsString("Dialog_ID"));
+                    } else {
+                        updateAndInsertScenario(dialogValues, "Dialog", "Dialog_ID");
+                    }
+                    List<ContentValues> keyWordValues = dialogKeywordsMap
+                            .get(dialogValues);
+                    if (keyWordValues != null) {
+                        for (ContentValues keywordValues : keyWordValues) {
+                            // insertTable("Dialog_Keyword", keywordValues);
+                            if ("true".equalsIgnoreCase(keywordValues.getAsString("deleted"))) {
+                                deleteDialogKeyword(keywordValues.getAsString("ID"));
+                            } else {
+                                updateAndInsertScenario(keywordValues, "Dialog_Keyword", "ID");
+                            }
+                        }
+                    }
+                }
 
-			}
-		}
+            }
+        }
     }
 
-	public int updateAndInsertScenario(ContentValues contentValues, String tableName, String primeryKeyId) {
-		if(contentValues != null) {
-			String id = contentValues.getAsString(primeryKeyId);
-			int updateCount = this.db.update(tableName, contentValues, primeryKeyId + "=?", new String[]{id});
-			if(updateCount == 0) {
-				this.db.insert(tableName, null, contentValues);
-			}else {
-				//Remove exist file.
-				String audioFile = contentValues.getAsString("Sentence_Audio_Link");
-				AudioPlayer.newInstance().deleteExistAudioFile(audioFile);
-			}
-			return updateCount;
-		}
-		return 0;
-	}
-	
+    public int updateAndInsertScenario(ContentValues contentValues, String tableName,
+            String primeryKeyId) {
+        if (contentValues != null) {
+            String id = contentValues.getAsString(primeryKeyId);
+            int updateCount = this.db.update(tableName, contentValues, primeryKeyId + "=?",
+                    new String[] {
+                        id
+                    });
+            if (updateCount == 0) {
+                this.db.insert(tableName, null, contentValues);
+            } else {
+                // Remove exist file.
+                String audioFile = contentValues.getAsString("Sentence_Audio_Link");
+                AudioPlayer.newInstance().deleteExistAudioFile(audioFile);
+            }
+            return updateCount;
+        }
+        return 0;
+    }
+
     public long insertToBookmark(String dictionaryID) {
         try {
             ContentValues contentValues = new ContentValues();
@@ -237,7 +257,7 @@ public class IhuayuOperationImpl {
 
     public int removeFromFavorites(int dictionaryId) {
         int result = this.db.delete("Favorites", "Dictionary_ID = ?", new String[] {
-            dictionaryId + ""
+                dictionaryId + ""
         });
         return result;
     }
@@ -325,7 +345,7 @@ public class IhuayuOperationImpl {
         } else {
             Log.w(TAG, "Cannot query last update time");
         }
-        
+
         if (dataTime == null || dataTime.length() <= 0) {
             dataTime = "2011-04-01T01S01S01";
         }
@@ -344,30 +364,30 @@ public class IhuayuOperationImpl {
         }
     }
 
-    public String getCancelTime() {
-        String dataTime = "";
-        Cursor result = this.db.rawQuery(
-                "select Last_Update from Information where version = 'cancel'", null);
-        if (result != null) {
-            if (result.moveToNext()) {
-                dataTime = result.getString(result.getColumnIndex("Last_Update"));
-            }
-        }
-        if (dataTime == null || dataTime.length() <= 0) {
-            dataTime = null;
-        }
-        return dataTime;
-    }
+    // public String getCancelTime() {
+    // String dataTime = "";
+    // Cursor result = this.db.rawQuery(
+    // "select Last_Update from Information where version = 'cancel'", null);
+    // if (result != null) {
+    // if (result.moveToNext()) {
+    // dataTime = result.getString(result.getColumnIndex("Last_Update"));
+    // }
+    // }
+    // if (dataTime == null || dataTime.length() <= 0) {
+    // dataTime = null;
+    // }
+    // return dataTime;
+    // }
 
-    public long updateCancelTime() {
-        try {
-            ContentValues contentValues = new ContentValues();
-            contentValues.put("Version", "cancel");
-            contentValues.put("Last_Update", getStandardTimeStr());
-            return this.db.insert("Information", null, contentValues);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
+    // public long updateCancelTime() {
+    // try {
+    // ContentValues contentValues = new ContentValues();
+    // contentValues.put("Version", "cancel");
+    // contentValues.put("Last_Update", getStandardTimeStr());
+    // return this.db.insert("Information", null, contentValues);
+    // } catch (Exception e) {
+    // return -1;
+    // }
+    // }
 
 }

@@ -118,20 +118,20 @@ public class DBManagerment {
             int size = dictionaryList.size();
             Log.d(TAG, "[getNextDictionary] size = " + size);
             return dictionaryList;
-//            if (size == 2) {
-//                Log.d(TAG, "[getNextDictionary] get(0).getRowid = "
-//                        + dictionaryList.get(0).getRowid());
-//                Log.d(TAG, "[getNextDictionary] get(1).getRowid = "
-//                        + dictionaryList.get(1).getRowid());
-//                return dictionaryList.get(0);
-//            } else if (size == 1) {
-//                Log.d(TAG, "[getNextDictionary] get(0).getRowid = "
-//                        + dictionaryList.get(0).getRowid());
-//                return dictionaryList.get(0);
-//            } else {
-//                Log.e(TAG, "[getNextDictionary] error while getNextDictionary");
-//                return null;
-//            }
+            // if (size == 2) {
+            // Log.d(TAG, "[getNextDictionary] get(0).getRowid = "
+            // + dictionaryList.get(0).getRowid());
+            // Log.d(TAG, "[getNextDictionary] get(1).getRowid = "
+            // + dictionaryList.get(1).getRowid());
+            // return dictionaryList.get(0);
+            // } else if (size == 1) {
+            // Log.d(TAG, "[getNextDictionary] get(0).getRowid = "
+            // + dictionaryList.get(0).getRowid());
+            // return dictionaryList.get(0);
+            // } else {
+            // Log.e(TAG, "[getNextDictionary] error while getNextDictionary");
+            // return null;
+            // }
         } else {
             Log.e(TAG, "[getNextDictionary] error while getNextDictionary");
             return null;
@@ -150,20 +150,21 @@ public class DBManagerment {
             int size = dictionaryList.size();
             Log.d(TAG, "[getPreviousDictionary] size = " + size);
             return dictionaryList;
-//            if (size == 2) {
-//                Log.d(TAG, "[getPreviousDictionary] get(0).getRowid = "
-//                        + dictionaryList.get(0).getRowid());
-//                Log.d(TAG, "[getPreviousDictionary] get(1).getRowid = "
-//                        + dictionaryList.get(1).getRowid());
-//                return dictionaryList.get(1);
-//            } else if (size == 1) {
-//                Log.d(TAG, "[getPreviousDictionary] get(0).getRowid = "
-//                        + dictionaryList.get(0).getRowid());
-//                return dictionaryList.get(0);
-//            } else {
-//                Log.e(TAG, "[getPreviousDictionary] error while getPreviousDictionary");
-//                return null;
-//            }
+            // if (size == 2) {
+            // Log.d(TAG, "[getPreviousDictionary] get(0).getRowid = "
+            // + dictionaryList.get(0).getRowid());
+            // Log.d(TAG, "[getPreviousDictionary] get(1).getRowid = "
+            // + dictionaryList.get(1).getRowid());
+            // return dictionaryList.get(1);
+            // } else if (size == 1) {
+            // Log.d(TAG, "[getPreviousDictionary] get(0).getRowid = "
+            // + dictionaryList.get(0).getRowid());
+            // return dictionaryList.get(0);
+            // } else {
+            // Log.e(TAG,
+            // "[getPreviousDictionary] error while getPreviousDictionary");
+            // return null;
+            // }
         } else {
             Log.e(TAG, "[getPreviousDictionary] error while getPreviousDictionary");
             return null;
@@ -181,9 +182,9 @@ public class DBManagerment {
     }
 
     public void deleteDictionary(String id) {
-    	operation.deleteDictionary(id);
+        operation.deleteDictionary(id);
     }
-    
+
     // For update
     public void insertScenario(
             HashMap<ContentValues, HashMap<ContentValues, List<ContentValues>>> scenarioDialogKeyword) {
@@ -203,11 +204,11 @@ public class DBManagerment {
         return operation.updateUpdateTime();
     }
 
-    public String getLastCancelUpdateTime() {
-        return operation.getCancelTime();
-    }
+    // public String getLastCancelUpdateTime() {
+    // return operation.getCancelTime();
+    // }
 
-    public long updateCancelUpdateTime() {
-        return operation.updateCancelTime();
-    }
+    // public long updateCancelUpdateTime() {
+    // return operation.updateCancelTime();
+    // }
 }

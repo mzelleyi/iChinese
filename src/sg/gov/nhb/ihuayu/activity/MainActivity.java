@@ -21,6 +21,8 @@ import sg.gov.nhb.ihuayu.activity.rest.RestService;
 import sg.gov.nhb.ihuayu.view.MyDialogFragment;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -51,8 +53,9 @@ public class MainActivity extends FragmentActivity implements
     private static final int COPY_DB_TO_PHONE = 101;
     private static final int CHECK_UPDATE_COUNT = 102;
     private static final int UPDATE_DATA_TO_DB = 103;
-    private static final int UPDATE_TIME_STAMP = 104;
-    private static final int UPDATE_CANCEL_TIME = 105;
+    private static final int UPDATE_TIME_UPDATE = 104;
+    private static final int UPDATE_TIME_CHECK = 105;
+    // private static final int UPDATE_CANCEL_TIME = 105;
 
     // Message code for dialog
     private static final int SHOW_CHECKING_DIALOG = 106;
@@ -71,6 +74,8 @@ public class MainActivity extends FragmentActivity implements
     private static final String TAB_SCENARIO = "Scenario";
     private static final String TAB_BOOKMARK = "Bookmark";
     private static final String TAB_INFO = "Info";
+
+    private static final String PREFERENCE_CHECK_TIME = "mCheckTime";
 
     // Flag for fragment
     public static final String fragment_tag_search = "tag_Search";
@@ -156,20 +161,12 @@ public class MainActivity extends FragmentActivity implements
         mNonUiHandler = new NonUiHandler(mHandlerThread.getLooper());
 
         if (!FileUtils.hasDBFileInPhone()) {
+            // install apps case
             sendNonUIHandlerMsg(COPY_DB_TO_PHONE, 500);
         } else {
+            // launch apps case
             dbManagerment = new DBManagerment(MainActivity.this);
-//            try
-//            {
-//                if (canShowUpdate()) {
-//                    sendNonUIHandlerMsg(CHECK_UPDATE_COUNT, 500);
-//                }
-//            } catch (ParseException e)
-//            {
-//                Log.i(TAG, e.getMessage());
-//            }
         }
-
         Log.d(TAG, "[onCreate] + End");
     }
 
@@ -197,15 +194,17 @@ public class MainActivity extends FragmentActivity implements
         // TODO Auto-generated method stub
         super.onResume();
         mTabHost.setOnTabChangedListener(this);
-        try
-	      {
-	          if (canShowUpdate()) {
-	              sendNonUIHandlerMsg(CHECK_UPDATE_COUNT, 500);
-	          }
-	      } catch (ParseException e)
-	      {
-	          Log.i(TAG, e.getMessage());
-	      }
+        boolean netWorkAvailable = Utils.hasNetwork(MainActivity.this);
+        if (netWorkAvailable) {
+            try {
+                if (needCheckUpdate()) {
+                    sendNonUIHandlerMsg(CHECK_UPDATE_COUNT, 500);
+                }
+            } catch (ParseException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
         Log.d(TAG, "[onResume] + End");
     }
 
@@ -427,15 +426,14 @@ public class MainActivity extends FragmentActivity implements
                         }
                     }
                     break;
-                case UPDATE_TIME_STAMP:
-                    Log.d(TAG, "[NonUihandler][handleMessage] - UPDATE_TIME_STAMP");
-                    updateTimeStamp();
-                    updateCancelTimeStamp();
+                case UPDATE_TIME_UPDATE:
+                    Log.d(TAG, "[NonUihandler][handleMessage] - UPDATE_TIME_UPDATE");
+                    updateTimeUpdate();
+                    // updateCancelTimeStamp();
                     break;
-                case UPDATE_CANCEL_TIME:
-                    Log.d(TAG, "[NonUihandler][handleMessage] - UPDATE_CANCEL_TIME");
-                    sendUIHandlerMsg(HIDE_NUMBER_OF_UPDATES, 0);
-                    updateCancelTimeStamp();
+                case UPDATE_TIME_CHECK:
+                    Log.d(TAG, "[NonUihandler][handleMessage] - UPDATE_TIME_CHECK");
+                    updateTimeCheck();
                     break;
                 default:
                     Log.e(TAG, "[NonUihandler][handleMessage] Something wrong in handleMessage()");
@@ -447,20 +445,28 @@ public class MainActivity extends FragmentActivity implements
                 IOException, ParseException {
             Log.d(TAG, "[copyDB2Phone] + Begin");
             dbManagerment = new DBManagerment(MainActivity.this);
-            sendNonUIHandlerMsg(CHECK_UPDATE_COUNT, 500);
+            // sendNonUIHandlerMsg(CHECK_UPDATE_COUNT, 500);
             Log.d(TAG, "[copyDB2Phone] + End");
         }
 
-        private void updateTimeStamp() {
+        private void updateTimeUpdate() {
             if (null != dbManagerment) {
                 dbManagerment.updateUpdateTime();
             }
         }
 
-        private void updateCancelTimeStamp() {
-            if (null != dbManagerment) {
-                dbManagerment.updateCancelUpdateTime();
-            }
+        private void updateTimeCheck() {
+            Log.d(TAG, "[updateTimeCheck] + Begin");
+            SharedPreferences.Editor editor = MainActivity.this
+                    .getPreferences(Context.MODE_PRIVATE)
+                    .edit();
+            DateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
+            Date now = new Date();
+            String nowTime = format.format(now);
+            editor.putString(PREFERENCE_CHECK_TIME, nowTime);
+            editor.apply();
+            Log.i(TAG, "[updateTimeCheck] update check time = " + nowTime);
+            Log.d(TAG, "[updateTimeCheck] + End");
         }
 
         private void checkForUpdate() throws InvalidKeyException, ClientProtocolException,
@@ -525,6 +531,9 @@ public class MainActivity extends FragmentActivity implements
                     if (mCheckUpdateDialog != null) {
                         mCheckUpdateDialog.dismiss();
                     }
+
+                    sendNonUIHandlerMsg(UPDATE_TIME_CHECK, 500);
+
                     if (mMax_Progress > 0) {
                         sendUIHandlerMsg(SHOW_NUMBER_OF_UPDATES, 0);
                     } else {
@@ -560,7 +569,7 @@ public class MainActivity extends FragmentActivity implements
                     if (mProgressDialog != null) {
                         mProgressDialog.dismiss();
                     }
-                    sendNonUIHandlerMsg(UPDATE_TIME_STAMP, 0);
+                    sendNonUIHandlerMsg(UPDATE_TIME_UPDATE, 0);
                     break;
                 }
                 case UPDATE_DOWNLOAD_PROCESS: {
@@ -582,7 +591,11 @@ public class MainActivity extends FragmentActivity implements
     };
 
     private static void sendNonUIHandlerMsg(int msgCode, int delayTime) {
-    	if(mNonUiHandler == null) return;
+        if (mNonUiHandler == null) {
+            Log.e(TAG, "[sendNonUIHandlerMsg] mNonUiHandler is NULL!!!");
+            return;
+        }
+
         if (mNonUiHandler.hasMessages(msgCode)) {
             mNonUiHandler.removeMessages(msgCode);
         }
@@ -606,22 +619,45 @@ public class MainActivity extends FragmentActivity implements
         sendNonUIHandlerMsg(UPDATE_DATA_TO_DB, 0);
     }
 
-    public static void updateCancelTime() {
-        sendNonUIHandlerMsg(UPDATE_CANCEL_TIME, 0);
-    }
+    // public static void updateCancelTime() {
+    // sendNonUIHandlerMsg(UPDATE_CANCEL_TIME, 0);
+    // }
 
-    private boolean canShowUpdate() throws ParseException {
-    	if(dbManagerment == null) return false;
-        String cancelTime = dbManagerment.getLastCancelUpdateTime();
-        if (cancelTime == null || cancelTime.length() <= 0)
+    private boolean needCheckUpdate() throws ParseException {
+        Log.d(TAG, "[needCheckUpdate] + Begin");
+        SharedPreferences prefs = MainActivity.this.getPreferences(Context.MODE_PRIVATE);
+        String restoredTime = prefs.getString(PREFERENCE_CHECK_TIME, null);
+        if (restoredTime == null || restoredTime.length() <= 0) {
+            Log.i(TAG, "[needCheckUpdate] get time is null, is install case: need update");
             return true;
+        }
+        Log.i(TAG, "[needCheckUpdate] get last check time =" + restoredTime);
         Date now = new Date();
-        DateFormat cancelFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-        Date cancelDateTime = cancelFormat.parse(cancelTime);
-        long diff = now.getTime() - cancelDateTime.getTime();
+        DateFormat updateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        Date checkDateTime = updateFormat.parse(restoredTime);
+        long diff = now.getTime() - checkDateTime.getTime();
         long day = diff / (1000 * 60 * 60 * 24);
-        if (day >= 1)
+        if (day >= 1) {
+            Log.i(TAG, "[needCheckUpdate] over one day, need check again");
             return true;
+        }
+        Log.d(TAG, "[needCheckUpdate] below one day,no need check");
         return false;
     }
+
+    // private boolean canShowUpdate() throws ParseException {
+    // if (dbManagerment == null)
+    // return false;
+    // String cancelTime = dbManagerment.getLastCancelUpdateTime();
+    // if (cancelTime == null || cancelTime.length() <= 0)
+    // return true;
+    // Date now = new Date();
+    // DateFormat cancelFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+    // Date cancelDateTime = cancelFormat.parse(cancelTime);
+    // long diff = now.getTime() - cancelDateTime.getTime();
+    // long day = diff / (1000 * 60 * 60 * 24);
+    // if (day >= 1)
+    // return true;
+    // return false;
+    // }
 }

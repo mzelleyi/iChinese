@@ -101,7 +101,7 @@ public class RestService {
         if (finalResult == null || finalResult.length() <= 0)
             return null;
         JSONArray resultArray = new JSONArray(finalResult);
-        Log.i(TAG, "GetDictionary Result: " + finalResult);
+        Log.i(TAG, "Scenariao Result: " + finalResult);
         long end = System.currentTimeMillis();
         Log.i(TAG, "Scenariao time speed: " + (end - start) / 1000);
         HashMap<ContentValues, HashMap<ContentValues, List<ContentValues>>> scenariaoDialogKeyWords = OperationUtils

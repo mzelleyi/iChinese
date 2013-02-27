@@ -173,7 +173,7 @@ public class IhuayuOperationImpl {
                     ContentValues dialogValues = dialogKeyIter.next();
                     // insertTable("Dialog", dialogValues);
                     if ("true".equalsIgnoreCase(dialogValues.getAsString("deleted"))) {
-                        deleteDialog(contentValues.getAsString("Dialog_ID"));
+                        deleteDialog(dialogValues.getAsString("Dialog_ID"));
                     } else {
                         updateAndInsertScenario(dialogValues, "Dialog", "Dialog_ID");
                     }

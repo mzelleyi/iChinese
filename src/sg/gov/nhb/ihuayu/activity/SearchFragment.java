@@ -84,6 +84,7 @@ public class SearchFragment extends Fragment {
     private EditText mEditText = null;
     private Button mBtnLanguage = null;
     private ImageView mPromptImg = null;
+    private ImageView mClearImg = null;
     private LinearLayout mFuzzyHintLayout = null;
     private TextView mFuzzySuggestHint = null;
     private TextView mEmptySuggestHint = null;
@@ -151,19 +152,38 @@ public class SearchFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 // TODO Auto-generated method stub
+                String text = mEditText.getText().toString().trim();
                 if (mSearchKeyType == QueryType.EN) {
                     mBtnLanguage.setBackgroundResource(R.drawable.btn_chinese);
                     mSearchKeyType = QueryType.CN;
+                    if (text != null && text.length() > 0) {
+                        sendSuggentSearchMsg(text, DELAY_REFRESH_LIST_VIEW);
+                        mClearImg.setVisibility(View.VISIBLE);
+                        mPromptImg.setVisibility(View.GONE);
+                        mListView.setVisibility(View.VISIBLE);
+                        bFuzzyMode = false;
+                    }
                 } else {
                     mBtnLanguage.setBackgroundResource(R.drawable.btn_english);
                     mSearchKeyType = QueryType.EN;
+                    if (text != null && text.length() > 2) {
+                        sendSuggentSearchMsg(text, DELAY_REFRESH_LIST_VIEW);
+                        mPromptImg.setVisibility(View.GONE);
+                        bFuzzyMode = false;
+                    } else {
+                        // mAdapter.clear();
+                        // mAdapter.notifyDataSetChanged();
+                        mListView.setVisibility(View.GONE);
+                        mPromptImg.setVisibility(View.VISIBLE);
+                    }
+                    mClearImg.setVisibility(View.VISIBLE);
                 }
             }
         });
 
         mPromptImg = (ImageView) parentActivity
                 .findViewById(R.id.search_fragment_prompt_image);
-        final ImageView mClearImg = (ImageView) parentActivity
+        mClearImg = (ImageView) parentActivity
                 .findViewById(R.id.search_bar_edit_clear);
         mFuzzyHintLayout = (LinearLayout) parentActivity
                 .findViewById(R.id.search_fuzzy_hint_layout);
@@ -258,6 +278,7 @@ public class SearchFragment extends Fragment {
                     bFuzzyMode = false;
                     mClearImg.setVisibility(View.GONE);
                     mPromptImg.setVisibility(View.VISIBLE);
+                    mListView.setVisibility(View.GONE);
                 } else {
                     if (start - before != 0) {
                         Log.i(TAG, "[onTextChanged] set fuzzyMode = false");
@@ -272,12 +293,14 @@ public class SearchFragment extends Fragment {
                             if (text.length() > 2) {
                                 sendSuggentSearchMsg(text, DELAY_REFRESH_LIST_VIEW);
                                 mPromptImg.setVisibility(View.GONE);
+                                mListView.setVisibility(View.VISIBLE);
                             }
                             mClearImg.setVisibility(View.VISIBLE);
                         } else {
                             sendSuggentSearchMsg(text, DELAY_REFRESH_LIST_VIEW);
                             mClearImg.setVisibility(View.VISIBLE);
                             mPromptImg.setVisibility(View.GONE);
+                            mListView.setVisibility(View.VISIBLE);
                         }
                         bFuzzyMode = false;
                     }
@@ -473,6 +496,7 @@ public class SearchFragment extends Fragment {
 
                     // if (sceListSize > 0 || dicListSize > 0) {
                     mPromptImg.setVisibility(View.GONE);
+                    mListView.setVisibility(View.VISIBLE);
                     // } else {
                     // mPromptImg.setVisibility(View.VISIBLE);
                     // }

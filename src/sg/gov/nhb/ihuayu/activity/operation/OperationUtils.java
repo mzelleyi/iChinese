@@ -125,7 +125,7 @@ public class OperationUtils {
             } else if ("Title_ID".equalsIgnoreCase(name)) {
                 dialog.setTitle_id(cursor.getString(cursor.getColumnIndex(name)));
             } else if ("Sentence_Sequence_ID".equalsIgnoreCase(name)) {
-                dialog.setSentence_sequence_id(cursor.getString(cursor.getColumnIndex(name)));
+                dialog.setSentence_sequence_id(cursor.getInt(cursor.getColumnIndex(name)));
             } else if ("Gender".equalsIgnoreCase(name)) {
                 dialog.setGender(cursor.getString(cursor.getColumnIndex(name)));
             } else if ("Narrator".equalsIgnoreCase(name)) {
@@ -266,7 +266,7 @@ public class OperationUtils {
                 } else if ("Title_ID".equalsIgnoreCase(name)) {
                     dialogValue.put("Title_ID", object.getString(name));
                 } else if ("seq".equalsIgnoreCase(name)) {
-                    dialogValue.put("Sentence_Sequence_ID", object.getString(name));
+                    dialogValue.put("Sentence_Sequence_ID", object.getInt(name));
                 } else if ("gender".equalsIgnoreCase(name)) {
                     dialogValue.put("Gender", object.getString(name));
                 } else if ("narrator".equalsIgnoreCase(name)) {

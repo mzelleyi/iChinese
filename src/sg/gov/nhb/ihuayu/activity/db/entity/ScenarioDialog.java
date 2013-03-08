@@ -10,7 +10,7 @@ package sg.gov.nhb.ihuayu.activity.db.entity;
 public class ScenarioDialog {
     private String id;
     private String title_id;
-    private String sentence_sequence_id;
+    private int sentence_sequence_id;
     private String gender;
     private String narrator;
     private String sentence;
@@ -34,11 +34,11 @@ public class ScenarioDialog {
         this.title_id = title_id;
     }
 
-    public String getSentence_sequence_id() {
+    public int getSentence_sequence_id() {
         return sentence_sequence_id;
     }
 
-    public void setSentence_sequence_id(String sentence_sequence_id) {
+    public void setSentence_sequence_id(int sentence_sequence_id) {
         this.sentence_sequence_id = sentence_sequence_id;
     }
 

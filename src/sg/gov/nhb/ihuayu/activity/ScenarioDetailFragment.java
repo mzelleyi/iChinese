@@ -534,13 +534,13 @@ public class ScenarioDetailFragment extends Fragment {
         // //return super.getItemViewType(position);
         // }
 
-        @Override
-        public int getViewTypeCount() {
-            Log.d(TAG, "[getViewTypeCount], return 2");
-            // TODO Auto-generated method stub
-            return 2;
-            // return super.getViewTypeCount();
-        }
+        // @Override
+        // public int getViewTypeCount() {
+        // Log.d(TAG, "[getViewTypeCount], return 2");
+        // // TODO Auto-generated method stub
+        // return 2;
+        // // return super.getViewTypeCount();
+        // }
 
         /**
          * Populate new items in the list.
@@ -561,17 +561,17 @@ public class ScenarioDetailFragment extends Fragment {
             // String dialogAudio = null;
             SpannableString spanStr = null;
 
-            if (convertView == null) {
-                if (dialogItem.getGender().equalsIgnoreCase("f")) {
-                    Log.d(TAG, "[ScenarioDialogAdapter][getView] new female item");
-                    convertView = mInflater.inflate(R.layout.scenario_detail_listitem_female,
-                            parent, false);
-                } else {
-                    Log.d(TAG, "[ScenarioDialogAdapter][getView] new male item");
-                    convertView = mInflater.inflate(R.layout.scenario_detail_listitem_male, parent,
-                            false);
-                }
+            // if (convertView == null) {
+            if (dialogItem.getGender().equalsIgnoreCase("f")) {
+                Log.d(TAG, "[ScenarioDialogAdapter][getView] new female item");
+                convertView = mInflater.inflate(R.layout.scenario_detail_listitem_female,
+                        parent, false);
+            } else {
+                Log.d(TAG, "[ScenarioDialogAdapter][getView] new male item");
+                convertView = mInflater.inflate(R.layout.scenario_detail_listitem_male, parent,
+                        false);
             }
+            // }
 
             if (convertView != null) {
                 if (dialogItem != null) {

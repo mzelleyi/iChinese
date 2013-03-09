@@ -51,7 +51,7 @@ public class DBManagerment {
     public List<HashMap<ScenarioDialog, List<DialogKeywords>>> getDialogList(String titleId) {
         List<HashMap<ScenarioDialog, List<DialogKeywords>>> dialogKeywordList = new ArrayList<HashMap<ScenarioDialog, List<DialogKeywords>>>();
         List<ScenarioDialog> dialogList = operation.queryDialog(
-                "select * from Dialog where title_id = ? order by Sentence_Sequence_ID ASC", new String[] {
+                "select * from Dialog where title_id = ? order by cast(Sentence_Sequence_ID as interger) ASC", new String[] {
                     titleId
                 });
         for (ScenarioDialog dialog : dialogList) {

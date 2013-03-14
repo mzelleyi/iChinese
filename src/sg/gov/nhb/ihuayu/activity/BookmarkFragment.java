@@ -202,6 +202,8 @@ public class BookmarkFragment extends Fragment {
                             Toast.LENGTH_SHORT);
                     toast.setGravity(Gravity.CENTER, 0, 0);
                     toast.show();
+                    //Fix Issue
+                    TAB_BOOKMARK_DATA_CHANGED = true;
                     break;
                 }
                 case INDICATE_HIDE: {

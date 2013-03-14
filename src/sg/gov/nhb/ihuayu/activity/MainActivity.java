@@ -354,18 +354,31 @@ public class MainActivity extends FragmentActivity implements
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
             ft.commit();
         } else {
-            if (BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED && TAB_BOOKMARK.equals(tabTag)) {
-                Fragment fragment = fm.findFragmentByTag(MainActivity.fragment_tag_bookmark_detail);
-                if (fragment != null) {
-                    Log.i(TAG, "[updateTab] BookmarkFragment show detail view");
-                    mTabHost.setCurrentTabByTag(tabTag);
-                } else {
-                    BookmarkFragment.removeIndicateWindow();
-                    Log.i(TAG, "[updateTab] BookmarkFragment do restartLoader");
-                    BookmarkFragment mBookmarkFragment = (BookmarkFragment) newFragment;
-                    mBookmarkFragment.getLoaderManager().restartLoader(0, null,
-                            mBookmarkFragment.mBookmarkListFragment);
-                    BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED = false;
+            if (BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED) {
+                if (TAB_BOOKMARK.equals(tabTag)) {
+                    Fragment fragment = fm.findFragmentByTag(MainActivity.fragment_tag_bookmark_detail);
+                    if (fragment != null) {
+                        Log.i(TAG, "[updateTab] BookmarkFragment show detail view");
+                        mTabHost.setCurrentTabByTag(tabTag);
+                    } else {
+                        BookmarkFragment.removeIndicateWindow();
+                        Log.i(TAG, "[updateTab] BookmarkFragment do restartLoader");
+                        BookmarkFragment mBookmarkFragment = (BookmarkFragment) newFragment;
+                        mBookmarkFragment.getLoaderManager().restartLoader(0, null,
+                                mBookmarkFragment.mBookmarkListFragment);
+                        BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED = false;
+                    }
+                } else if (TAB_SEARCH.equals(tabTag)) {
+                    Fragment fragment = fm.findFragmentByTag(MainActivity.fragment_tag_search_detail);
+                    if (fragment == null) {
+                        mTabHost.setCurrentTabByTag(tabTag);
+                    } else {
+                        Log.i(TAG, "[updateTab] fragment_search_detail do restartLoader");
+                        SearchDetailFragment mSearchDetailFragment = (SearchDetailFragment) fragment;
+                        mSearchDetailFragment.getLoaderManager().restartLoader(0, null,
+                                mSearchDetailFragment);
+                        BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED = false;
+                    }
                 }
             } else {
                 Log.i(TAG, "[updateTab] find fragment != null, do setCurrentTabByTag");

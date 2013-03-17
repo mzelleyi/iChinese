@@ -16,6 +16,7 @@ import sg.gov.nhb.ihuayu.activity.db.DBSqlite;
 import sg.gov.nhb.ihuayu.activity.db.entity.DialogKeywords;
 import sg.gov.nhb.ihuayu.activity.db.entity.Dictionary;
 import sg.gov.nhb.ihuayu.activity.db.entity.FuzzyResult;
+import sg.gov.nhb.ihuayu.activity.db.entity.QueryType;
 import sg.gov.nhb.ihuayu.activity.db.entity.Scenario;
 import sg.gov.nhb.ihuayu.activity.db.entity.ScenarioDialog;
 import sg.gov.nhb.ihuayu.activity.rest.AudioPlayer;
@@ -324,10 +325,18 @@ public class IhuayuOperationImpl {
         }
 
         // Select from Scenario
-        List<Scenario> scenarioList = queryScenario(
+        List<Scenario> scenarioList = null;
+        if(QueryType.EN.getName().equals(language_dir)) {
+        	scenarioList = queryScenario(
                 "SELECT * FROM Scenario_Category WHERE Title_EN LIKE ? ", new String[] {
                     "%" + keyword + "%"
                 });
+        }else {
+        	scenarioList = queryScenario(
+                    "SELECT * FROM Scenario_Category WHERE Title_CN LIKE ? ", new String[] {
+                        "%" + keyword + "%"
+                    });
+        }
         result.setScenarioList(scenarioList);
         return result;
     }

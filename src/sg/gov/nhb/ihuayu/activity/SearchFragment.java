@@ -193,7 +193,6 @@ public class SearchFragment extends Fragment {
         mFuzzySuggestHint = (TextView) parentActivity
                 .findViewById(R.id.search_fuzzy_hint_text_suggest);
         mFuzzySuggestHint.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View v) {
                 // TODO Auto-generated method stub
@@ -211,7 +210,12 @@ public class SearchFragment extends Fragment {
             public void onClick(View v) {
                 // TODO Auto-generated method stub
                 if (null != mEditText) {
-                    Utils.sendMailToFeedback(parentActivity, mEditText.getText().toString());
+                    Editable editable = mEditText.getText();
+                    String feedbackStr = "";
+                    if (editable != null) {
+                        feedbackStr = editable.toString();
+                    }
+                    Utils.sendMailToFeedback(parentActivity, feedbackStr);
                 }
             }
         });

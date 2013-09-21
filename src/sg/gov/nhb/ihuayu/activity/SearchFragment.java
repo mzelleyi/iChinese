@@ -615,16 +615,18 @@ public class SearchFragment extends Fragment {
         private void doSuggestSearch(String searchStr) {
             Log.d(TAG, "[NonUihandler][doSuggestSearch] + Begin");
             Log.d(TAG, "[NonUihandler][doSuggestSearch] keyStr = " + searchStr);
-            List<Dictionary> dicList = MainActivity.dbManagerment.searchDictionary(mSearchKeyType,
-                    searchStr);
-            Log.d(TAG, "[NonUihandler][doSuggestSearch] dicList.size = " + dicList.size());
-            if (mUiHandler != null) {
-                if (mUiHandler.hasMessages(MSG_REFRESH_SUGGEST_LISTVIEW)) {
-                    mUiHandler.removeMessages(MSG_REFRESH_SUGGEST_LISTVIEW);
+            if (MainActivity.dbManagerment != null) {
+                List<Dictionary> dicList = MainActivity.dbManagerment.searchDictionary(mSearchKeyType,
+                        searchStr);
+                Log.d(TAG, "[NonUihandler][doSuggestSearch] dicList.size = " + dicList.size());
+                if (mUiHandler != null) {
+                    if (mUiHandler.hasMessages(MSG_REFRESH_SUGGEST_LISTVIEW)) {
+                        mUiHandler.removeMessages(MSG_REFRESH_SUGGEST_LISTVIEW);
+                    }
+                    Message msg1 = mUiHandler.obtainMessage(MSG_REFRESH_SUGGEST_LISTVIEW);
+                    msg1.obj = dicList;
+                    mUiHandler.sendMessage(msg1);
                 }
-                Message msg1 = mUiHandler.obtainMessage(MSG_REFRESH_SUGGEST_LISTVIEW);
-                msg1.obj = dicList;
-                mUiHandler.sendMessage(msg1);
             }
             Log.d(TAG, "[NonUihandler][doSuggestSearch] + End");
         }
@@ -632,20 +634,21 @@ public class SearchFragment extends Fragment {
         private void doFuzzySearch(String searchStr) {
             Log.d(TAG, "[NonUihandler][doFuzzySearch] + Begin");
             Log.d(TAG, "[NonUihandler][doFuzzySearch] searchStr = " + searchStr);
-
-            FuzzyResult fuzzyResult = MainActivity.dbManagerment.fuzzySearchDictionary(
-                    mSearchKeyType,
-                    searchStr);
-            Log.d(TAG,
-                    "[NonUihandler][doFuzzySearch] result is extact result = "
-                            + fuzzyResult.isExactResult());
-            if (mUiHandler != null) {
-                if (mUiHandler.hasMessages(MSG_REFRESH_FUZZY_RESULT)) {
-                    mUiHandler.removeMessages(MSG_REFRESH_FUZZY_RESULT);
+            if (MainActivity.dbManagerment != null) {
+                FuzzyResult fuzzyResult = MainActivity.dbManagerment.fuzzySearchDictionary(
+                        mSearchKeyType,
+                        searchStr);
+                Log.d(TAG,
+                        "[NonUihandler][doFuzzySearch] result is extact result = "
+                                + fuzzyResult.isExactResult());
+                if (mUiHandler != null) {
+                    if (mUiHandler.hasMessages(MSG_REFRESH_FUZZY_RESULT)) {
+                        mUiHandler.removeMessages(MSG_REFRESH_FUZZY_RESULT);
+                    }
+                    Message msg2 = mUiHandler.obtainMessage(MSG_REFRESH_FUZZY_RESULT);
+                    msg2.obj = fuzzyResult;
+                    mUiHandler.sendMessage(msg2);
                 }
-                Message msg2 = mUiHandler.obtainMessage(MSG_REFRESH_FUZZY_RESULT);
-                msg2.obj = fuzzyResult;
-                mUiHandler.sendMessage(msg2);
             }
             Log.d(TAG, "[NonUihandler][doFuzzySearch] + End");
         }

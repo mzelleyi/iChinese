@@ -542,7 +542,7 @@ public class MainActivity extends FragmentActivity implements
                 case HIDE_CHECKING_DIALOG: {
                     Log.d(TAG, "[mUihandler handleMessage] HIDE_CHECKING_DIALOG");
                     if (mCheckUpdateDialog != null) {
-                        mCheckUpdateDialog.dismiss();
+                        mCheckUpdateDialog.dismissAllowingStateLoss();
                     }
 
                     sendNonUIHandlerMsg(UPDATE_TIME_CHECK, 500);
@@ -565,7 +565,7 @@ public class MainActivity extends FragmentActivity implements
                 case HIDE_NUMBER_OF_UPDATES: {
                     Log.d(TAG, "[mUihandler handleMessage] HIDE_NUMBER_OF_UPDATES");
                     if (mUpdateCountDialog != null) {
-                        mUpdateCountDialog.dismiss();
+                        mUpdateCountDialog.dismissAllowingStateLoss();
                     }
                     break;
                 }

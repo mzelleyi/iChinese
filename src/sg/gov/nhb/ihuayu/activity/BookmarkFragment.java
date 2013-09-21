@@ -227,7 +227,7 @@ public class BookmarkFragment extends Fragment {
                 case HIDE_DOWNLOAD_DIALOG: {
                     Log.d(TAG, "[mUihandler handleMessage] HIDE_DOWNLOAD_DIALOG");
                     if (downloadDialog != null) {
-                        downloadDialog.dismiss();
+                        downloadDialog.dismissAllowingStateLoss();
                     }
                     break;
                 }

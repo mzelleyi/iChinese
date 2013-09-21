@@ -453,7 +453,7 @@ public class BookmarkDetailFragment extends Fragment implements
                 case HIDE_DOWNLOAD_DIALOG: {
                     Log.d(TAG, "[mUihandler handleMessage] HIDE_DOWNLOAD_DIALOG");
                     if (downloadDialog != null) {
-                        downloadDialog.dismiss();
+                        downloadDialog.dismissAllowingStateLoss();
                     }
                     break;
                 }
@@ -664,7 +664,7 @@ public class BookmarkDetailFragment extends Fragment implements
             case MyDialogFragment.REMOVE_RESULT:
             case MyDialogFragment.ADD_RESULT:
                 Log.d(TAG, "[doPositiveClick] - REMOVE_RESULT or ADD_RESULT");
-                mCurrentDialog.dismiss();
+                mCurrentDialog.dismissAllowingStateLoss();
                 break;
             default:
                 Log.d(TAG, "[doPositiveClick] Something wrong in handleMessage()");

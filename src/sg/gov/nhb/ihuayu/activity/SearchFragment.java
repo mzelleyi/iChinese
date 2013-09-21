@@ -482,7 +482,7 @@ public class SearchFragment extends Fragment {
                 }
                 case SearchFragment.MSG_REFRESH_FUZZY_RESULT: {
                     Log.d(TAG, "[mUihandler][MSG_REFRESH_FUZZY_RESULT]");
-                    searchDialog.dismiss();
+                    searchDialog.dismissAllowingStateLoss();
 
                     FuzzyResult fuzzyResult = (FuzzyResult) msg.obj;
                     List<Dictionary> dicList = fuzzyResult.getDictionaryList();
@@ -561,7 +561,7 @@ public class SearchFragment extends Fragment {
                 case HIDE_DOWNLOAD_DIALOG: {
                     Log.d(TAG, "[mUihandler handleMessage] HIDE_DOWNLOAD_DIALOG");
                     if (downloadDialog != null) {
-                        downloadDialog.dismiss();
+                        downloadDialog.dismissAllowingStateLoss();
                     }
                     break;
                 }

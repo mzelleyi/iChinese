@@ -77,7 +77,7 @@ public class InfoFragment extends Fragment {
                 FragmentTransaction ft = fm.beginTransaction();
                 ft.replace(R.id.tab_content_info, newFragment, MainActivity.fragment_tag_help);
                 ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                ft.commit();
+                ft.commitAllowingStateLoss();
             }
         });
         Log.d(TAG, "[onViewCreated] + End");

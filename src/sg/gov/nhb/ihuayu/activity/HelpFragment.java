@@ -80,7 +80,7 @@ public class HelpFragment extends Fragment {
                     FragmentTransaction ft = fm.beginTransaction();
                     ft.replace(R.id.tab_content_info, newFragment, MainActivity.fragment_tag_info);
                     ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-                    ft.commit();
+                    ft.commitAllowingStateLoss();
                 }
             }
         });

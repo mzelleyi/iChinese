@@ -192,7 +192,7 @@ public class BookmarkDetailFragment extends Fragment implements
                     ft.replace(R.id.tab_content_bookmark, newFragment,
                             MainActivity.fragment_tag_bookmark);
                     ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-                    ft.commit();
+                    ft.commitAllowingStateLoss();
                 }
             }
         });

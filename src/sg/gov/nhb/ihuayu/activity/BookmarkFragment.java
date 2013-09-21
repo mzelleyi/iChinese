@@ -152,14 +152,14 @@ public class BookmarkFragment extends Fragment {
             ft.add(R.id.fragment_bookmark_listview, mBookmarkListFragment);
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
             // ft.addToBackStack(null);
-            ft.commit();
+            ft.commitAllowingStateLoss();
         } else {
             Log.d(TAG, "[onViewCreated] used BookmarkListFragment, do replace");
             mBookmarkListFragment = new BookmarkListFragment();
             ft.replace(R.id.fragment_bookmark_listview, mBookmarkListFragment);
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
             // ft.addToBackStack(null);
-            ft.commit();
+            ft.commitAllowingStateLoss();
         }
     }
 
@@ -483,7 +483,7 @@ public class BookmarkFragment extends Fragment {
                             MainActivity.fragment_tag_bookmark_detail);
                     ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
                     // ft.addToBackStack(null);
-                    ft.commit();
+                    ft.commitAllowingStateLoss();
                 } else {
                     Log.w(TAG, "[BookmarkListFragment][onItemClick] Item Type is Divider,do return");
                 }

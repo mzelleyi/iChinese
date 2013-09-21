@@ -150,14 +150,14 @@ public class ScenarioDetailFragment extends Fragment {
             ft.add(R.id.scenario_detail_dialog_listview, list);
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
             // ft.addToBackStack(null);
-            ft.commit();
+            ft.commitAllowingStateLoss();
         } else {
             list = new ScenarioDialogFragment();
             Log.d(TAG, "[onViewCreated] used ScenarioDialogFragment, do replace");
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
             ft.replace(R.id.scenario_detail_dialog_listview, list);
             // ft.addToBackStack(null);
-            ft.commit();
+            ft.commitAllowingStateLoss();
         }
         Log.d(TAG, "[onViewCreated] + End");
     }

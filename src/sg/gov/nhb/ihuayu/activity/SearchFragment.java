@@ -236,7 +236,7 @@ public class SearchFragment extends Fragment {
                         MainActivity.fragment_tag_search_detail);
                 ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
                 ft.addToBackStack(null);
-                ft.commit();
+                ft.commitAllowingStateLoss();
             }
         });
 
@@ -259,7 +259,7 @@ public class SearchFragment extends Fragment {
                 ft.replace(R.id.tab_content_search, newFragment);
                 ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
                 ft.addToBackStack(null);
-                ft.commit();
+                ft.commitAllowingStateLoss();
             }
         });
 
@@ -844,7 +844,7 @@ public class SearchFragment extends Fragment {
                         ft.replace(R.id.tab_content_search, newFragment);
                         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
                         ft.addToBackStack(null);
-                        ft.commit();
+                        ft.commitAllowingStateLoss();
                     }
                 });
             }

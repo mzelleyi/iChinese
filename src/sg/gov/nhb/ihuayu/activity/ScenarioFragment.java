@@ -82,14 +82,14 @@ public class ScenarioFragment extends Fragment {
             ft.add(R.id.fragment_scenario_listview, list);
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
             // ft.addToBackStack(null);
-            ft.commit();
+            ft.commitAllowingStateLoss();
         } else {
             Log.d(TAG, "[onViewCreated] used ScenarioListFragment, do replace");
             list = new ScenarioListFragment();
             ft.replace(R.id.fragment_scenario_listview, list);
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
             // ft.addToBackStack(null);
-            ft.commit();
+            ft.commitAllowingStateLoss();
         }
     }
 
@@ -149,7 +149,7 @@ public class ScenarioFragment extends Fragment {
                     MainActivity.fragment_tag_scenario_detail);
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
             ft.addToBackStack(null);
-            ft.commit();
+            ft.commitAllowingStateLoss();
         }
 
         public Loader<List<Scenario>> onCreateLoader(int id, Bundle args) {
@@ -410,7 +410,7 @@ public class ScenarioFragment extends Fragment {
                         ft.replace(R.id.tab_content_scenario, newFragment);
                         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
                         ft.addToBackStack(null);
-                        ft.commit();
+                        ft.commitAllowingStateLoss();
                     }
                 });
             }

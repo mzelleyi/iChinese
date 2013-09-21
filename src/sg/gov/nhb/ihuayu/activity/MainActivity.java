@@ -19,6 +19,7 @@ import sg.gov.nhb.ihuayu.activity.operation.DBManagerment;
 import sg.gov.nhb.ihuayu.activity.rest.FileUtils;
 import sg.gov.nhb.ihuayu.activity.rest.RestService;
 import sg.gov.nhb.ihuayu.view.MyDialogFragment;
+
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -111,47 +112,18 @@ public class MainActivity extends FragmentActivity implements
         mInflater = this.getLayoutInflater();
 
         mTabHost = (TabHost) findViewById(android.R.id.tabhost);
-        mTabHost.setup();
+        if (mTabHost != null) {
+            mTabHost.setup();
 
-        setupTab(TAB_SEARCH);
-        setupTab(TAB_SCENARIO);
-        setupTab(TAB_BOOKMARK);
-        setupTab(TAB_INFO);
+            setupTab(TAB_SEARCH);
+            setupTab(TAB_SCENARIO);
+            setupTab(TAB_BOOKMARK);
+            setupTab(TAB_INFO);
+        }
 
-        // mTabHost.getTabWidget().setDividerDrawable(null);
-        // mTabHost.addTab(mTabHost
-        // .newTabSpec(TAB_SEARCH)
-        // .setIndicator(mRes.getString(R.string.tab_bar_search),
-        // mRes.getDrawable(R.drawable.tab_search_selector))
-        // .setContent(R.id.tab_content_search));
-        // mTabHost.addTab(mTabHost
-        // .newTabSpec(TAB_SCENARIO)
-        // .setIndicator(mRes.getString(R.string.tab_bar_scenario),
-        // mRes.getDrawable(R.drawable.tab_scenarios_selector))
-        // .setContent(R.id.tab_content_scenario));
-        // mTabHost.addTab(mTabHost
-        // .newTabSpec(TAB_BOOKMARK)
-        // .setIndicator(mRes.getString(R.string.tab_bar_bookmark),
-        // mRes.getDrawable(R.drawable.tab_bookmark_selector))
-        // .setContent(R.id.tab_content_bookmark));
-        // mTabHost.addTab(mTabHost
-        // .newTabSpec(TAB_INFO)
-        // .setIndicator(mRes.getString(R.string.tab_bar_info),
-        // mRes.getDrawable(R.drawable.tab_help_selector))
-        // .setContent(R.id.tab_content_info));
-        //
-        // for (int i = 0; i < mTabHost.getTabWidget().getChildCount(); i++)
-        // {
-        // View view = mTabHost.getTabWidget().getChildAt(i);
-        // view.setBackgroundResource(R.drawable.tab_bg_selector);
-        //
-        // TextView title = (TextView) view.findViewById(android.R.id.title);
-        // title.setTextSize(mRes.getDimension(R.dimen.tab_bar_textview_size));
-        // title.setTextColor(mRes.getColorStateList(R.color.tab_text_color));
-        // title.invalidate();
-        // }
-
-        mTabHost.setCurrentTabByTag(TAB_SEARCH);
+        if (mTabHost != null) {
+            mTabHost.setCurrentTabByTag(TAB_SEARCH);
+        }
 
         this.updateTab(TAB_SEARCH, R.id.tab_content_search);
 
@@ -193,7 +165,10 @@ public class MainActivity extends FragmentActivity implements
         Log.d(TAG, "[onResume] + Begin");
         // TODO Auto-generated method stub
         super.onResume();
-        mTabHost.setOnTabChangedListener(this);
+        if (mTabHost != null) {
+            mTabHost.setOnTabChangedListener(this);
+        }
+
         boolean netWorkAvailable = Utils.hasNetwork(MainActivity.this);
         if (netWorkAvailable) {
             try {
@@ -245,7 +220,9 @@ public class MainActivity extends FragmentActivity implements
         // Log.d(TAG, "[onBackPressed] stackCount = "+stackCount);
         // TODO Auto-generated method stub
         // super.onBackPressed();
-        dbManagerment.close();
+        if (dbManagerment != null) {
+            dbManagerment.close();
+        }
         this.finish();
     }
 
@@ -307,19 +284,25 @@ public class MainActivity extends FragmentActivity implements
         } else {
             Log.e(TAG, "Error Tab Type");
         }
-        mTabHost.addTab(tabSpec);
+
+        if (mTabHost != null) {
+            mTabHost.addTab(tabSpec);
+        }
     }
 
     private View createTabView(final String text, final Drawable icon) {
-        View view = mInflater.inflate(R.layout.tab_item, null);
-        view.setBackgroundResource(R.drawable.tab_bg_selector);
+        View view = null;
+        if (mInflater != null) {
+            view = mInflater.inflate(R.layout.tab_item, null);
+            view.setBackgroundResource(R.drawable.tab_bg_selector);
 
-        ImageView img = (ImageView) view.findViewById(R.id.tab_item_icon);
-        img.setImageDrawable(icon);
+            ImageView img = (ImageView) view.findViewById(R.id.tab_item_icon);
+            img.setImageDrawable(icon);
 
-        TextView tv = (TextView) view.findViewById(R.id.tab_item_text);
-        tv.setText(text);
-        tv.setTextColor(mRes.getColorStateList(R.color.tab_text_color));
+            TextView tv = (TextView) view.findViewById(R.id.tab_item_text);
+            tv.setText(text);
+            tv.setTextColor(mRes.getColorStateList(R.color.tab_text_color));
+        }
         return view;
     }
 
@@ -352,12 +335,12 @@ public class MainActivity extends FragmentActivity implements
             Log.i(TAG, "[updateTab] find fragment == null, do add fragment:" + fragmentTag);
             ft.add(viewHolderId, newFragment, fragmentTag);
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-            ft.commit();
+            ft.commitAllowingStateLoss();
         } else {
             if (BookmarkFragment.TAB_BOOKMARK_DATA_CHANGED) {
                 if (TAB_BOOKMARK.equals(tabTag)) {
                     Fragment fragment = fm.findFragmentByTag(MainActivity.fragment_tag_bookmark_detail);
-                    if (fragment != null) {
+                    if (fragment != null && mTabHost != null) {
                         Log.i(TAG, "[updateTab] BookmarkFragment show detail view");
                         mTabHost.setCurrentTabByTag(tabTag);
                     } else {
@@ -370,7 +353,7 @@ public class MainActivity extends FragmentActivity implements
                     }
                 } else if (TAB_SEARCH.equals(tabTag)) {
                     Fragment fragment = fm.findFragmentByTag(MainActivity.fragment_tag_search_detail);
-                    if (fragment == null) {
+                    if (fragment == null && mTabHost != null) {
                         mTabHost.setCurrentTabByTag(tabTag);
                     } else {
                         Log.i(TAG, "[updateTab] fragment_search_detail do restartLoader");
@@ -382,7 +365,9 @@ public class MainActivity extends FragmentActivity implements
                 }
             } else {
                 Log.i(TAG, "[updateTab] find fragment != null, do setCurrentTabByTag");
-                mTabHost.setCurrentTabByTag(tabTag);
+                if (mTabHost != null) {
+                    mTabHost.setCurrentTabByTag(tabTag);
+                }
             }
         }
         Log.d(TAG, "[updateTab] + End");
@@ -512,7 +497,9 @@ public class MainActivity extends FragmentActivity implements
                     ContentValues scenraioValues = keyIter.next();
                     HashMap<ContentValues, List<ContentValues>> dialogKeywordsMap = scenarioMap
                             .get(scenraioValues);
-                    dbManagerment.insertScenario(scenraioValues, dialogKeywordsMap);
+                    if (dbManagerment != null) {
+                        dbManagerment.insertScenario(scenraioValues, dialogKeywordsMap);
+                    }
                     // Update record one by one.
                     sendUIHandlerMsg(UPDATE_DOWNLOAD_PROCESS, 0);
                 }

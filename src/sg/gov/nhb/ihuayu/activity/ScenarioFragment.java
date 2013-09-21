@@ -93,7 +93,7 @@ public class ScenarioFragment extends Fragment {
         }
     }
 
-    public class ScenarioListFragment extends ListFragment implements
+    public static class ScenarioListFragment extends ListFragment implements
             LoaderManager.LoaderCallbacks<List<Scenario>> {
 
         // This is the Adapter being used to display the list's data.
@@ -337,7 +337,7 @@ public class ScenarioFragment extends Fragment {
         }
     }
 
-    public class ScenarioListAdapter extends ArrayAdapter<Scenario> {
+    public static class ScenarioListAdapter extends ArrayAdapter<Scenario> {
         private final LayoutInflater mInflater;
 
         public ScenarioListAdapter(Context context) {
@@ -417,40 +417,4 @@ public class ScenarioFragment extends Fragment {
             return convertView;
         }
     }
-
-    // /**
-    // * Perform alphabetical comparison of application entry objects.
-    // */
-    // public static final Comparator<Scenario> ALPHA_COMPARATOR = new
-    // Comparator<Scenario>() {
-    // private final Collator sCollator = Collator.getInstance();
-    // public int compare(Scenario object1, Scenario object2) {
-    // return sCollator.compare(object1.getLabel(), object2.getLabel());
-    // }
-    // };
-
-    // /**
-    // * Helper for determining if the configuration has changed in an
-    // interesting
-    // * way so we need to rebuild the list.
-    // */
-    // public static class InterestingConfigChanges {
-    // final Configuration mLastConfiguration = new Configuration();
-    // int mLastDensity;
-    //
-    // boolean applyNewConfig(Resources res) {
-    // int configChanges =
-    // mLastConfiguration.updateFrom(res.getConfiguration());
-    // boolean densityChanged = mLastDensity !=
-    // res.getDisplayMetrics().densityDpi;
-    // if (densityChanged || (configChanges&(ActivityInfo.CONFIG_LOCALE
-    // |ActivityInfoCompat.CONFIG_UI_MODE|ActivityInfo.CONFIG_SCREEN_LAYOUT)) !=
-    // 0) {
-    // mLastDensity = res.getDisplayMetrics().densityDpi;
-    // return true;
-    // }
-    // return false;
-    // }
-    // }
-
 }

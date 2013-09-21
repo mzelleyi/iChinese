@@ -32,8 +32,10 @@ public class OperationUtils {
 
     public static List<Scenario> cursorToScenario(Cursor cursor) {
         List<Scenario> list = new ArrayList<Scenario>();
-        while (cursor.moveToNext()) {
-            list.add(cursorToOneScenario(cursor));
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                list.add(cursorToOneScenario(cursor));
+            }
         }
         return list;
     }

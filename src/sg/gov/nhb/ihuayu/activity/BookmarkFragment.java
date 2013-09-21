@@ -797,19 +797,12 @@ public class BookmarkFragment extends Fragment {
 
             List<Dictionary> mList = MainActivity.dbManagerment.getAllBookMarks();
 
-            // // Create corresponding array of entries and load their labels.
-            // List<Dictionary> entries = new
-            // ArrayList<Dictionary>(apps.size());
-            // for (int i=0; i<apps.size(); i++) {
-            // Dictionary entry = new Dictionary(this, apps.get(i));
-            // entry.loadLabel(context);
-            // entries.add(entry);
-            // }
+            if (mList != null) {
+                // Sort the list.
+                Collections.sort(mList, ALPHA_COMPARATOR);
+                Log.d(TAG, "[BookmarkListLoader][loadInBackground] List Size =" + mList.size());
+            }
 
-            // Sort the list.
-            Collections.sort(mList, ALPHA_COMPARATOR);
-
-            Log.d(TAG, "[BookmarkListLoader][loadInBackground] List Size =" + mList.size());
             Log.d(TAG, "[BookmarkListLoader][loadInBackground] + End");
             // Done!
             return mList;
